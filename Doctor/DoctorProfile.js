@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import ImagePicker from 'react-native-image-crop-picker';
+import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 
 const specialties = [
   'Cardiology',
@@ -69,9 +71,29 @@ const DoctorProfile = () => {
         setModalVisible(false);
       });
   };
-  const handleSaveProfile = () => {
-    // Implement saving profile logic here
-    console.log('Profile saved!');
+  const handleSaveProfile = async () => {
+    // Upload profile image to Firebase Storage
+    const imageRef = storage().ref().child('profile_images/' + name);
+    await imageRef.putFile(selectedImage);
+    const imageUrl = await imageRef.getDownloadURL();
+  
+    // Save profile data to Firestore
+    await firestore()
+      .collection('users')
+      .add({
+        name,
+        email,
+        password,
+        specialty,
+        experience,
+        imageUrl, // URL of the uploaded profile image
+      })
+      .then(() => {
+        console.log('Profile saved!');
+      })
+      .catch(error => {
+        console.error('Error saving profile: ', error);
+      });
   };
 
   return (
