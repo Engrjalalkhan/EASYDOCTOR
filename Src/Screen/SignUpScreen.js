@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,11 @@ import {
   Alert,
 } from 'react-native';
 import CountryPicker from 'react-native-country-picker-modal';
-import {NavigationContainer} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NavigationContainer } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 
-const SignUpWithMobileScreen = ({navigation}) => {
+const SignUpWithMobileScreen = ({ navigation }) => {
   const [country, setCountry] = useState({
     name: 'United States',
     cca2: 'US',
@@ -24,6 +25,23 @@ const SignUpWithMobileScreen = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isSignedUp, setIsSignedUp] = useState(false); // State to track if the user is signed up
+
+  useEffect(() => {
+    // Check if the user is signed up
+    checkIfSignedUp();
+  }, []);
+
+  const checkIfSignedUp = async () => {
+    try {
+      const value = await AsyncStorage.getItem('isSignedUp');
+      if (value !== null) {
+        setIsSignedUp(true);
+      }
+    } catch (error) {
+      console.error('Error reading from AsyncStorage:', error);
+    }
+  };
 
   const handleSignUp = async () => {
     if (!name || !email || !phone || !password || !confirmPassword) {
@@ -41,6 +59,8 @@ const SignUpWithMobileScreen = ({navigation}) => {
       // Additional logic like sending verification email can be added here
       Alert.alert('Success', 'User registered successfully!');
       navigation.navigate('SignIn'); // Navigate to sign in screen after successful registration
+      // Store signup status
+      await AsyncStorage.setItem('isSignedUp', 'true');
     } catch (error) {
       Alert.alert('Error', error.message);
     }

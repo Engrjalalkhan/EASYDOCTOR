@@ -1,7 +1,19 @@
-import React from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import auth from '@react-native-firebase/auth';
 
-const SelctionScreen = ({navigation}) => {
+const SelctionScreen = ({ navigation }) => {
+  useEffect(() => {
+    checkAuthentication();
+  }, []);
+
+  const checkAuthentication = async () => {
+    const user = auth().currentUser;
+    if (user) {
+      // User is authenticated, navigate to SplashScreen
+      navigation.navigate('Splash');
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.container1}>

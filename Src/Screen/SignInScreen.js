@@ -1,35 +1,40 @@
-import React, { useState } from 'react';
-import {
-    View,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    StyleSheet,
-    ScrollView,
-    Alert
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
+
 const SignInWithMobileScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    
+    useEffect(() => {
+        // Check if the user is already authenticated
+        const unsubscribe = auth().onAuthStateChanged(user => {
+            if (user) {
+                // User is authenticated, navigate to the splash screen
+                navigation.navigate('Splash');
+            }
+        });
+
+        // Cleanup function
+        return () => unsubscribe();
+    }, []);
+
     const handleSignIn = async () => {
         if (!email || !password) {
-          Alert.alert('Error', 'Please enter both email and password.');
-          return; // Exit the function if email or password is empty
+            Alert.alert('Error', 'Please enter both email and password.');
+            return;
         }
-      
+
         try {
-          await auth().signInWithEmailAndPassword(email, password);
-          // User is signed in
-          // You can navigate to another screen or perform any other action here
-          navigation.navigate('Splash'); // Example: Navigate to Home screen after successful sign-in
+            await auth().signInWithEmailAndPassword(email, password);
+            // User is signed in
+            // Navigate to the splash screen
+            navigation.navigate('Splash');
         } catch (error) {
-          Alert.alert('Error', error.message);
+            Alert.alert('Error', error.message);
         }
-      };
+    };
 
     return (
         <View style={styles.container}>
