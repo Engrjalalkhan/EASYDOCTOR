@@ -9,11 +9,13 @@ import {
   Modal,
   StyleSheet,
   TouchableOpacity,
+  Alert
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import ImagePicker from 'react-native-image-crop-picker';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
+import {useNavigation} from '@react-navigation/native'; 
 
 const specialties = [
   'Cardiology',
@@ -30,6 +32,9 @@ const specialties = [
 ];
 
 const DoctorProfile = () => {
+
+  const navigation = useNavigation();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -72,29 +77,39 @@ const DoctorProfile = () => {
       });
   };
   const handleSaveProfile = async () => {
-    // Upload profile image to Firebase Storage
-    const imageRef = storage().ref().child('profile_images/' + name);
-    await imageRef.putFile(selectedImage);
-    const imageUrl = await imageRef.getDownloadURL();
-  
-    // Save profile data to Firestore
-    await firestore()
-      .collection('users')
-      .add({
+    // Validate input fields
+    if (!name || !email || !password || !specialty || !experience || !selectedImage) {
+      Alert.alert('Error', 'Please fill out all fields and select a profile image.');
+      return;
+    }
+
+    try {
+      // Upload profile image to Firebase Storage
+      const imageRef = storage().ref().child('profile_images/' + name);
+      await imageRef.putFile(selectedImage);
+      const imageUrl = await imageRef.getDownloadURL();
+    
+      // Save profile data to Firestore
+      await firestore().collection('users').add({
         name,
         email,
         password,
         specialty,
         experience,
         imageUrl, // URL of the uploaded profile image
-      })
-      .then(() => {
-        console.log('Profile saved!');
-      })
-      .catch(error => {
-        console.error('Error saving profile: ', error);
       });
-  };
+      
+      // Navigate to Home screen after saving profile
+      navigation.navigate('Home', {
+        profileImage: imageUrl, // Pass profile image URL as navigation parameter
+        userName: name, // Pass user's name as navigation parameter
+      });
+    } catch (error) {
+      console.error('Error saving profile: ', error);
+      Alert.alert('Error', 'Failed to save profile. Please try again later.');
+    }
+};
+
 
   return (
     <View style={styles.container}>
