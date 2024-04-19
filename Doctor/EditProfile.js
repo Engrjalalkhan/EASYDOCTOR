@@ -6,7 +6,6 @@ import {
   Image,
   Button,
   ScrollView,
-  Modal,
   StyleSheet,
   TouchableOpacity,
   Alert
@@ -16,31 +15,32 @@ import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 
-const EditProfile = ({ navigation }) => {
+const EditProfile = ({ navigation, route }) => {
+  const [selectedImage, setSelectedImage] = useState(route.params?.profileImage || null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [experience, setExperience] = useState('');
-  const [selectedImage, setSelectedImage] = useState(null);
   const [userId, setUserId] = useState('');
 
   useEffect(() => {
-    // Fetch user data from Firestore
     const fetchUserData = async () => {
       try {
         const currentUser = auth().currentUser;
         if (currentUser) {
-          const userData = await firestore().collection('users').doc(currentUser.uid).get();
-          if (userData.exists) {
-            const { name, email, experience, imageUrl } = userData.data();
-            setName(name);
-            setEmail(email);
-            setExperience(experience);
-            setSelectedImage(imageUrl);
-            setUserId(currentUser.uid);
+          const userId = currentUser.uid;
+          setUserId(userId);
+          const userDataSnapshot = await firestore().collection('users').doc(userId).get();
+          if (userDataSnapshot.exists) {
+            const userData = userDataSnapshot.data();
+            setName(userData.name);
+            setEmail(userData.email);
+            setExperience(userData.experience);
+            setSelectedImage(userData.imageUrl || null);
           }
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
+        Alert.alert('Error', 'Failed to fetch user data.');
       }
     };
     fetchUserData();
@@ -51,7 +51,7 @@ const EditProfile = ({ navigation }) => {
       width: 300,
       height: 300,
       cropping: true,
-      cropperCircleOverlay: true, // Enable circular crop
+      cropperCircleOverlay: true,
     })
       .then(image => {
         setSelectedImage(image.path);
@@ -63,30 +63,42 @@ const EditProfile = ({ navigation }) => {
 
   const handleSaveProfile = async () => {
     try {
-      // Upload profile image to Firebase Storage
       let imageUrl = selectedImage;
       if (selectedImage !== null) {
         const imageRef = storage().ref().child('profile_images/' + userId);
         await imageRef.putFile(selectedImage);
         imageUrl = await imageRef.getDownloadURL();
       }
-
-      // Update user data in Firestore
-      await firestore().collection('users').doc(userId).update({
-        name,
-        email,
-        experience,
-        imageUrl,
+  
+      const userDocRef = firestore().collection('users').doc(userId);
+      const userDocSnapshot = await userDocRef.get();
+  
+      if (userDocSnapshot.exists) {
+        await userDocRef.update({
+          name,
+          email,
+          experience,
+          imageUrl,
+        });
+      } else {
+        await userDocRef.set({
+          name,
+          email,
+          experience,
+          imageUrl,
+        });
+      }
+  
+      navigation.navigate('Home', {
+        profileImage: imageUrl,
+        userName: name,
       });
-
-      // Navigate back to profile screen
-      navigation.goBack();
     } catch (error) {
       console.error('Error saving profile:', error);
       Alert.alert('Error', 'Failed to save profile. Please try again later.');
     }
   };
-
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.profileImageContainer}>
@@ -147,8 +159,12 @@ const styles = StyleSheet.create({
   },
   editIcon: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
+    bottom: 5,
+    left: 30,
+    width: 30,
+    height: 30,
+    borderRadius: 100,
+    borderWidth: 1,
   },
   input: {
     width: '80%',

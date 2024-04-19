@@ -31,8 +31,8 @@ const Home = ({route, navigation}) => {
       <View style={styles.content}>
         <TouchableOpacity onPress={toggleDrawer}>
           <View style={styles.profileContainer}>
-            <Image source={{uri: profileImage}} style={styles.profileImage} />
             <Text style={styles.userName}>{userName}</Text>
+            <Image source={{uri: profileImage}} style={styles.profileImage} />
           </View>
         </TouchableOpacity>
         <View style={{alignItems: 'center', justifyContent: 'center', flex: 1}}>
@@ -82,7 +82,10 @@ const Home = ({route, navigation}) => {
         </TouchableOpacity>
         <View style={styles.drawerItem}>
           <Text>Logout</Text>
-          <Image source={require('../Src/images/Logout.png')} style={styles.logoutImage} />
+          <Image
+            source={require('../Src/images/Logout.png')}
+            style={styles.logoutImage}
+          />
         </View>
       </View>
 
@@ -123,7 +126,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
-    paddingHorizontal: 10,
+    paddingHorizontal: 1,
+    paddingTop: 10,
+    paddingRight:30,
+    paddingLeft:10,
+    justifyContent:'space-between'
   },
   profileContainer1: {
     flexDirection: 'row',
@@ -148,7 +155,6 @@ const styles = StyleSheet.create({
     marginLeft: 50,
     flexDirection: 'row',
     alignItems: 'center',
-  
   },
   switch: {
     transform: [{scaleX: 0.8}, {scaleY: 0.8}], // Adjust switch size
