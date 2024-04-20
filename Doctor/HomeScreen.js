@@ -13,6 +13,10 @@ const Home = ({route, navigation}) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [onlineConsultation, setOnlineConsultation] = useState(false); // Define onlineConsultation state
 
+  const handlePress = option => {
+    // Handle navigation to the respective screens based on the selected option
+    navigation.navigate(option);
+  };
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
@@ -35,8 +39,50 @@ const Home = ({route, navigation}) => {
             <Image source={{uri: profileImage}} style={styles.profileImage} />
           </View>
         </TouchableOpacity>
-        <View style={{alignItems: 'center', justifyContent: 'center', flex: 1}}>
-          <Text>Welcome to Home Screen!</Text>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#fff',
+            paddingHorizontal: 30,
+          }}>
+          <TouchableOpacity
+            onPress={() => handlePress('MyPatients')}
+            style={styles.card}>
+            <Image
+              source={require('../Src/images/Logout.png')}
+              style={styles.logo}
+            />
+            <Text style={styles.cardText}>My Patients</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handlePress('TextCheckup')}
+            style={styles.card}>
+            <Image
+              source={require('../Src/images/Logout.png')}
+              style={styles.logo}
+            />
+            <Text style={styles.cardText}>Text Checkup</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handlePress('VideoConsultation')}
+            style={styles.card}>
+            <Image
+              source={require('../Src/images/Logout.png')}
+              style={styles.logo}
+            />
+            <Text style={styles.cardText}>Video Consultation</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handlePress('PatientFeedback')}
+            style={styles.card}>
+            <Image
+              source={require('../Src/images/Logout.png')}
+              style={styles.logo}
+            />
+            <Text style={styles.cardText}>Patient Feedback</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Add your home screen content here */}
@@ -128,9 +174,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingHorizontal: 1,
     paddingTop: 10,
-    paddingRight:30,
-    paddingLeft:10,
-    justifyContent:'space-between'
+    paddingRight: 30,
+    paddingLeft: 10,
+    justifyContent: 'space-between',
   },
   profileContainer1: {
     flexDirection: 'row',
@@ -163,6 +209,24 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     marginLeft: 10,
+  },
+  card: {
+    backgroundColor: '#f0f0f0',
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 20,
+    width: '100%',
+    alignItems: 'center',
+    elevation: 3,
+  },
+  logo: {
+    width: 50,
+    height: 50,
+    marginBottom: 10,
+  },
+  cardText: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 
