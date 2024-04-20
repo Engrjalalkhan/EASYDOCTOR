@@ -1,15 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Image,
-  Button,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  Alert
-} from 'react-native';
+import { View, Text, TextInput, Image, Button, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
@@ -65,14 +55,15 @@ const EditProfile = ({ navigation, route }) => {
     try {
       let imageUrl = selectedImage;
       if (selectedImage !== null) {
-        const imageRef = storage().ref().child('profile_images/' + userId);
+        // Use the updated name to save the image with the correct filename
+        const imageRef = storage().ref().child('profile_images/' + name);
         await imageRef.putFile(selectedImage);
         imageUrl = await imageRef.getDownloadURL();
       }
-  
+
       const userDocRef = firestore().collection('users').doc(userId);
       const userDocSnapshot = await userDocRef.get();
-  
+
       if (userDocSnapshot.exists) {
         await userDocRef.update({
           name,
@@ -88,7 +79,7 @@ const EditProfile = ({ navigation, route }) => {
           imageUrl,
         });
       }
-  
+
       navigation.navigate('Home', {
         profileImage: imageUrl,
         userName: name,
@@ -98,18 +89,21 @@ const EditProfile = ({ navigation, route }) => {
       Alert.alert('Error', 'Failed to save profile. Please try again later.');
     }
   };
-  
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.profileImageContainer}>
-        <TouchableOpacity onPress={handleImagePicker}>
-          {selectedImage ? (
-            <Image source={{ uri: selectedImage }} style={styles.profileImage} />
-          ) : (
-            <Image source={require('../Src/images/ProfilePlaceholder.png')} style={styles.profileImage} />
-          )}
-          <Image source={require('../Src/images/edit-icon.png')} style={styles.editIcon} />
-        </TouchableOpacity>
+      <TouchableOpacity onPress={handleImagePicker}>
+    {selectedImage ? (
+      <Image source={{ uri: selectedImage }} style={styles.profileImage} />
+    ) : (
+      <Image
+        source={require('../Src/images/ProfilePlaceholder.png')}
+        style={styles.profileImage}
+      />
+    )}
+    <Image source={require('../Src/images/edit-icon.png')} style={styles.editIcon} />
+  </TouchableOpacity>
       </View>
       <TextInput
         placeholder="Name"

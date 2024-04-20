@@ -45,7 +45,8 @@ const Home = ({route, navigation}) => {
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: '#fff',
-            paddingHorizontal: 30,
+            paddingHorizontal: 40,
+            paddingStart:-10,
           }}>
           <TouchableOpacity
             onPress={() => handlePress('MyPatients')}
