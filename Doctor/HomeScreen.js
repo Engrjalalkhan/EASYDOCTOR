@@ -17,6 +17,7 @@ const Home = ({route, navigation}) => {
     // Handle navigation to the respective screens based on the selected option
     navigation.navigate(option);
   };
+
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
@@ -25,14 +26,20 @@ const Home = ({route, navigation}) => {
     setOnlineConsultation(!onlineConsultation);
   };
 
-  const navigateToEditProfile = () => {
-    navigation.navigate('EditProfile'); // Navigate to the EditProfile screen
-  };
-
   return (
-    <View style={styles.container}>
+    <View style={styles.container1}>
       {/* Content */}
       <View style={styles.content}>
+        <Text
+          style={{
+            fontSize: 24,
+            textAlign: 'center',
+            color: 'white',
+            fontWeight: 'bold',
+            paddingBottom: -30,
+          }}>
+          EASY + DOCTOR
+        </Text>
         <TouchableOpacity onPress={toggleDrawer}>
           <View style={styles.profileContainer}>
             <Text style={styles.userName}>{userName}</Text>
@@ -46,13 +53,14 @@ const Home = ({route, navigation}) => {
             alignItems: 'center',
             backgroundColor: '#fff',
             paddingHorizontal: 40,
-            paddingStart:-10,
+            borderTopRightRadius: 25,
+            borderTopLeftRadius: 25,
           }}>
           <TouchableOpacity
             onPress={() => handlePress('MyPatients')}
             style={styles.card}>
             <Image
-              source={require('../Src/images/Logout.png')}
+              source={require('../Src/images/Patient.png')}
               style={styles.logo}
             />
             <Text style={styles.cardText}>My Patients</Text>
@@ -61,7 +69,7 @@ const Home = ({route, navigation}) => {
             onPress={() => handlePress('TextCheckup')}
             style={styles.card}>
             <Image
-              source={require('../Src/images/Logout.png')}
+              source={require('../Src/images/chat.png')}
               style={styles.logo}
             />
             <Text style={styles.cardText}>Text Checkup</Text>
@@ -70,7 +78,7 @@ const Home = ({route, navigation}) => {
             onPress={() => handlePress('VideoConsultation')}
             style={styles.card}>
             <Image
-              source={require('../Src/images/Logout.png')}
+              source={require('../Src/images/consultation.png')}
               style={styles.logo}
             />
             <Text style={styles.cardText}>Video Consultation</Text>
@@ -79,29 +87,30 @@ const Home = ({route, navigation}) => {
             onPress={() => handlePress('PatientFeedback')}
             style={styles.card}>
             <Image
-              source={require('../Src/images/Logout.png')}
+              source={require('../Src/images/feedback.png')}
               style={styles.logo}
             />
             <Text style={styles.cardText}>Patient Feedback</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Add your home screen content here */}
       </View>
 
       {/* Drawer */}
       <View style={[styles.drawer, {marginLeft: isDrawerOpen ? 0 : -200}]}>
         {/* User Profile in Drawer */}
-        <TouchableOpacity onPress={navigateToEditProfile}>
+        <TouchableOpacity>
           <View style={styles.profileContainer1}>
             <Image source={{uri: profileImage}} style={styles.profileImage} />
-            <Text style={styles.userName}>{userName}</Text>
+            <Text style={styles.userName1}>{userName}</Text>
           </View>
         </TouchableOpacity>
         {/* Add your drawer content here */}
         <TouchableOpacity
           style={styles.drawerItem}
-          onPress={() => console.log('My Calendar clicked')}>
+          onPress={() => {
+            navigation.navigate('MyCalendar');
+            setIsDrawerOpen(false); // Close drawer after navigating
+          }}>
           <Text>My Calendar</Text>
         </TouchableOpacity>
         <View style={styles.drawerItem}>
@@ -114,17 +123,26 @@ const Home = ({route, navigation}) => {
         </View>
         <TouchableOpacity
           style={styles.drawerItem}
-          onPress={() => console.log('About Doctor Easy clicked')}>
+          onPress={() => {
+            navigation.navigate('About');
+            setIsDrawerOpen(false); // Close drawer after navigating
+          }}>
           <Text>About Doctor Easy</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.drawerItem}
-          onPress={() => console.log('Help clicked')}>
+          onPress={() => {
+            navigation.navigate('Help');
+            setIsDrawerOpen(false); // Close drawer after navigating
+          }}>
           <Text>Help</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.drawerItem}
-          onPress={() => console.log('Delete Account clicked')}>
+          onPress={() => {
+            navigation.navigate('DeleteAccount');
+            setIsDrawerOpen(false); // Close drawer after navigating
+          }}>
           <Text>Delete Account</Text>
         </TouchableOpacity>
         <View style={styles.drawerItem}>
@@ -145,15 +163,14 @@ const Home = ({route, navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  container1: {
     flex: 1,
     flexDirection: 'row',
   },
   content: {
     flex: 1,
-    paddingTop: 20,
-    paddingLeft: 40,
-    backgroundColor: '#fff',
+    paddingTop: 50,
+    backgroundColor: '#0D4744',
   },
   drawer: {
     position: 'absolute',
@@ -175,7 +192,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingHorizontal: 1,
     paddingTop: 10,
-    paddingRight: 30,
     paddingLeft: 10,
     justifyContent: 'space-between',
   },
@@ -195,6 +211,11 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: 'white',
+  },
+  userName1: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   drawerItem: {
     fontSize: 20,
@@ -212,7 +233,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   card: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#136b66',
     padding: 20,
     borderRadius: 10,
     marginBottom: 20,
@@ -224,10 +245,12 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     marginBottom: 10,
+    borderRadius: 25,
   },
   cardText: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: 'white',
   },
 });
 

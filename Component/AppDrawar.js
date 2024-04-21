@@ -22,6 +22,7 @@ const Navigation = () => {
         <Drawer.Screen name="Home" component={Home} />
         <Drawer.Screen name="DoctorProfile" component={DoctorProfile} />
         <Drawer.Screen name="DrawerScreen" component={DrawerScreen} />
+        
       </Drawer.Navigator>
     </NavigationContainer>
   );
