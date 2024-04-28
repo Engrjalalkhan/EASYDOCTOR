@@ -25,7 +25,7 @@ const MyCalendarScreen = () => {
       </TouchableOpacity>
       <Modal visible={showCalendar} transparent={true}>
         <View style={styles.modalContainer}>
-          
+         
             <Calendar/>
           
           <TouchableOpacity style={styles.closeButton} onPress={toggleCalendar}>
@@ -92,13 +92,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   calendarCard: {
-    backgroundColor: 'lightgray',
+    backgroundColor: '#0D4744',
     borderRadius: 10,
     padding: 10,
     marginTop: 10,
   },
   closeButton: {
     marginTop: 20,
+    
   },
   closeButtonText: {
     fontSize: 18,

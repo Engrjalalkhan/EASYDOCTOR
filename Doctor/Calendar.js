@@ -3,7 +3,7 @@ import { SafeAreaView, StyleSheet, View, Text, Image } from 'react-native';
 import CalendarPicker from 'react-native-calendar-picker';
 
 const App = () => {
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState('');
 
   const onDateChange = (date) => {
     // Function to handle the date change
@@ -56,14 +56,14 @@ const App = () => {
           ]}
           nextComponent={<NextButton />} // Use custom component for Next button
           previousComponent={<PreviousButton />} // Use custom component for Previous button
-          todayBackgroundColor="#0D4744"
+          todayBackgroundColor="gray"
           selectedDayColor="#0D4744"
           selectedDayTextColor="white" // Change selected date text color to white
           scaleFactor={375}
           textStyle={{
             color: 'black',
           }}
-          customDayHeaderStyles={{ textStyle: { color: 'black' } }} // Customize day header text color
+          // customDayHeaderStyles={{ textStyle: { color: 'black' } }} // Customize day header text color
           customDatesStyles={[{ // Add style for selected date circle
             date: selectedDate,
             dateNameStyle: { color: 'white' }, // Text color of selected date
