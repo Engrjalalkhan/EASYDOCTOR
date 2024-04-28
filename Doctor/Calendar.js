@@ -12,7 +12,7 @@ const App = () => {
   const NextButton = () => (
     <Image
       source={require('../Src/images/right.png')} // Change the path to your "Next" button image
-      style={{ width: 24, height: 24 }} // Adjust the width and height as needed
+      style={{ width: 35, height: 35 }} // Adjust the width and height as needed
     />
   );
 
@@ -20,7 +20,7 @@ const App = () => {
   const PreviousButton = () => (
     <Image
       source={require('../Src/images/left.png')} // Change the path to your "Previous" button image
-      style={{ width: 24, height: 24 }} // Adjust the width and height as needed
+      style={{ width: 35, height: 35 }} // Adjust the width and height as needed
     />
   );
   return (
@@ -53,7 +53,8 @@ const App = () => {
             'October',
             'November',
             'December',
-          ]}
+            
+          ]} 
           nextComponent={<NextButton />} // Use custom component for Next button
           previousComponent={<PreviousButton />} // Use custom component for Previous button
           todayBackgroundColor="gray"
@@ -87,5 +88,5 @@ const styles = StyleSheet.create({
     maxHeight: 400,
     maxWidth: 400,
     borderRadius: 15,
-  },
+  }
 });

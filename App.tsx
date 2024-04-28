@@ -1,8 +1,9 @@
 import React from 'react';
 import Navigator from './Component/Navigator';
+import MyCalendarScreen from './Doctor/MyCalender';
 
 const App = () => {
-  return <Navigator />;
+  return <MyCalendarScreen />;
 };
 
 export default App;
