@@ -4,15 +4,21 @@ import {
   Text,
   TextInput,
   Image,
-  Button,
   ScrollView,
   Modal,
   StyleSheet,
   TouchableOpacity,
+  Alert
 } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
+import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
+import { useNavigation } from '@react-navigation/native';
 
 const PatientProfile = () => {
+
+  const navigation = useNavigation();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -54,9 +60,40 @@ const PatientProfile = () => {
         setModalVisible(false);
       });
   };
-  const handleSaveProfile = () => {
-    // Implement saving profile logic here
-    console.log('Profile saved!');
+
+  const handleSaveProfile = async () => {
+    // Validate input fields
+    if (!name || !email || !password || !age || !phone || !selectedImage) {
+      Alert.alert('Error', 'Please fill out all fields and select a profile image.');
+      return;
+    }
+
+    try {
+      // Upload profile image to Firebase Storage
+      const imageRef = storage().ref().child('Patient/' + name);
+      await imageRef.putFile(selectedImage);
+      const imageUrl = await imageRef.getDownloadURL();
+    
+      // Save profile data to Firestore in 'patients' collection
+      await firestore().collection('Patients').add({
+        name,
+        email,
+        password,
+        age,
+        phone,
+        imageUrl, // URL of the uploaded profile image
+      });
+      
+      // Navigate to Home screen after saving profile
+      // Replace 'Home' with the name of your home screen route
+      navigation.navigate('PatientHome', {
+        profileImage: imageUrl, // Pass profile image URL as navigation parameter
+        userName: name, // Pass user's name as navigation parameter
+      });
+    } catch (error) {
+      console.error('Error saving profile: ', error);
+      Alert.alert('Error', 'Failed to save profile. Please try again later.');
+    }
   };
 
   return (

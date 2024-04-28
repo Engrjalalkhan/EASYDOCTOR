@@ -30,12 +30,6 @@ const SplashScreen = ({navigation}) => {
           <Text style={styles.buttonText}>Patient</Text>
         </TouchableOpacity>
       </View>
-      <View style={{flexDirection: 'row'}}>
-        <Text style={styles.signInText}>Already have an account?</Text>
-        <TouchableOpacity>
-          <Text style={{color: '#599CA5', fontSize: 18}}> Sign In</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };

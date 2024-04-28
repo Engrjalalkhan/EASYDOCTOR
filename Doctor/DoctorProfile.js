@@ -85,12 +85,12 @@ const DoctorProfile = () => {
 
     try {
       // Upload profile image to Firebase Storage
-      const imageRef = storage().ref().child('profile_images/' + name);
+      const imageRef = storage().ref().child('Doctors/' + name);
       await imageRef.putFile(selectedImage);
       const imageUrl = await imageRef.getDownloadURL();
     
       // Save profile data to Firestore
-      await firestore().collection('users').add({
+      await firestore().collection('Doctor').add({
         name,
         email,
         password,
