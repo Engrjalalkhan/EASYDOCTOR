@@ -15,16 +15,16 @@ const PatientHome = ({route, navigation}) => {
 
   const handlePress = option => {
     // Handle navigation to the respective screens based on the selected option
-    navigation.navigate(option);
+    navigation.navigate(option, {
+    profileImage: profileImage,
+    userName: userName,
+  });
   };
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
 
-  const toggleOnlineConsultation = () => {
-    setOnlineConsultation(!onlineConsultation);
-  };
 
   return (
     <View style={styles.container1}>
@@ -57,13 +57,22 @@ const PatientHome = ({route, navigation}) => {
             borderTopLeftRadius: 25,
           }}>
           <TouchableOpacity
-            onPress={() => handlePress('MyPatients')}
+            onPress={() => handlePress('NewAppointment')}
             style={styles.card}>
             <Image
-              source={require('../Src/images/Patient.png')}
+              source={require('../Src/images/Appointment.png')}
               style={styles.logo}
             />
-            <Text style={styles.cardText}>My Patients</Text>
+            <Text style={styles.cardText}>Book New Appointment</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handlePress('MyAppointment')}
+            style={styles.card}>
+            <Image
+              source={require('../Src/images/Appointment.png')}
+              style={styles.logo}
+            />
+            <Text style={styles.cardText}>My Appointment</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => handlePress('TextCheckup')}
@@ -83,15 +92,6 @@ const PatientHome = ({route, navigation}) => {
             />
             <Text style={styles.cardText}>Video Consultation</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => handlePress('PatientFeedback')}
-            style={styles.card}>
-            <Image
-              source={require('../Src/images/feedback.png')}
-              style={styles.logo}
-            />
-            <Text style={styles.cardText}>Patient Feedback</Text>
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -108,19 +108,12 @@ const PatientHome = ({route, navigation}) => {
         <TouchableOpacity
           style={styles.drawerItem}
           onPress={() => {
-            navigation.navigate('MyCalendar');
+            navigation.navigate('BOOKMARK');
             setIsDrawerOpen(false); // Close drawer after navigating
           }}>
-          <Text>My Calendar</Text>
+          <Text>BOOK MARKS</Text>
         </TouchableOpacity>
-        <View style={styles.drawerItem}>
-          <Text>Enable Online Consultation</Text>
-          <Switch
-            value={onlineConsultation}
-            onValueChange={toggleOnlineConsultation}
-            style={styles.switch}
-          />
-        </View>
+        
         <TouchableOpacity
           style={styles.drawerItem}
           onPress={() => {

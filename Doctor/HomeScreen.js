@@ -57,7 +57,7 @@ const Home = ({route, navigation}) => {
             borderTopLeftRadius: 25,
           }}>
           <TouchableOpacity
-            onPress={() => handlePress('MyPatients')}
+            onPress={() => handlePress('MyPatient')}
             style={styles.card}>
             <Image
               source={require('../Src/images/Patient.png')}

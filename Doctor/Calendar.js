@@ -1,92 +1,59 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Text, Image } from 'react-native';
-import CalendarPicker from 'react-native-calendar-picker';
+import { View, StyleSheet } from 'react-native';
+import { Calendar } from 'react-native-calendars';
 
-const App = () => {
-  const [selectedDate, setSelectedDate] = useState('');
+const MyPatientScreen = () => {
+  const [selectedDate, setSelectedDate] = useState(null);
 
-  const onDateChange = (date) => {
-    // Function to handle the date change
+  // Function to handle date selection
+  const handleDateSelection = (date) => {
     setSelectedDate(date);
+    // Add your logic for fetching appointments for the selected date
   };
-  const NextButton = () => (
-    <Image
-      source={require('../Src/images/right.png')} // Change the path to your "Next" button image
-      style={{ width: 35, height: 35 }} // Adjust the width and height as needed
-    />
-  );
 
-  // Custom component for the "Previous" button
-  const PreviousButton = () => (
-    <Image
-      source={require('../Src/images/left.png')} // Change the path to your "Previous" button image
-      style={{ width: 35, height: 35 }} // Adjust the width and height as needed
-    />
-  );
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.container}>
-        <CalendarPicker
-          startFromMonday={true}
-          allowRangeSelection={false} // Only allow single date selection
-          minDate={new Date(2018, 1, 1)}
-          maxDate={new Date(2050, 6, 3)}
-          weekdays={[
-            'Mon',
-            'Tue',
-            'Wed',
-            'Thur',
-            'Fri',
-            'Sat',
-            'Sun'
-          ]}
-          months={[
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-            'July',
-            'August',
-            'September',
-            'October',
-            'November',
-            'December',
-            
-          ]} 
-          nextComponent={<NextButton />} // Use custom component for Next button
-          previousComponent={<PreviousButton />} // Use custom component for Previous button
-          todayBackgroundColor="gray"
-          selectedDayColor="#0D4744"
-          selectedDayTextColor="white" // Change selected date text color to white
-          scaleFactor={375}
-          textStyle={{
-            color: 'black',
-          }}
-          // customDayHeaderStyles={{ textStyle: { color: 'black' } }} // Customize day header text color
-          customDatesStyles={[{ // Add style for selected date circle
-            date: selectedDate,
-            dateNameStyle: { color: 'white' }, // Text color of selected date
-            dateNumberStyle: { color: 'white' }, // Text color of selected date
-            style: { backgroundColor: '#0D4744', borderRadius: 20 }, // Background color and circle shape
-          }]}
-          onDateChange={onDateChange}
-        />
-      </View>
-    </SafeAreaView>
+    <View style={styles.container}>
+      {/* Calendar component for date selection */}
+      <Calendar
+        style={styles.calendar}
+        onDayPress={(day) => handleDateSelection(day.dateString)}
+        markedDates={{ [selectedDate]: { selected: true } }}
+        theme={{
+          calendarBackground: '#ffffff', // Background color of the calendar
+          textSectionTitleColor: '#b6c1cd', // Color of section title
+          selectedDayBackgroundColor: '#0D4744', // Background color of selected day
+          todayTextColor: '#136b66', // Text color of today's date
+          dayTextColor: '#2d4150', // Text color of day
+          textDisabledColor: '#d9e1e8', // Text color of disabled date
+          dotColor: '#00adf5', // Color of dots in the calendar
+          selectedDotColor: '#ffffff', // Color of selected dots
+          arrowColor: 'black', // Color of arrows in the header
+          monthTextColor: '#136b66', // Text color of month name
+          textMonthFontWeight:"bold",
+          textDayFontSize: 16, // Font size for day text
+          textMonthFontSize: 16, // Font size for month text
+          textDayHeaderFontSize: 16, // Font size for day header text
+        }}
+      />
+      
+      {/* Add rest of your UI components here */}
+    </View>
   );
 };
-export default App;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 30,
-    backgroundColor: '#ffffff',
-    padding: 16,
-    maxHeight: 400,
-    maxWidth: 400,
-    borderRadius: 15,
-  }
+    padding: 30,
+    
+  },
+  calendar: {
+    width: 400, // Adjust the width of the calendar
+    height: 400, // Adjust the height of the calendar
+    alignSelf:'center',
+    borderRadius:15,
+    borderWidth:1,
+  },
 });
+
+export default MyPatientScreen;

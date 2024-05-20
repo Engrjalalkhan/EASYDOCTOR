@@ -16,6 +16,8 @@ import DeleteAccountScreen from '../Doctor/DeleteAccountScreen';
 import PatientHome from '../Patient/PatientHomeScreen';
 import MyCalendarScreen from '../Doctor/MyCalender';
 import CalendarComponent from '../Doctor/Calendar';
+import MyPatient from '../Doctor/MyPatient';
+import BookNew from '../Patient/BookNew';
 
 const Stack = createNativeStackNavigator();
 
@@ -90,6 +92,11 @@ const Navigator = () => {
           options={{headerShown: true}}
         />
         <Stack.Screen
+          name="MyPatient"
+          component={MyPatient}
+          options={{headerShown: true}}
+        />
+        <Stack.Screen
           name="PatientProfile"
           component={PatientProfile}
           options={{headerShown: false}}
@@ -97,6 +104,11 @@ const Navigator = () => {
         <Stack.Screen
           name="PatientHome"
           component={PatientHome}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="NewAppointment"
+          component={BookNew}
           options={{headerShown: false}}
         />
       </Stack.Navigator>
