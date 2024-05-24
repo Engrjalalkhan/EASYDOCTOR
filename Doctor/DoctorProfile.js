@@ -20,14 +20,10 @@ import {useNavigation} from '@react-navigation/native';
 const specialties = [
   'Cardiology',
   'Dermatology',
-  'Endocrinology',
-  'Gastroenterology',
-  'Neurology',
-  'Ophthalmology',
+  'Dentistry',
+  'Brain',
   'Orthopedics',
   'Pediatrics',
-  'Psychiatry',
-  'Surgery',
   // Add more specialties as needed
 ];
 
@@ -82,7 +78,7 @@ const DoctorProfile = () => {
       Alert.alert('Error', 'Please fill out all fields and select a profile image.');
       return;
     }
-
+  
     try {
       // Upload profile image to Firebase Storage
       const imageRef = storage().ref().child('Doctors/' + name);
@@ -99,8 +95,9 @@ const DoctorProfile = () => {
         imageUrl, // URL of the uploaded profile image
       });
       
-      // Navigate to Home screen after saving profile
-      navigation.navigate('Home', {
+      // Navigate to Patient Home screen after saving profile
+      navigation.navigate('HomeScreen', {
+        specialtyFilter: specialty, // Pass the selected specialty as navigation parameter
         profileImage: imageUrl, // Pass profile image URL as navigation parameter
         userName: name, // Pass user's name as navigation parameter
       });
@@ -108,7 +105,7 @@ const DoctorProfile = () => {
       console.error('Error saving profile: ', error);
       Alert.alert('Error', 'Failed to save profile. Please try again later.');
     }
-};
+  };
 
 
   return (

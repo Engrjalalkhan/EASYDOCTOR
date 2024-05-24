@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SignInWithMobileScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
@@ -8,16 +9,26 @@ const SignInWithMobileScreen = ({ navigation }) => {
     const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
-        // Check if the user is already authenticated
-        const unsubscribe = auth().onAuthStateChanged(user => {
-            if (user) {
-                // User is authenticated, navigate to the splash screen
+        const checkAuth = async () => {
+            const lastLogin = await AsyncStorage.getItem('lastLogin');
+            const currentTime = new Date().getTime();
+            
+            if (lastLogin && (currentTime - parseInt(lastLogin) <= 3600000)) {
                 navigation.navigate('Splash');
+            } else {
+                await auth().signOut();
             }
-        });
 
-        // Cleanup function
-        return () => unsubscribe();
+            const unsubscribe = auth().onAuthStateChanged(user => {
+                if (user) {
+                    navigation.navigate('Splash');
+                }
+            });
+
+            return () => unsubscribe();
+        };
+
+        checkAuth();
     }, []);
 
     const handleSignIn = async () => {
@@ -28,8 +39,8 @@ const SignInWithMobileScreen = ({ navigation }) => {
 
         try {
             await auth().signInWithEmailAndPassword(email, password);
-            // User is signed in
-            // Navigate to the splash screen
+            const currentTime = new Date().getTime();
+            await AsyncStorage.setItem('lastLogin', currentTime.toString());
             navigation.navigate('Splash');
         } catch (error) {
             Alert.alert('Error', error.message);
@@ -80,9 +91,8 @@ const SignInWithMobileScreen = ({ navigation }) => {
             </TouchableOpacity>
             <View style={{ flexDirection: 'row' }}>
                 <Text style={styles.signInText}>Don't have an account?</Text>
-                <TouchableOpacity onPress={()=>navigation.navigate('SignUp')}>
+                <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
                     <Text style={{ color: '#599CA5', fontSize: 18, marginTop: 20 }}>
-
                         Sign Up
                     </Text>
                 </TouchableOpacity>
@@ -91,13 +101,13 @@ const SignInWithMobileScreen = ({ navigation }) => {
     );
 };
 export default SignInWithMobileScreen;
+
 const styles = StyleSheet.create({
     container: {
-        // flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 20,
-        marginBottom:180
+        marginBottom: 180
     },
     container1: {
         justifyContent: 'center',
@@ -108,14 +118,14 @@ const styles = StyleSheet.create({
         marginBottom: 50,
         borderBottomEndRadius: 500,
         borderBottomStartRadius: 500,
-        paddingTop:50
+        paddingTop: 50
     },
     label: {
         fontSize: 16,
         marginBottom: 5,
         alignSelf: 'flex-start',
         paddingHorizontal: 30,
-    }, 
+    },
     showPasswordContainer: {
         alignSelf: 'flex-end',
         marginBottom: 5,

@@ -4,7 +4,13 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, TextInput 
 const NewAppointment = ({ route, navigation }) => {
   // Extract profile image URL and user name from navigation parameters
   const { profileImage, userName } = route.params;
-
+  const handlePress = option => {
+    // Handle navigation to the respective screens based on the selected option
+    navigation.navigate(option, {
+    profileImage: profileImage,
+    userName: userName,
+  });
+  };
   return (
     <View style={styles.container1}>
       <View style={styles.content}>
@@ -26,7 +32,7 @@ const NewAppointment = ({ route, navigation }) => {
           })}>
             <Image
               source={require('../Src/images/back.png')}
-              style={{ width: 25, height: 25, paddingLeft: 30 }}
+              style={{ width: 25, height: 25, paddingLeft: 40 }}
             />
           </TouchableOpacity>
 
@@ -62,42 +68,42 @@ const NewAppointment = ({ route, navigation }) => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.specialtiesContainer}>
             {/* Example specialties with circular shapes */}
-            <TouchableOpacity style={styles.specialty}>
+            <TouchableOpacity style={styles.specialty} onPress={() => handlePress('DentalScreen')}>
               <Image
                 source={require('../Src/images/Dental.png')}
                 style={styles.specialtyIcon}
               />
-              <Text style={styles.specialtyText}>Dental</Text>
+              <Text style={styles.specialtyText}>Dentistry</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.specialty}>
+            <TouchableOpacity style={styles.specialty} onPress={() => handlePress('CardiologyScreen')}>
               <Image
                 source={require('../Src/images/heart.png')}
                 style={styles.specialtyIcon}
               />
               <Text style={styles.specialtyText}>Cardiology</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.specialty}>
+            <TouchableOpacity style={styles.specialty} onPress={() => handlePress('PediatricsScreen')}>
               <Image
-                source={require('../Src/images/bon.png')}
+                source={require('../Src/images/children.png')}
                 style={styles.specialtyIcon}
               />
-              <Text style={styles.specialtyText}>Orthopedic</Text>
+              <Text style={styles.specialtyText}>Pediatrics</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.specialty}>
+            <TouchableOpacity style={styles.specialty} onPress={() => handlePress('DermatologyScreen')}>
               <Image
-                source={require('../Src/images/Dental.png')}
+                source={require('../Src/images/skin.png')}
                 style={styles.specialtyIcon}
               />
-              <Text style={styles.specialtyText}>Dental</Text>
+              <Text style={styles.specialtyText}>Dermatology</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.specialty}>
+            <TouchableOpacity style={styles.specialty} onPress={() => handlePress('BrainScreen')}>
               <Image
-                source={require('../Src/images/heart.png')}
+                source={require('../Src/images/brain.png')}
                 style={styles.specialtyIcon}
               />
-              <Text style={styles.specialtyText}>Cardiology</Text>
+              <Text style={styles.specialtyText}>Brain</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.specialty}>
+            <TouchableOpacity style={styles.specialty} onPress={() => handlePress('OrthopedicScreen')}>
               <Image
                 source={require('../Src/images/bon.png')}
                 style={styles.specialtyIcon}
@@ -113,28 +119,49 @@ const NewAppointment = ({ route, navigation }) => {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.specialtiesContainer}>
+            contentContainerStyle={styles.symptomsContainer}>
             {/* Example symptoms with circular shapes */}
-            <TouchableOpacity style={styles.specialty}>
+            <TouchableOpacity style={styles.symptoms}>
               <Image
                 source={require('../Src/images/fever.png')}
-                style={styles.specialtyIcon}
+                style={styles.symptomsIcon}
               />
-              <Text style={styles.specialtyText}>Fever</Text>
+              <Text style={styles.symptomsText}>Fever</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.specialty}>
+            <TouchableOpacity style={styles.symptoms}>
               <Image
                 source={require('../Src/images/cough.png')}
-                style={styles.specialtyIcon}
+                style={styles.symptomsIcon}
               />
-              <Text style={styles.specialtyText}>Cough</Text>
+              <Text style={styles.symptomsText}>Cough</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.specialty}>
+            <TouchableOpacity style={styles.symptoms}>
               <Image
                 source={require('../Src/images/headache.png')}
-                style={styles.specialtyIcon}
+                style={styles.symptomsIcon}
               />
-              <Text style={styles.specialtyText}>Headache</Text>
+              <Text style={styles.symptomsText}>Headache</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.symptoms}>
+              <Image
+                source={require('../Src/images/fever.png')}
+                style={styles.symptomsIcon}
+              />
+              <Text style={styles.symptomsText}>Fever</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.symptoms}>
+              <Image
+                source={require('../Src/images/cough.png')}
+                style={styles.symptomsIcon}
+              />
+              <Text style={styles.symptomsText}>Cough</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.symptoms}>
+              <Image
+                source={require('../Src/images/headache.png')}
+                style={styles.symptomsIcon}
+              />
+              <Text style={styles.symptomsText}>Headache</Text>
             </TouchableOpacity>
             {/* Add more symptoms as needed */}
           </ScrollView>
@@ -175,7 +202,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: 'white',
-    paddingRight: 200,
+    paddingRight: 150,
   },
   searchBar: {
     width: '100%',
@@ -210,11 +237,37 @@ const styles = StyleSheet.create({
   },
   specialtyIcon: {
     width: 60,
-    height: 60,
+    height: 65,
     borderRadius: 30,
     marginBottom: 10,
   },
   specialtyText: {
+    color: 'black',
+    fontWeight: 'bold',
+  },
+   symptomsTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    alignSelf:"flex-start"
+  },
+  symptomsContainer: {
+    paddingTop: 10,
+    paddingBottom: 20,
+    marginBottom:240,
+  },
+  symptoms: {
+    alignItems: 'center',
+    marginHorizontal: 10,
+    marginStart:10
+  },
+  symptomsIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginBottom: 10,
+  },
+  symptomsText: {
     color: 'black',
     fontWeight: 'bold',
   },

@@ -18,6 +18,14 @@ import MyCalendarScreen from '../Doctor/MyCalender';
 import CalendarComponent from '../Doctor/Calendar';
 import MyPatient from '../Doctor/MyPatient';
 import BookNew from '../Patient/BookNew';
+import DentalScreen from '../Patient/DentalScreen';
+import CardiologyScreen from '../Patient/CardiologyScreen';
+import DermatologyScreen from '../Patient/DermatologyScreen';
+import BrainScreen from '../Patient/BrainScreen';
+import PediatricsScreen from '../Patient/PediatricsScreen';
+import OrthopedicScreen from '../Patient/OrthopedicScreen';
+import ViewProfile from '../Patient/ViewProfile';
+import UserFeedback from '../Doctor/UserFeedback';
 
 const Stack = createNativeStackNavigator();
 
@@ -107,9 +115,49 @@ const Navigator = () => {
           options={{headerShown: false}}
         />
         <Stack.Screen
+          name="HomeScreen"
+          component={HomeScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
           name="NewAppointment"
           component={BookNew}
           options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="DentalScreen"
+          component={DentalScreen}
+          // options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="CardiologyScreen"
+          component={CardiologyScreen}
+          // options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="DermatologyScreen"
+          component={DermatologyScreen}
+          // options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="BrainScreen"
+          component={BrainScreen}
+          // options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="PediatricsScreen"
+          component={PediatricsScreen}
+          // options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="FeedbackScreen"
+          component={ViewProfile}
+          // options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="PatientFeedback"
+          component={UserFeedback}
+          // options={{headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>
