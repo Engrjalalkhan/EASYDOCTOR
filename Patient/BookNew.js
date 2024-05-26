@@ -26,7 +26,7 @@ const NewAppointment = ({ route, navigation }) => {
         </Text>
         <View style={styles.profileContainer}>
           {/* Navigate back to PatientHome when back button is clicked */}
-          <TouchableOpacity onPress={() => navigation.navigate('PatientHome', {
+          {/* <TouchableOpacity onPress={() => navigation.navigate('PatientHome', {
             profileImage: profileImage,
             userName: userName,
           })}>
@@ -34,7 +34,7 @@ const NewAppointment = ({ route, navigation }) => {
               source={require('../Src/images/back.png')}
               style={{ width: 25, height: 25, paddingLeft: 40 }}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <Text style={styles.userName}>{userName}</Text>
           <Image source={{ uri: profileImage }} style={styles.profileImage} />

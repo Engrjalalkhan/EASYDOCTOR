@@ -26,6 +26,8 @@ import PediatricsScreen from '../Patient/PediatricsScreen';
 import OrthopedicScreen from '../Patient/OrthopedicScreen';
 import ViewProfile from '../Patient/ViewProfile';
 import UserFeedback from '../Doctor/UserFeedback';
+import PatientLoginScreen from '../Patient/PatientLogin';
+import DoctorLoginScreen from '../Doctor/DoctorLogin';
 
 const Stack = createNativeStackNavigator();
 
@@ -127,37 +129,52 @@ const Navigator = () => {
         <Stack.Screen
           name="DentalScreen"
           component={DentalScreen}
-          // options={{headerShown: false}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="CardiologyScreen"
           component={CardiologyScreen}
-          // options={{headerShown: false}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="DermatologyScreen"
           component={DermatologyScreen}
-          // options={{headerShown: false}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="BrainScreen"
           component={BrainScreen}
-          // options={{headerShown: false}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="PediatricsScreen"
           component={PediatricsScreen}
-          // options={{headerShown: false}}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="OrthopedicScreen"
+          component={OrthopedicScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="PatientLogin"
+          component={PatientLoginScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="DoctorLogin"
+          component={DoctorLoginScreen}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="FeedbackScreen"
           component={ViewProfile}
-          // options={{headerShown: false}}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="PatientFeedback"
           component={UserFeedback}
-          // options={{headerShown: false}}
+          options={{headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>
