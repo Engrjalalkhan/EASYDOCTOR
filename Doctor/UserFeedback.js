@@ -1,60 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, FlatList, TouchableOpacity, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import { AirbnbRating } from 'react-native-ratings';
 
-const DoctorHome = () => {
+const DoctorHomeScreen = () => {
+  const navigation = useNavigation();
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const doctorId = 'logged_in_doctor_id'; // Replace with the actual logged-in doctor's ID
 
   useEffect(() => {
     const fetchFeedbacks = async () => {
       try {
-        const feedbackSnapshot = await firestore()
-          .collection('feedback')
-          .where('doctorId', '==', doctorId)
-          .get();
-
+        const feedbackSnapshot = await firestore().collection('feedback').get();
         const feedbackList = feedbackSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setFeedbacks(feedbackList);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching feedback: ', error);
+        console.error(error);
+        Alert.alert('Error', 'Unable to fetch feedbacks. Please try again later.');
         setLoading(false);
       }
     };
 
     fetchFeedbacks();
+  }, []);
 
-    // Cleanup function
-    return () => {};
-  }, [doctorId]);
-
-  const renderFeedbackItem = ({ item }) => (
-    <View style={styles.card}>
-      <Text style={styles.feedbackText}>Feedback: {item.feedback}</Text>
-      <Text style={styles.ratingText}>Rating: {item.rating}</Text>
-      <Text style={styles.dateText}>Date: {item.createdAt?.toDate().toLocaleDateString()}</Text>
-    </View>
+  const renderItem = ({ item }) => (
+    <TouchableOpacity style={styles.feedbackCard}>
+      <View style={styles.feedbackContainer}>
+        <Text style={styles.feedbackText}>{item.feedback}</Text>
+        <View style={styles.ratingContainer}>
+          <Text style={styles.ratingText}>Rating:</Text>
+          <Text style={styles.ratingValue}>{item.rating}</Text>
+          <AirbnbRating
+            count={1}
+            defaultRating={item.rating} // Set the initial rating from the feedback
+            size={20}
+            showRating={false} // Hide the rating text from the star
+            selectedColor="#FFD700" // Color for the filled star
+            isDisabled
+          />
+        </View>
+      </View>
+    </TouchableOpacity>
   );
+  
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#0D4744" />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Received Feedback</Text>
       <FlatList
         data={feedbacks}
-        renderItem={renderFeedbackItem}
+        renderItem={renderItem}
         keyExtractor={item => item.id}
-        ListEmptyComponent={<Text style={styles.noFeedbackText}>No feedback available.</Text>}
+        contentContainerStyle={styles.flatListContent}
+        ListEmptyComponent={<Text style={styles.emptyListText}>No feedback available</Text>}
       />
     </View>
   );
@@ -63,7 +71,6 @@ const DoctorHome = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#fff',
   },
   loadingContainer: {
@@ -71,36 +78,46 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+  flatListContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
-  card: {
-    padding: 15,
+  feedbackCard: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 5,
+    borderRadius: 10,
+    padding: 10,
     marginBottom: 10,
   },
   feedbackText: {
     fontSize: 16,
+    marginBottom: 5,
   },
-  ratingText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  dateText: {
-    fontSize: 14,
-    fontStyle: 'italic',
-    color: 'gray',
-    marginTop: 5,
-  },
-  noFeedbackText: {
-    fontSize: 16,
+  emptyListText: {
     textAlign: 'center',
     marginTop: 20,
+    fontSize: 16,
+    color: '#888',
   },
+    feedbackText: {
+      fontSize: 16,
+      marginBottom: 5,
+    },
+    ratingContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    ratingText: {
+      marginRight: 5,
+      fontSize: 16,
+      color: '#888',
+    },
+    ratingValue: {
+      marginRight: 5,
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: '#888',
+    },
 });
 
-export default DoctorHome;
+export default DoctorHomeScreen;

@@ -28,6 +28,7 @@ import ViewProfile from '../Patient/ViewProfile';
 import UserFeedback from '../Doctor/UserFeedback';
 import PatientLoginScreen from '../Patient/PatientLogin';
 import DoctorLoginScreen from '../Doctor/DoctorLogin';
+import BookmarkScreen from '../Patient/Bookmark';
 
 const Stack = createNativeStackNavigator();
 
@@ -174,6 +175,11 @@ const Navigator = () => {
         <Stack.Screen
           name="PatientFeedback"
           component={UserFeedback}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Bookmark"
+          component={BookmarkScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

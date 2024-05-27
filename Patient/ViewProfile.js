@@ -43,15 +43,15 @@ const FeedbackScreen = ({ route }) => {
       Alert.alert('Error', 'Please select a doctor.');
       return;
     }
-
+  
     if (!feedback || rating === 0) {
       Alert.alert('Error', 'Please provide feedback and a rating.');
       return;
     }
-
+  
     try {
       await firestore().collection('feedback').add({
-        doctorId: selectedDoctor,
+        doctorId: selectedDoctor, // Set the doctorId field to selectedDoctor
         feedback: feedback,
         rating: rating,
         createdAt: firestore.FieldValue.serverTimestamp(),
@@ -66,6 +66,7 @@ const FeedbackScreen = ({ route }) => {
       Alert.alert('Error', 'Something went wrong. Please try again later.');
     }
   };
+  
 
   if (loading) {
     return (

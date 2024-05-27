@@ -108,7 +108,7 @@ const PatientHome = ({route, navigation}) => {
         <TouchableOpacity
           style={styles.drawerItem}
           onPress={() => {
-            navigation.navigate('BOOKMARK');
+            navigation.navigate('Bookmark');
             setIsDrawerOpen(false); // Close drawer after navigating
           }}>
           <Text>BOOK MARKS</Text>
