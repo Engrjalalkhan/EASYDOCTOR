@@ -39,6 +39,7 @@ const PatientHome = ({ route }) => {
 
   const handleBookAppointment = () => {
     // Implement booking functionality here
+    navigation.navigate("Book")
   };
 
   const handleCallDoctor = () => {
@@ -48,10 +49,26 @@ const PatientHome = ({ route }) => {
 
   const handleBookmarkDoctor = async (doctor) => {
     try {
-      await firestore().collection('BookmarkedDoctors').add(doctor);
-      setBookmarkedDoctors(prevBookmarkedDoctors => [...prevBookmarkedDoctors, doctor]);
+      // Check if the doctor is already bookmarked
+      const bookmarkSnapshot = await firestore()
+        .collection('BookmarkedDoctors')
+        .where('id', '==', doctor.id)
+        .get();
+  
+      if (!bookmarkSnapshot.empty) {
+        // Doctor is already bookmarked, remove it
+        const docId = bookmarkSnapshot.docs[0].id;
+        await firestore().collection('BookmarkedDoctors').doc(docId).delete();
+        setBookmarkedDoctors(prevBookmarkedDoctors =>
+          prevBookmarkedDoctors.filter(bookmarkedDoctor => bookmarkedDoctor.id !== doctor.id)
+        );
+      } else {
+        // Doctor is not bookmarked, add it
+        await firestore().collection('BookmarkedDoctors').add(doctor);
+        setBookmarkedDoctors(prevBookmarkedDoctors => [...prevBookmarkedDoctors, doctor]);
+      }
     } catch (error) {
-      console.error('Error bookmarking doctor: ', error);
+      console.error('Error toggling bookmark for doctor: ', error);
     }
   };
   

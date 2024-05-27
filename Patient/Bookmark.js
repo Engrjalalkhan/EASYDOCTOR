@@ -37,7 +37,7 @@ const BookmarkScreen = () => {
       <View style={styles.profileContainer}>
         <Image source={{ uri: item.imageUrl }} style={styles.profileImage} />
         <TouchableOpacity onPress={() => handleViewProfile(item.id)}>
-          <Text style={styles.viewProfileButton}>View Profile</Text>
+          <Text style={styles.viewProfileButton}>View Feedback</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.doctorDetails}>

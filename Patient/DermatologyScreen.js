@@ -44,13 +44,41 @@ const PatientHome = ({ route }) => {
   const handleCallDoctor = () => {
     // Implement calling functionality here
   };
+  const [bookmarkedDoctors, setBookmarkedDoctors] = useState([]);
+
+  const handleBookmarkDoctor = async (doctor) => {
+    try {
+      // Check if the doctor is already bookmarked
+      const bookmarkSnapshot = await firestore()
+        .collection('BookmarkedDoctors')
+        .where('id', '==', doctor.id)
+        .get();
+  
+      if (!bookmarkSnapshot.empty) {
+        // Doctor is already bookmarked, remove it
+        const docId = bookmarkSnapshot.docs[0].id;
+        await firestore().collection('BookmarkedDoctors').doc(docId).delete();
+        setBookmarkedDoctors(prevBookmarkedDoctors =>
+          prevBookmarkedDoctors.filter(bookmarkedDoctor => bookmarkedDoctor.id !== doctor.id)
+        );
+      } else {
+        // Doctor is not bookmarked, add it
+        await firestore().collection('BookmarkedDoctors').add(doctor);
+        setBookmarkedDoctors(prevBookmarkedDoctors => [...prevBookmarkedDoctors, doctor]);
+      }
+    } catch (error) {
+      console.error('Error toggling bookmark for doctor: ', error);
+    }
+  };
+  
+
 
   const renderDoctorCard = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.profileContainer}>
         <Image source={{ uri: item.imageUrl }} style={styles.profileImage} />
         <TouchableOpacity onPress={() => handleViewProfile(item.id)}>
-          <Text style={styles.viewProfileButton}>View Profile</Text>
+          <Text style={styles.viewProfileButton}>View Feedback</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.doctorDetails}>
@@ -60,6 +88,11 @@ const PatientHome = ({ route }) => {
         {/* Add more doctor details here */}
       </View>
       <View style={styles.buttonContainer}>
+        <View style={styles.bookmarkContainer}>
+          <TouchableOpacity onPress={() => handleBookmarkDoctor(item)} style={styles.bookmarkButton}>
+            <Text style={[styles.bookmarkText, { color: bookmarkedDoctors.includes(item.id) ? 'gold' : 'gray' }]}>🔖</Text>
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity onPress={handleBookAppointment} style={styles.actionButton}>
           <Text style={styles.actionButtonText}>Book</Text>
         </TouchableOpacity>
@@ -69,6 +102,9 @@ const PatientHome = ({ route }) => {
       </View>
     </View>
   );
+  
+  
+  
 
   return (
     <View style={styles.container}>
@@ -197,6 +233,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
     paddingRight: 150,
+  },
+  bookmarkButton: {
+    alignItems: 'center',
+    width: 50,
+    height: 50,
+    top: 10,
+    right: 10,
+    paddingLeft:20
+  },
+  bookmarkText: {
+    fontSize: 24,
   },
 });
 
