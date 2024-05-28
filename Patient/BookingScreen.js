@@ -1,104 +1,88 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, Image, ScrollView, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  FlatList,
+  StyleSheet,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import Calendar from '../Doctor/Calendar';
 
 const BookingScreen = () => {
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [morningSlots, setMorningSlots] = useState([]);
-  const [eveningSlots, setEveningSlots] = useState([]);
+  const [schedules, setSchedules] = useState([]);
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const [patientName, setPatientName] = useState('');
+  const [patientPhone, setPatientPhone] = useState('');
 
   useEffect(() => {
-    const fetchSlots = async () => {
-      try {
-        const morningSnapshot = await firestore().collection('Schedules').doc('morning').get();
-        const eveningSnapshot = await firestore().collection('Schedules').doc('evening').get();
-  
-        if (morningSnapshot.exists) {
-          setMorningSlots(morningSnapshot.data().slots);
-        } else {
-          console.log('No morning slots available');
-        }
-  
-        if (eveningSnapshot.exists) {
-          setEveningSlots(eveningSnapshot.data().slots);
-        } else {
-          console.log('No evening slots available');
-        }
-      } catch (error) {
-        console.error('Error fetching slots: ', error);
-      }
+    const fetchSchedules = async () => {
+      const scheduleSnapshot = await firestore().collection('Schedules').get();
+      const scheduleList = scheduleSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setSchedules(scheduleList);
     };
-  
-    fetchSlots();
+
+    fetchSchedules();
   }, []);
-  
 
-  const toggleCalendar = () => {
-    setShowCalendar(!showCalendar);
-  };
+  const bookAppointment = async () => {
+    if (!selectedSchedule || !patientName || !patientPhone) {
+      alert('Please fill in all fields.');
+      return;
+    }
 
-  const handleSlotBooking = async (slot, period) => {
     try {
-      const booking = {
-        date: selectedDate,
-        slot,
-        period,
-      };
-
-      await firestore().collection('Bookings').add(booking);
-      Alert.alert('Success', 'Slot booked successfully!');
+      await firestore().collection('Appointments').add({
+        scheduleId: selectedSchedule.id,
+        patientName,
+        patientPhone,
+        status: 'pending',
+        doctorNotified: false,
+      });
+      alert('Appointment booked successfully!');
     } catch (error) {
-      console.error('Error booking slot: ', error);
-      Alert.alert('Error', 'Failed to book the slot.');
+      console.error('Error booking appointment: ', error);
+      alert('Failed to book appointment. Please try again.');
     }
   };
 
-  const renderSlots = (slots, period) => {
-    return slots.map((slot, index) => (
-      <TouchableOpacity
-        key={index}
-        style={styles.slotButton}
-        onPress={() => handleSlotBooking(slot, period)}
-      >
-        <Text style={styles.slotText}>{slot}</Text>
-      </TouchableOpacity>
-    ));
-  };
-
   return (
-    <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.calendarButton} onPress={toggleCalendar}>
-        <Text style={styles.iconText}>Calendar</Text>
-        <Image
-          source={require('../Src/images/description.png')}
-          style={{ width: 24, height: 24, justifyContent: 'flex-end' }}
-        />
-      </TouchableOpacity>
-      <Modal visible={showCalendar} transparent={true}>
-        <View style={styles.modalContainer}>
-          <Calendar onDateSelected={setSelectedDate} />
-          <TouchableOpacity style={styles.closeButton} onPress={toggleCalendar}>
-            <Text style={styles.closeButtonText}>Close</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Book an Appointment</Text>
+      <FlatList
+        data={schedules}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.scheduleItem}
+            onPress={() => setSelectedSchedule(item)}
+          >
+            <Text style={styles.scheduleText}>
+              {item.morning.enabled ? `Morning: ${item.morning.fromTime} - ${item.morning.toTime}` : 'No morning schedule'}
+            </Text>
+            <Text style={styles.scheduleText}>
+              {item.evening.enabled ? `Evening: ${item.evening.fromTime} - ${item.evening.toTime}` : 'No evening schedule'}
+            </Text>
           </TouchableOpacity>
-        </View>
-      </Modal>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Morning Slots</Text>
-        <View style={styles.slotContainer}>
-          {renderSlots(morningSlots, 'morning')}
-        </View>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Evening Slots</Text>
-        <View style={styles.slotContainer}>
-          {renderSlots(eveningSlots, 'evening')}
-        </View>
-      </View>
-    </ScrollView>
+        )}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Your Name"
+        value={patientName}
+        onChangeText={setPatientName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Your Phone"
+        value={patientPhone}
+        onChangeText={setPatientPhone}
+        keyboardType="phone-pad"
+      />
+      <TouchableOpacity style={styles.bookButton} onPress={bookAppointment}>
+        <Text style={styles.bookButtonText}>Book Appointment</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -107,60 +91,38 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  calendarButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignSelf: 'center',
-    alignItems: 'center',
-    backgroundColor: '#136b66',
-    borderRadius: 7,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    width: '40%',
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
-  iconText: {
-    fontSize: 20,
-    color: 'white',
+  scheduleItem: {
+    padding: 15,
+    backgroundColor: '#f0f0f0',
+    marginBottom: 10,
+    borderRadius: 5,
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    paddingTop: 150,
+  scheduleText: {
+    fontSize: 16,
   },
-  closeButton: {
-    marginTop: 20,
-  },
-  closeButtonText: {
-    fontSize: 18,
-    color: '#0D4744',
-  },
-  card: {
+  input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: 'gray',
     borderRadius: 5,
     padding: 10,
-    marginTop: 20,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    marginTop: 10,
     marginBottom: 10,
   },
-  slotContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  slotButton: {
+  bookButton: {
     backgroundColor: '#0D4744',
-    borderRadius: 5,
-    padding: 10,
-    margin: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 15,
+    borderRadius: 25,
   },
-  slotText: {
+  bookButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 18,
   },
 });
 

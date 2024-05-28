@@ -16,15 +16,14 @@ const PatientHome = ({route, navigation}) => {
   const handlePress = option => {
     // Handle navigation to the respective screens based on the selected option
     navigation.navigate(option, {
-    profileImage: profileImage,
-    userName: userName,
-  });
+      profileImage: profileImage,
+      userName: userName,
+    });
   };
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
-
 
   return (
     <View style={styles.container1}>
@@ -96,7 +95,7 @@ const PatientHome = ({route, navigation}) => {
       </View>
 
       {/* Drawer */}
-      <View style={[styles.drawer, {marginLeft: isDrawerOpen ? 0 : -200}]}>
+      <View style={[styles.drawer, {marginLeft: isDrawerOpen ? 0 : -300}]}>
         {/* User Profile in Drawer */}
         <TouchableOpacity>
           <View style={styles.profileContainer1}>
@@ -113,7 +112,14 @@ const PatientHome = ({route, navigation}) => {
           }}>
           <Text>BOOK MARKS</Text>
         </TouchableOpacity>
-        
+        <TouchableOpacity
+          style={styles.drawerItem}
+          onPress={() => {
+            navigation.navigate('PatientNotification');
+            setIsDrawerOpen(false); // Close drawer after navigating
+          }}>
+          <Text style={styles.notificationText}>Notification</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.drawerItem}
           onPress={() => {
@@ -133,18 +139,23 @@ const PatientHome = ({route, navigation}) => {
         <TouchableOpacity
           style={styles.drawerItem}
           onPress={() => {
-            navigation.navigate('DeleteAccount');
+            navigation.navigate('PatientDelete');
             setIsDrawerOpen(false); // Close drawer after navigating
           }}>
           <Text>Delete Account</Text>
         </TouchableOpacity>
-        <View style={styles.drawerItem}>
+        <TouchableOpacity
+          style={styles.drawerItem}
+          onPress={() => {
+            navigation.navigate('Logout');
+            setIsDrawerOpen(false); // Close drawer after navigating
+          }}>
           <Text>Logout</Text>
           <Image
             source={require('../Src/images/Logout.png')}
             style={styles.logoutImage}
           />
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* Overlay */}
@@ -170,7 +181,7 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     backgroundColor: '#f0f0f0',
-    width: 200, // Width of the drawer
+    width: 300, // Width of the drawer
     zIndex: 100, // Ensure drawer is on top of content
     borderTopRightRadius: 20,
     borderBottomRightRadius: 20,

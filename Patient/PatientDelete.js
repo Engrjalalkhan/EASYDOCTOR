@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
-import {View, Text, Button, Alert, TouchableOpacity} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import React, { useState } from 'react';
+import { View, Text, Button, Alert, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 
 const DeleteAccountScreen = () => {
@@ -11,15 +11,17 @@ const DeleteAccountScreen = () => {
     setLoading(true);
     try {
       // Query all documents from the Doctor collection
-      const querySnapshot = await firestore().collection('Doctor').get();
+      const querySnapshot = await firestore().collection('Patients').get();
 
       // Delete each document
       const deletePromises = querySnapshot.docs.map(doc => doc.ref.delete());
       await Promise.all(deletePromises);
 
-      Alert.alert('Success', 'All accounts have been deleted successfully.', [
-        {text: 'OK', onPress: () => navigation.navigate('Splash')},
-      ]);
+      Alert.alert(
+        'Success',
+        'All accounts have been deleted successfully.',
+        [{ text: 'OK', onPress: () => navigation.navigate('Splash') }]
+      );
     } catch (error) {
       Alert.alert('Error', 'An error occurred while deleting the accounts.');
       console.error('Error deleting accounts:', error);
@@ -28,7 +30,7 @@ const DeleteAccountScreen = () => {
   };
 
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text style={{fontSize: 18, fontWeight: 'bold', color:"black"}}>
         Are you sure you want to delete accounts?
       </Text>

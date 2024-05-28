@@ -95,8 +95,7 @@ const Home = ({route, navigation}) => {
         </View>
       </View>
 
-      {/* Drawer */}
-      <View style={[styles.drawer, {marginLeft: isDrawerOpen ? 0 : -200}]}>
+      <View style={[styles.drawer, {marginLeft: isDrawerOpen ? 0 : -300}]}>
         {/* User Profile in Drawer */}
         <TouchableOpacity>
           <View style={styles.profileContainer1}>
@@ -121,6 +120,15 @@ const Home = ({route, navigation}) => {
             style={styles.switch}
           />
         </View>
+        {/* Additional notification text */}
+        <TouchableOpacity
+          style={styles.drawerItem}
+          onPress={() => {
+            navigation.navigate('DoctorNotification');
+            setIsDrawerOpen(false); // Close drawer after navigating
+          }}>
+          <Text style={styles.notificationText}>Notification</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.drawerItem}
           onPress={() => {
@@ -145,13 +153,18 @@ const Home = ({route, navigation}) => {
           }}>
           <Text>Delete Account</Text>
         </TouchableOpacity>
-        <View style={styles.drawerItem}>
+        <TouchableOpacity
+          style={styles.drawerItem}
+          onPress={() => {
+            navigation.navigate('Logout');
+            setIsDrawerOpen(false); // Close drawer after navigating
+          }}>
           <Text>Logout</Text>
           <Image
             source={require('../Src/images/Logout.png')}
             style={styles.logoutImage}
           />
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* Overlay */}
@@ -177,7 +190,7 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     backgroundColor: '#f0f0f0',
-    width: 200, // Width of the drawer
+    width: 300, // Width of the drawer
     zIndex: 100, // Ensure drawer is on top of content
     borderTopRightRadius: 20,
     borderBottomRightRadius: 20,

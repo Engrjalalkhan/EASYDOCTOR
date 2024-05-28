@@ -28,10 +28,16 @@ import ViewProfile from '../Patient/ViewProfile';
 import UserFeedback from '../Doctor/UserFeedback';
 import PatientLoginScreen from '../Patient/PatientLogin';
 import DoctorLoginScreen from '../Doctor/DoctorLogin';
+import OnlineScreen from '../Doctor/OnlineScreen';
 import BookmarkScreen from '../Patient/Bookmark';
 import BookingScreen from '../Patient/BookingScreen';
+import DoctorNotificationScreen from '../Doctor/DoctorNotification';
+import PatientNotificationScreen from '../Patient/PatientNotification';
+import PatientDelete from '../Patient/PatientDelete';
+import LogoutScreen from '../Src/Screen/LogoutScreen';
 
 const Stack = createNativeStackNavigator();
+
 
 const Navigator = () => {
   return (
@@ -84,6 +90,11 @@ const Navigator = () => {
           options={{headerShown: true}}
         />
         <Stack.Screen
+          name="OnlineScreen"
+          component={OnlineScreen}
+          options={{headerShown: true}}
+        />
+        <Stack.Screen
           name="Help"
           component={HelpScreen}
           options={{headerShown: true}}
@@ -91,6 +102,16 @@ const Navigator = () => {
         <Stack.Screen
           name="DeleteAccount"
           component={DeleteAccountScreen}
+          options={{headerShown: true}}
+        />
+        <Stack.Screen
+          name="PatientDelete"
+          component={PatientDelete}
+          options={{headerShown: true}}
+        />
+        <Stack.Screen
+          name="Logout"
+          component={LogoutScreen}
           options={{headerShown: true}}
         />
         <Stack.Screen
@@ -186,6 +207,16 @@ const Navigator = () => {
         <Stack.Screen
           name="Book"
           component={BookingScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="DoctorNotification"
+          component={DoctorNotificationScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="PatientNotification"
+          component={PatientNotificationScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

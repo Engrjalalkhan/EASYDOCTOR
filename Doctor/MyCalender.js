@@ -58,16 +58,13 @@ const MyCalendarScreen = () => {
         },
         allDays: allEnabled,
       };
-  
-      await firestore().collection('Schedules').doc('schedule1').set(scheduleData);
+
+      await firestore().collection('Schedules').doc('doctorSchedule').set(scheduleData);
       console.log('Schedule saved successfully!');
     } catch (error) {
       console.error('Error saving schedule: ', error);
     }
   };
-  
-  
-
 
   return (
     <ScrollView style={styles.container}>

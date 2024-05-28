@@ -1,5 +1,5 @@
 {
-  "name": "EASYDOCTOR",
+  "name": "easydoctor",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -37,7 +37,8 @@
     "react-native-screens": "^3.31.1",
     "react-native-star-rating": "^1.1.0",
     "react-native-ui-datepicker": "^2.0.2",
-    "react-native-vector-icons": "^10.1.0"
+    "react-native-vector-icons": "^10.1.0",
+    "twilio": "^5.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
@@ -58,5 +59,10 @@
   },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "description": "This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

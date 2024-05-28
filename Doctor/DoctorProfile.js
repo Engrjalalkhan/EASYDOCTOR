@@ -133,7 +133,7 @@ const DoctorProfile = () => {
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: 'white',
-            width: 400,
+            width: 380,
             marginTop: 60,
             borderTopLeftRadius: 25,
             borderTopRightRadius: 25,
