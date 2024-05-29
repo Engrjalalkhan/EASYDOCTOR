@@ -48,8 +48,8 @@ const styles = StyleSheet.create({
     
   },
   calendar: {
-    width: 400, // Adjust the width of the calendar
-    height: 400, // Adjust the height of the calendar
+    width: 380, // Adjust the width of the calendar
+    height: 380, // Adjust the height of the calendar
     alignSelf:'center',
     borderRadius:15,
     borderWidth:1,

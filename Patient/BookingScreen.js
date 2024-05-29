@@ -1,86 +1,96 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  FlatList,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import Calendar from '../Doctor/Calendar';
 
-const BookingScreen = () => {
-  const [schedules, setSchedules] = useState([]);
-  const [selectedSchedule, setSelectedSchedule] = useState(null);
-  const [patientName, setPatientName] = useState('');
-  const [patientPhone, setPatientPhone] = useState('');
+const BookingScreen = ({navigation}) => {
+  const [morningSlots, setMorningSlots] = useState([]);
+  const [eveningSlots, setEveningSlots] = useState([]);
+  const [selectedMorningSlot, setSelectedMorningSlot] = useState(null);
+  const [selectedEveningSlot, setSelectedEveningSlot] = useState(null);
 
   useEffect(() => {
-    const fetchSchedules = async () => {
-      const scheduleSnapshot = await firestore().collection('Schedules').get();
-      const scheduleList = scheduleSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setSchedules(scheduleList);
+    const fetchSlots = async () => {
+      const docRef = firestore().collection('Schedules').doc('doctorSchedule');
+
+      const doc = await docRef.get();
+
+      if (doc.exists) {
+        const data = doc.data();
+        setMorningSlots(data.morning || []);
+        setEveningSlots(data.evening || []);
+      }
     };
 
-    fetchSchedules();
+    fetchSlots();
   }, []);
 
-  const bookAppointment = async () => {
-    if (!selectedSchedule || !patientName || !patientPhone) {
-      alert('Please fill in all fields.');
-      return;
-    }
+  const handleProceed=()=>{
+    navigation.navigate('Proceed')
+  }
 
-    try {
-      await firestore().collection('Appointments').add({
-        scheduleId: selectedSchedule.id,
-        patientName,
-        patientPhone,
-        status: 'pending',
-        doctorNotified: false,
-      });
-      alert('Appointment booked successfully!');
-    } catch (error) {
-      console.error('Error booking appointment: ', error);
-      alert('Failed to book appointment. Please try again.');
+  const handleSlotClick = (slot, period) => {
+    if (period === 'morning') {
+      setSelectedMorningSlot(slot.startTime);
+    } else {
+      setSelectedEveningSlot(slot.startTime);
+    }
+    console.log(`Slot ${slot.startTime} clicked`);
+  };
+ 
+
+  const renderSlotCard = (slots, period) => {
+    if (slots.length > 0) {
+      return slots.map((slot, index) => (
+        <TouchableOpacity
+          key={index}
+          style={[
+            styles.slotButton,
+            (period === 'morning' && selectedMorningSlot === slot.startTime) ||
+            (period === 'evening' && selectedEveningSlot === slot.startTime)
+              ? styles.selectedSlotButton
+              : null,
+          ]}
+          onPress={() => handleSlotClick(slot, period)}
+        >
+          <Text
+            style={[
+              styles.slotText,
+              (period === 'morning' && selectedMorningSlot === slot.startTime) ||
+              (period === 'evening' && selectedEveningSlot === slot.startTime)
+                ? styles.selectedSlotText
+                : null,
+            ]}
+          >
+            {slot.startTime}
+          </Text>
+        </TouchableOpacity>
+      ));
+    } else {
+      return <Text>No slots available</Text>;
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Book an Appointment</Text>
-      <FlatList
-        data={schedules}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.scheduleItem}
-            onPress={() => setSelectedSchedule(item)}
-          >
-            <Text style={styles.scheduleText}>
-              {item.morning.enabled ? `Morning: ${item.morning.fromTime} - ${item.morning.toTime}` : 'No morning schedule'}
-            </Text>
-            <Text style={styles.scheduleText}>
-              {item.evening.enabled ? `Evening: ${item.evening.fromTime} - ${item.evening.toTime}` : 'No evening schedule'}
-            </Text>
-          </TouchableOpacity>
-        )}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Your Name"
-        value={patientName}
-        onChangeText={setPatientName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Your Phone"
-        value={patientPhone}
-        onChangeText={setPatientPhone}
-        keyboardType="phone-pad"
-      />
-      <TouchableOpacity style={styles.bookButton} onPress={bookAppointment}>
-        <Text style={styles.bookButtonText}>Book Appointment</Text>
+      <Calendar />
+      <View style={styles.cardContainer}>
+        <View style={styles.card}>
+          <Text style={styles.sectionHeader}>MORNING</Text>
+          <View style={styles.slotRow}>{renderSlotCard(morningSlots, 'morning')}</View>
+        </View>
+      </View>
+      <View style={styles.cardContainer}>
+        <View style={styles.card}>
+          <Text style={styles.sectionHeader}>EVENING</Text>
+          <View style={styles.slotRow}>{renderSlotCard(eveningSlots, 'evening')}</View>
+        </View>
+      </View>
+      <TouchableOpacity
+        style={styles.proceedButton}
+        onPress={handleProceed}
+      >
+        <Text style={styles.proceedButtonText}>PROCEED</Text>
       </TouchableOpacity>
     </View>
   );
@@ -91,38 +101,56 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  scheduleItem: {
-    padding: 15,
-    backgroundColor: '#f0f0f0',
-    marginBottom: 10,
-    borderRadius: 5,
-  },
-  scheduleText: {
-    fontSize: 16,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 5,
-    padding: 10,
+  cardContainer: {
     marginTop: 10,
-    marginBottom: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    padding: 10,
   },
-  bookButton: {
+  card: {
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    borderRadius: 5,
+  },
+  sectionHeader: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#0D4744',
+  },
+  slotRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-evenly',
+  },
+  slotButton: {
+    backgroundColor: 'lightgray',
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
+  },
+  selectedSlotButton: {
     backgroundColor: '#0D4744',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 15,
-    borderRadius: 25,
   },
-  bookButtonText: {
-    color: 'white',
+  slotText: {
+    fontSize: 16,
+    color: '#000', // default text color
+  },
+  selectedSlotText: {
+    color: '#fff', // selected text color
+  },
+  proceedButton: {
+    height: 50,
+    width: '60%',
+    backgroundColor: '#0D4744',
+    alignSelf: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  proceedButtonText: {
     fontSize: 18,
+    color: '#fff',
+    alignSelf: 'center',
   },
 });
 

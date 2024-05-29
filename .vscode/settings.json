@@ -1,6 +1,7 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
     "cSpell.words": [
+        "datepicker",
         "Inwith",
         "lightgray",
         "Notificationscreen",

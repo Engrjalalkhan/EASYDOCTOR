@@ -35,6 +35,8 @@ import DoctorNotificationScreen from '../Doctor/DoctorNotification';
 import PatientNotificationScreen from '../Patient/PatientNotification';
 import PatientDelete from '../Patient/PatientDelete';
 import LogoutScreen from '../Src/Screen/LogoutScreen';
+import ProceedScreen from '../Patient/ProceedScreen';
+import PaymentScreen from '../Patient/PaymentScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -217,6 +219,16 @@ const Navigator = () => {
         <Stack.Screen
           name="PatientNotification"
           component={PatientNotificationScreen}
+          options={{headerShown: false}}
+        />
+         <Stack.Screen
+          name="Proceed"
+          component={ProceedScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="PaymentScreen"
+          component={PaymentScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>
