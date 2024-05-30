@@ -39,6 +39,7 @@ const PatientHome = ({ route }) => {
 
   const handleBookAppointment = () => {
     // Implement booking functionality here
+    navigation.navigate("Book")
   };
 
   const handleCallDoctor = () => {

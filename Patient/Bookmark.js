@@ -26,6 +26,7 @@ const BookmarkScreen = () => {
   };
   const handleBookAppointment = () => {
     // Implement booking functionality here
+    navigation.navigate("Book")
   };
 
   const handleCallDoctor = () => {
@@ -58,6 +59,7 @@ const BookmarkScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={{fontSize:20,fontWeight:"bold",alignSelf:"center", marginBottom:10}}>BOOK MARKS</Text>
       <FlatList
         data={bookmarkedDoctors}
         renderItem={renderDoctorCard}
