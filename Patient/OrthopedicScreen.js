@@ -85,7 +85,9 @@ const PatientHome = ({ route }) => {
       <View style={styles.doctorDetails}>
         <Text style={styles.doctorName}>{item.name}</Text>
         <Text style={styles.specialty}>{item.specialty}</Text>
-        <Text style={styles.experience}>Years of Experience: {item.experience}</Text>
+        <Text style={styles.experience}>Experience: {item.experience} year</Text>
+        <Text style={styles.experience}>Location: {item.clinicAddress}</Text>
+        <Text style={styles.experience}>Rasst: {item.rasst}</Text>
         {/* Add more doctor details here */}
       </View>
       <View style={styles.buttonContainer}>
@@ -130,7 +132,6 @@ const PatientHome = ({ route }) => {
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: '#fff',
-            paddingHorizontal: 40,
             borderTopRightRadius: 25,
             borderTopLeftRadius: 25,
             paddingTop:20,
@@ -165,7 +166,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
-    width:300,
+    width:350,
   },
   profileContainer: {
     alignItems: 'center',

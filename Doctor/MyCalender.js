@@ -6,7 +6,6 @@ import {
   Switch,
   TextInput,
   StyleSheet,
-  Modal,
   Image,
   ScrollView,
 } from 'react-native';
@@ -132,14 +131,11 @@ const MyCalendarScreen = () => {
           style={{ width: 24, height: 24, justifyContent: 'flex-end' }}
         />
       </TouchableOpacity>
-      <Modal visible={showCalendar} transparent={true}>
-        <View style={styles.modalContainer}>
+      
+        
           <Calendar />
-          <TouchableOpacity style={styles.closeButton} onPress={toggleCalendar}>
-            <Text style={styles.closeButtonText}>Close</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+        
+      
 
       <View style={styles.morningToggle}>
         <Text style={styles.sectionTitle}>Morning</Text>

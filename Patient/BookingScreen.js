@@ -1,18 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import Calendar from '../Doctor/Calendar';
+import { Calendar } from 'react-native-calendars';
 
-const BookingScreen = ({navigation}) => {
+// Calendar Card Component
+const CalendarCard = ({ selectedDate, setSelectedDate }) => {
+  // Function to handle date selection
+  const handleDateSelection = (date) => {
+    setSelectedDate(date);
+  };
+
+  return (
+    <View>
+      {/* Your calendar UI here */}
+      <Calendar
+        style={{ borderRadius: 15, borderWidth: 2, borderColor: "gray" }}
+        onDayPress={(day) => handleDateSelection(day.dateString)}
+        markedDates={{
+          [selectedDate]: { selected: true, selectedColor: '#0D4744' }
+        }}
+      />
+    </View>
+  );
+};
+
+const BookingScreen = ({ navigation }) => {
   const [morningSlots, setMorningSlots] = useState([]);
   const [eveningSlots, setEveningSlots] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
   const [selectedMorningSlot, setSelectedMorningSlot] = useState(null);
   const [selectedEveningSlot, setSelectedEveningSlot] = useState(null);
 
   useEffect(() => {
     const fetchSlots = async () => {
+      // Fetching slots from Firestore
       const docRef = firestore().collection('Schedules').doc('doctorSchedule');
-
       const doc = await docRef.get();
 
       if (doc.exists) {
@@ -25,9 +47,28 @@ const BookingScreen = ({navigation}) => {
     fetchSlots();
   }, []);
 
-  const handleProceed=()=>{
-    navigation.navigate('Proceed')
-  }
+  const handleProceed = () => {
+    if (selectedDate || (selectedMorningSlot || selectedEveningSlot)) {
+      // Storing selected date and time slots in Firestore
+      firestore()
+        .collection('Bookings')
+        .add({
+          date: selectedDate,
+          morningSlot: selectedMorningSlot,
+          eveningSlot: selectedEveningSlot,
+        })
+        .then(() => {
+          console.log('Booking saved successfully!');
+          navigation.navigate('Proceed');
+        })
+        .catch((error) => {
+          console.error('Error saving booking: ', error);
+        });
+    } else {
+      // Display alert if date or time slot is not selected
+      Alert.alert('Error', 'Please select a date and at least one time slot.');
+    }
+  };
 
   const handleSlotClick = (slot, period) => {
     if (period === 'morning') {
@@ -37,7 +78,6 @@ const BookingScreen = ({navigation}) => {
     }
     console.log(`Slot ${slot.startTime} clicked`);
   };
- 
 
   const renderSlotCard = (slots, period) => {
     if (slots.length > 0) {
@@ -73,7 +113,9 @@ const BookingScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Calendar />
+      {/* Calendar Card */}
+      <CalendarCard selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+
       <View style={styles.cardContainer}>
         <View style={styles.card}>
           <Text style={styles.sectionHeader}>MORNING</Text>
@@ -86,16 +128,12 @@ const BookingScreen = ({navigation}) => {
           <View style={styles.slotRow}>{renderSlotCard(eveningSlots, 'evening')}</View>
         </View>
       </View>
-      <TouchableOpacity
-        style={styles.proceedButton}
-        onPress={handleProceed}
-      >
+      <TouchableOpacity style={styles.proceedButton} onPress={handleProceed}>
         <Text style={styles.proceedButtonText}>PROCEED</Text>
       </TouchableOpacity>
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -1,31 +1,127 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Alert } from 'react-native';
 import { RadioButton, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import firestore from '@react-native-firebase/firestore';
 
 const ProceedScreen = () => {
   const [selectedOption, setSelectedOption] = useState('');
-  const [showFields, setShowFields] = useState(false);
+  const [showForMeFields, setShowForMeFields] = useState(false);
+  const [showForSomeoneElseFields, setShowForSomeoneElseFields] = useState(false);
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
+  const [gender, setGender] = useState('');
   const [symptom, setSymptom] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [complications, setComplications] = useState('');
+  const [fieldsValid, setFieldsValid] = useState(true);
+  const [patientname,setPatientName] = useState('');
+  const [patientage, setPatientage] = useState('');
+  const [patientgender, setPatientgender] = useState('');
+  const [patientsymptom, setPatientsymptom] = useState('');
+  const [patientcomplications, setPatientcomplications] = useState('');
 
   const navigation = useNavigation();
 
   const handleOptionChange = (value) => {
     setSelectedOption(value);
-    if (value === 'forSomeoneElse') {
-      setShowFields(true);
-    } else {
-      setShowFields(false);
-    }
+    setShowForMeFields(value === 'forMe');
+    setShowForSomeoneElseFields(value === 'forSomeoneElse');
   };
 
   const handleProceed = () => {
-    // Proceed to the Payment screen
-    navigation.navigate('PaymentScreen');
+    let bookingData = {};
+  
+    if (selectedOption === 'forMe') {
+      if (validateFieldsForMe()) {
+        bookingData = {
+          type: 'forMe',
+          patient: {
+            name: name,
+            age: age,
+            gender: gender,
+            symptom: symptom,
+            complications: complications,
+            // Add other relevant patient data here
+          }
+        };
+      }
+    } else if (selectedOption === 'forSomeoneElse') {
+      if (validateFieldsForSomeoneElse()) {
+        bookingData = {
+          type: 'forSomeoneElse',
+          patient: {
+            name: patientname,
+            age: patientage,
+            gender: patientgender,
+            symptom: patientsymptom,
+            complications: patientcomplications,
+            // Add other relevant patient data here
+          }
+        };
+      } 
+    }
+  
+    if (Object.keys(bookingData).length > 0) {
+      checkAndUpdateBooking(bookingData);
+    }
+  };
+  
+  const checkAndUpdateBooking = async (bookingData) => {
+    try {
+      const bookingId = await getRandomBookingId();
+      if (bookingId) {
+        updateBooking(bookingId, bookingData);
+      } else {
+        console.log('No bookings found.');
+        // Handle case where there are no bookings in the collection
+      }
+    } catch (error) {
+      console.error('Error checking and updating booking: ', error);
+    }
+  };
+  
+  const getRandomBookingId = async () => {
+    try {
+      const snapshot = await firestore().collection('Bookings').get();
+      const bookingIds = snapshot.docs.map(doc => doc.id);
+      const randomIndex = Math.floor(Math.random() * bookingIds.length);
+      return bookingIds[randomIndex];
+    } catch (error) {
+      throw error;
+    }
+  };
+  
+  const updateBooking = async (bookingId, bookingData) => {
+    try {
+      await firestore()
+        .collection('Bookings')
+        .doc(bookingId)
+        .update(bookingData);
+      console.log('Booking updated successfully!');
+      navigation.navigate('PaymentScreen');
+    } catch (error) {
+      console.error('Error updating booking: ', error);
+    }
+  };
+  
+  
+
+  const validateFieldsForMe = () => {
+    if (!name || !age || !gender || !symptom || !complications) {
+      setFieldsValid(false);
+      return false;
+    }
+    setFieldsValid(true);
+    return true;
+  };
+
+  const validateFieldsForSomeoneElse = () => {
+    if (!patientname || !patientage || !patientgender || !patientsymptom || !patientcomplications) {
+      setFieldsValid(false);
+      return false;
+    }
+    setFieldsValid(true);
+    return true;
   };
 
   return (
@@ -47,38 +143,104 @@ const ProceedScreen = () => {
           color="#0D4744"
         />
       </View>
-      {showFields && (
+      {showForMeFields && (
         <View style={styles.inputContainer}>
           <TextInput
-            style={[styles.input, { borderColor: '#0D4744' }]}
-            placeholder="Name"
+            style={[
+              styles.input,
+              { borderColor: fieldsValid ? '#0D4744' : 'red' },
+            ]}
+            placeholder="Your Name"
             value={name}
             onChangeText={setName}
           />
           <TextInput
-            style={[styles.input, { borderColor: '#0D4744' }]}
-            placeholder="Age"
+            style={[
+              styles.input,
+              { borderColor: fieldsValid ? '#0D4744' : 'red' },
+            ]}
+            placeholder="Your Age"
             value={age}
             onChangeText={setAge}
           />
           <TextInput
-            style={[styles.input, { borderColor: '#0D4744' }]}
-            placeholder="Symptom"
+            style={[
+              styles.input,
+              { borderColor: fieldsValid ? '#0D4744' : 'red' },
+            ]}
+            placeholder="Your Gender"
+            value={gender}
+            onChangeText={setGender}
+          />
+          <TextInput
+            style={[
+              styles.input,
+              { borderColor: fieldsValid ? '#0D4744' : 'red' },
+            ]}
+            placeholder="Your Symptom"
             value={symptom}
             onChangeText={setSymptom}
           />
           <TextInput
-            style={[styles.input, { borderColor: '#0D4744' }]}
-            placeholder="Phone Number"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-          />
-          <TextInput
-            style={[styles.input, { borderColor: '#0D4744' }]}
-            placeholder="Any Other Complications"
+            style={[
+              styles.input,
+              { borderColor: fieldsValid ? '#0D4744' : 'red' },
+            ]}
+            placeholder="Your Complication"
             value={complications}
             onChangeText={setComplications}
           />
+          {/* Add other fields for "For Me" option */}
+        </View>
+      )}
+      {showForSomeoneElseFields && (
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={[
+              styles.input,
+              { borderColor: fieldsValid ? '#0D4744' : 'red' },
+            ]}
+            placeholder="Patient's Name"
+            value={patientname}
+            onChangeText={setPatientName}
+          />
+          <TextInput
+            style={[
+              styles.input,
+              { borderColor: fieldsValid ? '#0D4744' : 'red' },
+            ]}
+            placeholder="Patient's Age"
+            value={patientage}
+            onChangeText={setPatientage}
+          />
+          <TextInput
+            style={[
+              styles.input,
+              { borderColor: fieldsValid ? '#0D4744' : 'red' },
+            ]}
+            placeholder="Patient's Gender"
+            value={patientgender}
+            onChangeText={setPatientgender}
+          />
+          <TextInput
+            style={[
+              styles.input,
+              { borderColor: fieldsValid ? '#0D4744' : 'red' },
+            ]}
+            placeholder="Patient's Symptom"
+            value={patientsymptom}
+            onChangeText={setPatientsymptom}
+          />
+          <TextInput
+            style={[
+              styles.input,
+              { borderColor: fieldsValid ? '#0D4744' : 'red' },
+            ]}
+            placeholder="Patient's Complication"
+            value={patientcomplications}
+            onChangeText={setPatientcomplications}
+          />
+          {/* Add other fields for "For Someone Else" option */}
         </View>
       )}
       <Button
@@ -92,7 +254,6 @@ const ProceedScreen = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

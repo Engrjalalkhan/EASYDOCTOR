@@ -37,6 +37,7 @@ import PatientDelete from '../Patient/PatientDelete';
 import LogoutScreen from '../Src/Screen/LogoutScreen';
 import ProceedScreen from '../Patient/ProceedScreen';
 import PaymentScreen from '../Patient/PaymentScreen';
+import MyAppointmentsScreen from '../Patient/MyAppointmentScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -209,27 +210,33 @@ const Navigator = () => {
         <Stack.Screen
           name="Book"
           component={BookingScreen}
-          options={{headerShown: false}}
+          options={{headerTitleAlign:"center"}}
+  
         />
         <Stack.Screen
           name="DoctorNotification"
           component={DoctorNotificationScreen}
-          options={{headerShown: false}}
+          options={{headerTitleAlign:"center"}}
         />
         <Stack.Screen
           name="PatientNotification"
           component={PatientNotificationScreen}
-          options={{headerShown: false}}
+          options={{headerTitleAlign:"center"}}
         />
          <Stack.Screen
           name="Proceed"
           component={ProceedScreen}
-          options={{headerShown: false}}
+          options={{headerTitleAlign:"center"}}
         />
         <Stack.Screen
           name="PaymentScreen"
           component={PaymentScreen}
-          options={{headerShown: false}}
+          options={{headerTitleAlign:"center"}}
+        />
+        <Stack.Screen
+          name="MyAppointment"
+          component={MyAppointmentsScreen}
+          options={{headerTitleAlign:"center"}}
         />
       </Stack.Navigator>
     </NavigationContainer>

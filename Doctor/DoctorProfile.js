@@ -9,13 +9,13 @@ import {
   Modal,
   StyleSheet,
   TouchableOpacity,
-  Alert
+  Alert,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import ImagePicker from 'react-native-image-crop-picker';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
-import {useNavigation} from '@react-navigation/native'; 
+import {useNavigation} from '@react-navigation/native';
 
 const specialties = [
   'Cardiology',
@@ -27,8 +27,22 @@ const specialties = [
   // Add more specialties as needed
 ];
 
-const DoctorProfile = () => {
+const clinicAddresses = [
+  'Islamabad',
+  'Peshawar',
+  'Lahore',
+  'Karachi',
+  'Bannu',
+  'Rawalpindi',
+  'Gujranwala',
+  'Faisalabad',
+  'Quetta',
+  'Bahawalpur',
+  'DI Khan',
+  // Add more addresses as needed
+];
 
+const DoctorProfile = () => {
   const navigation = useNavigation();
 
   const [name, setName] = useState('');
@@ -36,6 +50,8 @@ const DoctorProfile = () => {
   const [password, setPassword] = useState('');
   const [specialty, setSpecialty] = useState('');
   const [experience, setExperience] = useState('');
+  const [rasst, setRasst] = useState('');
+  const [clinicAddress, setClinicAddress] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -72,19 +88,34 @@ const DoctorProfile = () => {
         setModalVisible(false);
       });
   };
+
   const handleSaveProfile = async () => {
     // Validate input fields
-    if (!name || !email || !password || !specialty || !experience || !selectedImage) {
-      Alert.alert('Error', 'Please fill out all fields and select a profile image.');
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !specialty ||
+      !experience ||
+      !clinicAddress ||
+      !rasst||
+      !selectedImage
+    ) {
+      Alert.alert(
+        'Error',
+        'Please fill out all fields and select a profile image.',
+      );
       return;
     }
-  
+
     try {
       // Upload profile image to Firebase Storage
-      const imageRef = storage().ref().child('Doctors/' + name);
+      const imageRef = storage()
+        .ref()
+        .child('Doctors/' + name);
       await imageRef.putFile(selectedImage);
       const imageUrl = await imageRef.getDownloadURL();
-    
+
       // Save profile data to Firestore
       await firestore().collection('Doctor').add({
         name,
@@ -92,9 +123,11 @@ const DoctorProfile = () => {
         password,
         specialty,
         experience,
+        clinicAddress,
+        rasst,
         imageUrl, // URL of the uploaded profile image
       });
-      
+
       // Navigate to Patient Home screen after saving profile
       navigation.navigate('HomeScreen', {
         specialtyFilter: specialty, // Pass the selected specialty as navigation parameter
@@ -107,12 +140,11 @@ const DoctorProfile = () => {
     }
   };
 
-
   return (
     <View style={styles.container}>
       <View
         style={{
-          marginTop: 100,
+          marginTop: 40,
           alignItems: 'center',
         }}>
         <Text
@@ -121,7 +153,6 @@ const DoctorProfile = () => {
             textAlign: 'center',
             color: 'white',
             fontWeight: 'bold',
-
           }}>
           EASY + DOCTOR
         </Text>
@@ -134,7 +165,7 @@ const DoctorProfile = () => {
             justifyContent: 'center',
             backgroundColor: 'white',
             width: 380,
-            marginTop: 60,
+            marginTop: 20,
             borderTopLeftRadius: 25,
             borderTopRightRadius: 25,
           }}>
@@ -156,6 +187,7 @@ const DoctorProfile = () => {
                 style={styles.profileImage}
               />
             )}
+            
           </TouchableOpacity>
 
           {/* Modal with options */}
@@ -241,10 +273,43 @@ const DoctorProfile = () => {
               ))}
             </Picker>
           </View>
+          <View
+            style={{
+              width: 300,
+              borderColor: 'gray',
+              borderWidth: 1,
+              marginBottom: 20,
+              borderRadius: 10,
+            }}>
+            <Picker
+              selectedValue={clinicAddress}
+              onValueChange={itemValue => setClinicAddress(itemValue)}
+              style={{height: '8%', width: '100%'}}>
+              <Picker.Item label="Select Clinic Address" value="" />
+              {clinicAddresses.map(address => (
+                <Picker.Item label={address} value={address} key={address} />
+              ))}
+            </Picker>
+          </View>
           <TextInput
             placeholder="Years of Experience"
             value={experience}
             onChangeText={setExperience}
+            keyboardType="numeric"
+            style={{
+              width: 300,
+              height: 40,
+              borderColor: 'gray',
+              borderWidth: 1,
+              marginBottom: 20,
+              paddingHorizontal: 10,
+              borderRadius: 10,
+            }}
+          />
+          <TextInput
+            placeholder="Rasst ID for Payment"
+            value={rasst}
+            onChangeText={setRasst}
             keyboardType="numeric"
             style={{
               width: 300,
@@ -264,7 +329,6 @@ const DoctorProfile = () => {
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: 15,
-              marginTop: 20,
             }}
             onPress={handleSaveProfile}>
             <Text style={{color: 'white', fontSize: 18}}>Save Profile</Text>
@@ -276,6 +340,7 @@ const DoctorProfile = () => {
 };
 
 export default DoctorProfile;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -290,7 +355,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 20,
+    margin: 10,
   },
   profileImage: {
     width: '100%',

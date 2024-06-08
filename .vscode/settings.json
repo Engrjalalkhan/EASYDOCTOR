@@ -1,11 +1,22 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
     "cSpell.words": [
+        "Bahawalpur",
+        "Bannu",
         "datepicker",
+        "datetimepicker",
         "Inwith",
         "lightgray",
         "Notificationscreen",
+        "patientage",
+        "patientcomplications",
+        "patientgender",
+        "patientname",
+        "patientsymptom",
+        "Quetta",
+        "Rasst",
         "Selction",
+        "Tesseract",
         "toslot",
         "Upwith"
     ]
