@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const PaymentScreen = () => {
   const [doctors, setDoctors] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [paymentOption, setPaymentOption] = useState('cash');
   const [verificationMessage, setVerificationMessage] = useState('');
   const [selectedDoctorId, setSelectedDoctorId] = useState(null);
@@ -34,6 +35,26 @@ const PaymentScreen = () => {
       });
 
     return () => unsubscribe();
+  }, []);
+  
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const bookingsRef = firestore().collection('Bookings');
+        const snapshot = await bookingsRef.get();
+        const bookingsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setBookings(bookingsData);
+      } catch (error) {
+        console.error('Error fetching bookings: ', error);
+      }
+    };
+
+    fetchBookings();
+
+    // Cleanup function
+    return () => {
+      // Any cleanup logic, if needed
+    };
   }, []);
 
   const handleAddAttachment = async (doctorId) => {
@@ -96,53 +117,51 @@ const PaymentScreen = () => {
 
   const handleBookAppointment = async (doctorId) => {
     try {
-      if (paymentOption === 'online') {
-        // Check if the notification for this doctor is verified
-        const notificationRef = firestore().collection('Notifications').where('doctorId', '==', doctorId).where('verified', '==', true);
-        const notificationSnapshot = await notificationRef.get();
-  
-        if (notificationSnapshot.empty) {
-          Alert.alert(
-            'Unverified Attachment',
-            'Please wait for the doctor to verify the attachment before booking an appointment.',
-          );
-          return;
+        if (paymentOption === 'online') {
+            // Check if the notification for this doctor is verified
+            const notificationRef = firestore().collection('Notifications').where('doctorId', '==', doctorId).where('verified', '==', true);
+            const notificationSnapshot = await notificationRef.get();
+
+            if (notificationSnapshot.empty) {
+                Alert.alert(
+                    'Unverified Attachment',
+                    'Please wait for the doctor to verify the attachment before booking an appointment.',
+                );
+                return;
+            }
         }
-      }
-  
-      // Book the appointment
-      console.log(`Appointment booked with doctor ${doctorId}`);
-  
-      // Add the appointment to the 'Appointments' collection
-      const appointmentData = {
-        doctorId: doctorId,
-        patientId: '', // replace with actual patient ID
-        appointmentDate: 'June 15, 2024', // example appointment date
-        appointmentTime: '10:00 AM', // example appointment time
-      };
-      await firestore().collection('Appointments').add(appointmentData);
-  
-      // Show success message with a tick mark image
-      Alert.alert(
-        'Appointment Booked',
-        'Your appointment has been successfully booked!',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              // Navigate to the patient home screen
-              navigation.navigate('Book');
-            },
-          },
-        ],
-        { cancelable: false }
-      );
-  
+
+        // Assuming appointmentData contains the necessary appointment information
+        const appointmentData = {
+            // doctorId: name,
+             // Assuming a function to get user ID
+            // Add other appointment details here
+        };
+
+        // Add appointment data to the existing document fields of the Bookings collection
+        await firestore().collection('Bookings').doc().set(appointmentData, { merge: true });
+
+        Alert.alert(
+            'Appointment Booked',
+            'Your appointment has been successfully booked!',
+            [
+                {
+                    text: 'OK',
+                    onPress: () => {
+                        // Navigate to the patient home screen
+                        navigation.navigate('Book');
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
+
     } catch (error) {
-      console.error('Error booking appointment:', error);
-      
+        console.error('Error booking appointment:', error);
+
     }
-  };
+};
+
   
   
 
@@ -165,8 +184,18 @@ const PaymentScreen = () => {
           <Text style={styles.experience}>Rasst: {item.rasst}</Text>
         </View>
       </TouchableOpacity>
-      <Text style={styles.appointment}>Appointment Date: June 15, 2024 </Text>
-      <Text style={styles.appointment}>Appointment 10:00 AM</Text>
+      <FlatList
+        data={bookings}
+        renderItem={({ item }) => (
+          <View style={styles.bookingContainer}>
+            <Text style={styles.booking}>Booking Date: {item.date}</Text>
+            <Text style={styles.booking}>Booking Evening Time: {item.eveningSlot}</Text>
+            <Text style={styles.booking}>Booking Morning Time: {item.morningSlot}</Text>
+            {/* Add more fields as needed */}
+          </View>
+        )}
+        keyExtractor={(item) => item.id}
+      />
       <View style={styles.paymentOptions}>
         <Text style={styles.paymentLabel}>Payment Options:</Text>
         <View style={styles.radioButton}>
@@ -306,6 +335,17 @@ const PaymentScreen = () => {
       color: '#fff',
       fontWeight: 'bold',
     },
+    bookingContainer: {
+      borderColor: '#00000',
+      borderRadius: 5,
+      padding: 10,
+      marginBottom: 10,
+    },
+    booking:{
+      fontSize:18,
+      textAlign:"center",
+      color:"black"
+    }
   });
   
   export default PaymentScreen;

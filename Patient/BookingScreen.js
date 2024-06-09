@@ -54,8 +54,8 @@ const BookingScreen = ({ navigation }) => {
         .collection('Bookings')
         .add({
           date: selectedDate,
-          morningSlot: selectedMorningSlot,
-          eveningSlot: selectedEveningSlot,
+          morningSlot: selectedMorningSlot ? selectedMorningSlot + ' AM' : null,
+          eveningSlot: selectedEveningSlot ? selectedEveningSlot + ' PM' : null,
         })
         .then(() => {
           console.log('Booking saved successfully!');
@@ -69,6 +69,7 @@ const BookingScreen = ({ navigation }) => {
       Alert.alert('Error', 'Please select a date and at least one time slot.');
     }
   };
+  
 
   const handleSlotClick = (slot, period) => {
     if (period === 'morning') {
@@ -102,7 +103,7 @@ const BookingScreen = ({ navigation }) => {
                 : null,
             ]}
           >
-            {slot.startTime}
+            {slot.startTime} {period === 'morning' ? 'AM' : 'PM'}
           </Text>
         </TouchableOpacity>
       ));
@@ -110,6 +111,7 @@ const BookingScreen = ({ navigation }) => {
       return <Text>No slots available</Text>;
     }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -157,20 +159,19 @@ const styles = StyleSheet.create({
   },
   slotRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-evenly',
+    justifyContent: 'flex-start',
   },
   slotButton: {
     backgroundColor: 'lightgray',
-    padding: 10,
-    margin: 5,
+    padding: 6,
+    margin: 3,
     borderRadius: 5,
   },
   selectedSlotButton: {
     backgroundColor: '#0D4744',
   },
   slotText: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#000', // default text color
   },
   selectedSlotText: {
