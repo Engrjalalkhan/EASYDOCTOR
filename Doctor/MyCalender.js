@@ -151,7 +151,7 @@ const MyCalendarScreen = () => {
                 style={styles.input}
                 value={morningFromTime}
                 onChangeText={setMorningFromTime}
-                placeholder="08:00 AM"
+                placeholder="08:00 PM"
                 
               />
             </View>
@@ -161,7 +161,7 @@ const MyCalendarScreen = () => {
                 style={styles.input}
                 value={morningToTime}
                 onChangeText={setMorningToTime}
-                placeholder="9:00 AM"
+                placeholder="9:00 PM"
                 
               />
             </View>
@@ -196,7 +196,7 @@ const MyCalendarScreen = () => {
                 style={styles.input}
                 value={eveningFromTime}
                 onChangeText={setEveningFromTime}
-                placeholder="05:00 PM"
+                placeholder="05:00 AM"
                 
               />
             </View>
@@ -206,7 +206,7 @@ const MyCalendarScreen = () => {
                 style={styles.input}
                 value={eveningToTime}
                 onChangeText={setEveningToTime}
-                placeholder="09:00 PM"
+                placeholder="09:00 AM"
               />
             </View>
             <View>

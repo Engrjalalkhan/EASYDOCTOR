@@ -50,12 +50,25 @@ const FeedbackScreen = ({ route }) => {
     }
   
     try {
+      // Add feedback to the 'feedback' collection
       await firestore().collection('feedback').add({
         doctorId: selectedDoctor, // Set the doctorId field to selectedDoctor
         feedback: feedback,
         rating: rating,
         createdAt: firestore.FieldValue.serverTimestamp(),
       });
+  
+      // Check if the rating is positive (greater than 3)
+      if (rating > 3) {
+        // Add the doctor to the 'TopDoctor' collection
+        await firestore().collection('TopDoctor').doc(selectedDoctor).set({
+          doctorId: selectedDoctor,
+          feedback: feedback,
+          rating: rating,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        });
+      }
+  
       Alert.alert('Success', 'Thank you for your feedback!');
       setFeedback('');
       setRating(0);
@@ -66,6 +79,7 @@ const FeedbackScreen = ({ route }) => {
       Alert.alert('Error', 'Something went wrong. Please try again later.');
     }
   };
+  
   
 
   if (loading) {

@@ -1,170 +1,229 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+} from 'react-native';
+import firestore from '@react-native-firebase/firestore';
 
-const NewAppointment = ({ route, navigation }) => {
-  // Extract profile image URL and user name from navigation parameters
-  const { profileImage, userName } = route.params;
+const NewAppointment = ({route, navigation}) => {
+  const {profileImage, userName} = route.params;
+  const [topDoctors, setTopDoctors] = useState([]);
+
+  useEffect(() => {
+    const fetchTopDoctors = async () => {
+      try {
+        // Fetch top doctor IDs from TopDoctor collection
+        const topDoctorSnapshot = await firestore()
+          .collection('TopDoctor')
+          .get();
+        const doctorIds = topDoctorSnapshot.docs.map(
+          doc => doc.data().doctorId,
+        );
+
+        // Fetch detailed doctor data from Doctor collection
+        const doctorPromises = doctorIds.map(async id => {
+          const doctorDoc = await firestore()
+            .collection('Doctor')
+            .doc(id)
+            .get();
+          return {id: doctorDoc.id, ...doctorDoc.data()};
+        });
+
+        const doctorsList = await Promise.all(doctorPromises);
+        setTopDoctors(doctorsList);
+      } catch (error) {
+        console.error('Error fetching top doctors:', error);
+      }
+    };
+
+    fetchTopDoctors();
+  }, []);
+
   const handlePress = option => {
-    // Handle navigation to the respective screens based on the selected option
     navigation.navigate(option, {
-    profileImage: profileImage,
-    userName: userName,
-  });
+      profileImage: profileImage,
+      userName: userName,
+    });
   };
+  const handleViewProfile = (doctorId) => {
+    navigation.navigate('FeedbackScreen', { doctorId });
+  };
+
+  const handleBookAppointment = () => {
+    // Implement booking functionality here
+    navigation.navigate("Book")
+  };
+
+  const handleCallDoctor = () => {
+    // Implement calling functionality here
+  };
+  const [bookmarkedDoctors, setBookmarkedDoctors] = useState([]);
+
+  const handleBookmarkDoctor = async (doctor) => {
+    try {
+      // Check if the doctor is already bookmarked
+      const bookmarkSnapshot = await firestore()
+        .collection('BookmarkedDoctors')
+        .where('id', '==', doctor.id)
+        .get();
+  
+      if (!bookmarkSnapshot.empty) {
+        // Doctor is already bookmarked, remove it
+        const docId = bookmarkSnapshot.docs[0].id;
+        await firestore().collection('BookmarkedDoctors').doc(docId).delete();
+        setBookmarkedDoctors(prevBookmarkedDoctors =>
+          prevBookmarkedDoctors.filter(bookmarkedDoctor => bookmarkedDoctor.id !== doctor.id)
+        );
+      } else {
+        // Doctor is not bookmarked, add it
+        await firestore().collection('BookmarkedDoctors').add(doctor);
+        setBookmarkedDoctors(prevBookmarkedDoctors => [...prevBookmarkedDoctors, doctor]);
+      }
+    } catch (error) {
+      console.error('Error toggling bookmark for doctor: ', error);
+    }
+  };
+
   return (
     <View style={styles.container1}>
       <View style={styles.content}>
-        <Text
-          style={{
-            fontSize: 24,
-            textAlign: 'center',
-            color: 'white',
-            fontWeight: 'bold',
-            paddingBottom: -30,
-          }}>
-          EASY + DOCTOR
-        </Text>
+        <Text style={styles.headerText}>EASY + DOCTOR</Text>
         <View style={styles.profileContainer}>
-          {/* Navigate back to PatientHome when back button is clicked */}
-          {/* <TouchableOpacity onPress={() => navigation.navigate('PatientHome', {
-            profileImage: profileImage,
-            userName: userName,
-          })}>
-            <Image
-              source={require('../Src/images/back.png')}
-              style={{ width: 25, height: 25, paddingLeft: 40 }}
-            />
-          </TouchableOpacity> */}
-
           <Text style={styles.userName}>{userName}</Text>
-          <Image source={{ uri: profileImage }} style={styles.profileImage} />
+          <Image source={{uri: profileImage}} style={styles.profileImage} />
         </View>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: '#fff',
-            paddingHorizontal: 40,
-            borderTopRightRadius: 25,
-            borderTopLeftRadius: 25,
-          }}>
-          {/* Search bar */}
+        <View style={styles.mainContent}>
           <View style={styles.searchBar}>
-            <Image source={require('../Src/images/search.png')} style={{width:25,height:25,marginVertical:10 }}/>
+            <Image
+              source={require('../Src/images/search.png')}
+              style={styles.searchIcon}
+            />
             <TextInput
               placeholder="Search specialties"
               style={styles.searchInput}
               placeholderTextColor="#999"
             />
           </View>
-
-          {/* Title for specialties */}
           <Text style={styles.specialtiesTitle}>Specialties</Text>
-
-          {/* Additional content of the NewAppointment screen */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.specialtiesContainer}>
-            {/* Example specialties with circular shapes */}
-            <TouchableOpacity style={styles.specialty} onPress={() => handlePress('DentalScreen')}>
+            <TouchableOpacity
+              style={styles.specialty}
+              onPress={() => handlePress('DentalScreen')}>
               <Image
                 source={require('../Src/images/Dental.png')}
                 style={styles.specialtyIcon}
               />
               <Text style={styles.specialtyText}>Dentistry</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.specialty} onPress={() => handlePress('CardiologyScreen')}>
+            <TouchableOpacity
+              style={styles.specialty}
+              onPress={() => handlePress('CardiologyScreen')}>
               <Image
                 source={require('../Src/images/heart.png')}
                 style={styles.specialtyIcon}
               />
               <Text style={styles.specialtyText}>Cardiology</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.specialty} onPress={() => handlePress('PediatricsScreen')}>
+            <TouchableOpacity
+              style={styles.specialty}
+              onPress={() => handlePress('PediatricsScreen')}>
               <Image
                 source={require('../Src/images/children.png')}
                 style={styles.specialtyIcon}
               />
               <Text style={styles.specialtyText}>Pediatrics</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.specialty} onPress={() => handlePress('DermatologyScreen')}>
+            <TouchableOpacity
+              style={styles.specialty}
+              onPress={() => handlePress('DermatologyScreen')}>
               <Image
                 source={require('../Src/images/skin.png')}
                 style={styles.specialtyIcon}
               />
               <Text style={styles.specialtyText}>Dermatology</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.specialty} onPress={() => handlePress('BrainScreen')}>
+            <TouchableOpacity
+              style={styles.specialty}
+              onPress={() => handlePress('BrainScreen')}>
               <Image
                 source={require('../Src/images/brain.png')}
                 style={styles.specialtyIcon}
               />
               <Text style={styles.specialtyText}>Brain</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.specialty} onPress={() => handlePress('OrthopedicScreen')}>
+            <TouchableOpacity
+              style={styles.specialty}
+              onPress={() => handlePress('OrthopedicScreen')}>
               <Image
                 source={require('../Src/images/bon.png')}
                 style={styles.specialtyIcon}
               />
               <Text style={styles.specialtyText}>Orthopedic</Text>
             </TouchableOpacity>
-            {/* Add more specialties as needed */}
           </ScrollView>
-          {/* Title for symptoms */}
-          <Text style={styles.specialtiesTitle}>Symptoms</Text>
-
-          {/* ScrollView for symptoms */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.symptomsContainer}>
-            {/* Example symptoms with circular shapes */}
-            <TouchableOpacity style={styles.symptoms}>
-              <Image
-                source={require('../Src/images/fever.png')}
-                style={styles.symptomsIcon}
-              />
-              <Text style={styles.symptomsText}>Fever</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.symptoms}>
-              <Image
-                source={require('../Src/images/cough.png')}
-                style={styles.symptomsIcon}
-              />
-              <Text style={styles.symptomsText}>Cough</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.symptoms}>
-              <Image
-                source={require('../Src/images/headache.png')}
-                style={styles.symptomsIcon}
-              />
-              <Text style={styles.symptomsText}>Headache</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.symptoms}>
-              <Image
-                source={require('../Src/images/fever.png')}
-                style={styles.symptomsIcon}
-              />
-              <Text style={styles.symptomsText}>Fever</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.symptoms}>
-              <Image
-                source={require('../Src/images/cough.png')}
-                style={styles.symptomsIcon}
-              />
-              <Text style={styles.symptomsText}>Cough</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.symptoms}>
-              <Image
-                source={require('../Src/images/headache.png')}
-                style={styles.symptomsIcon}
-              />
-              <Text style={styles.symptomsText}>Headache</Text>
-            </TouchableOpacity>
-            {/* Add more symptoms as needed */}
-          </ScrollView>
+          <Text style={styles.topDoctorsTitle}>Top Doctors</Text>
+          {topDoctors.map(doctor => (
+            <View key={doctor.id} style={styles.card}>
+              <View style={styles.profileContainer1}>
+                <Image
+                  source={{uri: doctor.imageUrl}}
+                  style={styles.profileImage1}
+                />
+                <TouchableOpacity onPress={() => handleViewProfile(doctor.id)}>
+                  <Text style={styles.viewProfileButton}>View Feedback</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.doctorDetails}>
+                <Text style={styles.doctorName}>{doctor.name}</Text>
+                <Text style={styles.specialty}>{doctor.specialty}</Text>
+                <Text style={styles.experience}>
+                  Experience: {doctor.experience} year
+                </Text>
+                <Text style={styles.experience}>
+                  Location: {doctor.clinicAddress}
+                </Text>
+                <Text style={styles.experience}>Rasst: {doctor.rasst}</Text>
+                {/* Add more doctor details here */}
+              </View>
+              <View style={styles.buttonContainer}>
+                <View style={styles.bookmarkContainer}>
+                  <TouchableOpacity
+                    onPress={() => handleBookmarkDoctor(doctor)}
+                    style={styles.bookmarkButton}>
+                    <Text
+                      style={[
+                        styles.bookmarkText,
+                        {
+                          color: bookmarkedDoctors.includes(doctor.id)
+                            ? 'gold'
+                            : 'gray',
+                        },
+                      ]}>
+                      🔖
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <TouchableOpacity
+                  onPress={handleBookAppointment}
+                  style={styles.actionButton}>
+                  <Text style={styles.actionButtonText}>Book</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleCallDoctor}
+                  style={styles.actionButton}>
+                  <Text style={styles.actionButtonText}>Call</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
         </View>
       </View>
     </View>
@@ -182,6 +241,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 50,
     backgroundColor: '#0D4744',
+  },
+  headerText: {
+    fontSize: 24,
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: 'bold',
+    paddingBottom: -30,
   },
   profileContainer: {
     flexDirection: 'row',
@@ -204,6 +270,16 @@ const styles = StyleSheet.create({
     color: 'white',
     paddingRight: 150,
   },
+  mainContent: {
+    // flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: 40,
+    borderTopRightRadius: 25,
+    borderTopLeftRadius: 25,
+    height:650
+  },
   searchBar: {
     width: '100%',
     backgroundColor: '#fff',
@@ -211,20 +287,24 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#ccc', // Border color
-    marginTop:20,
-    flexDirection:'row'
+    borderColor: '#ccc',
+    marginTop: 20,
+    flexDirection: 'row',
+  },
+  searchIcon: {
+    width: 25,
+    height: 25,
+    marginVertical: 10,
   },
   searchInput: {
     fontSize: 16,
     color: '#333',
   },
-  
   specialtiesTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
-    alignSelf:"flex-start"
+    alignSelf: 'flex-start',
   },
   specialtiesContainer: {
     paddingTop: 10,
@@ -233,7 +313,7 @@ const styles = StyleSheet.create({
   specialty: {
     alignItems: 'center',
     marginHorizontal: 10,
-    marginStart:10
+    marginStart: 10,
   },
   specialtyIcon: {
     width: 60,
@@ -245,30 +325,63 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
   },
-   symptomsTitle: {
+  topDoctorsTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
-    alignSelf:"flex-start"
+    marginVertical: 10,
+    alignSelf: 'flex-start',
   },
-  symptomsContainer: {
-    paddingTop: 10,
-    paddingBottom: 20,
-    marginBottom:240,
-  },
-  symptoms: {
+  card: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 10,
-    marginStart:10
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 5,
+    marginBottom: 50,
+    width:350,
+    justifyContent:'space-between',
   },
-  symptomsIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+  profileContainer1: {
+    alignItems: 'center',
+  },
+  profileImage1: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     marginBottom: 10,
   },
-  symptomsText: {
-    color: 'black',
+  viewProfileButton: {
+    color: '#0D4744',
     fontWeight: 'bold',
+    textDecorationLine: 'underline',
+    marginTop: 5,
+  },
+  buttonContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  actionButton: {
+    backgroundColor: '#0D4744',
+    paddingHorizontal: 20,
+    paddingVertical: 5,
+    borderRadius: 5,
+    marginTop: 5,
+    width: '100%',
+  },
+  actionButtonText: {
+    color: 'white',
+    textAlign: 'center',
+  },
+  bookmarkButton: {
+    alignItems: 'center',
+    width: 50,
+    height: 50,
+    top: 10,
+    right: 10,
+    paddingLeft:20
+  },
+  bookmarkText: {
+    fontSize: 24,
   },
 });

@@ -63,6 +63,7 @@ const PatientLoginScreen = () => {
         });
       } else {
         Alert.alert('Error', 'Patient profile not found.');
+        navigation.navigate('PatientProfile')
       }
     } catch (error) {
       console.error('Login error: ', error);

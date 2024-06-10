@@ -80,6 +80,7 @@ const DoctorLoginScreen = () => {
           userName: doctorData.name,
         });
       } else {
+        navigation.navigate('DoctorProfile')
         Alert.alert('Error', 'Doctor profile not found.');
       }
     } catch (error) {

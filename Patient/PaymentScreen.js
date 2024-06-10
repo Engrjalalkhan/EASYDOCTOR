@@ -133,7 +133,7 @@ const PaymentScreen = () => {
 
         // Assuming appointmentData contains the necessary appointment information
         const appointmentData = {
-            // doctorId: name,
+            doctorId: doctorId,
              // Assuming a function to get user ID
             // Add other appointment details here
         };

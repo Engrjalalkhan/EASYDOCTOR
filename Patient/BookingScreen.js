@@ -54,8 +54,8 @@ const BookingScreen = ({ navigation }) => {
         .collection('Bookings')
         .add({
           date: selectedDate,
-          morningSlot: selectedMorningSlot ? selectedMorningSlot + ' AM' : null,
-          eveningSlot: selectedEveningSlot ? selectedEveningSlot + ' PM' : null,
+          morningSlot: selectedMorningSlot ? selectedMorningSlot + ' PM' : null,
+          eveningSlot: selectedEveningSlot ? selectedEveningSlot + ' AM' : null,
         })
         .then(() => {
           console.log('Booking saved successfully!');
@@ -103,7 +103,7 @@ const BookingScreen = ({ navigation }) => {
                 : null,
             ]}
           >
-            {slot.startTime} {period === 'morning' ? 'AM' : 'PM'}
+            {slot.startTime} {period === 'morning' ? 'PM' : 'AM'}
           </Text>
         </TouchableOpacity>
       ));
