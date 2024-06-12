@@ -130,16 +130,12 @@ const PaymentScreen = () => {
                 return;
             }
         }
-
-        // Assuming appointmentData contains the necessary appointment information
         const appointmentData = {
             doctorId: doctorId,
-             // Assuming a function to get user ID
-            // Add other appointment details here
         };
 
         // Add appointment data to the existing document fields of the Bookings collection
-        await firestore().collection('Bookings').doc().set(appointmentData, { merge: true });
+        await firestore().collection('Bookings').doc(doctorId).set(appointmentData, { merge: true });
 
         Alert.alert(
             'Appointment Booked',
@@ -158,9 +154,9 @@ const PaymentScreen = () => {
 
     } catch (error) {
         console.error('Error booking appointment:', error);
-
     }
 };
+
 
   
   
