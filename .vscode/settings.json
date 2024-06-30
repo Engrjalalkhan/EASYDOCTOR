@@ -1,12 +1,15 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
     "cSpell.words": [
+        "APIKEY",
         "Bahawalpur",
         "Bannu",
         "currentpatients",
         "datepicker",
         "datetimepicker",
+        "hotpink",
         "Inwith",
+        "latlng",
         "lightgray",
         "Notificationscreen",
         "patientage",
