@@ -50,6 +50,7 @@ const PatientNotificationScreen = () => {
               <Text style={styles.modalDetail}>Age: {selectedNotification.age}</Text>
               <Text style={styles.modalDetail}>Gender: {selectedNotification.gender}</Text>
               <Text style={styles.modalDetail}>Symptom: {selectedNotification.symptom}</Text>
+              <Text style={styles.modalDetail}>complications: {selectedNotification.complications}</Text>
               <Text style={styles.modalDetail}>Date: {selectedNotification.date}</Text>
               <Text style={styles.modalDetail}>Time: {selectedNotification.time}</Text>
             </>

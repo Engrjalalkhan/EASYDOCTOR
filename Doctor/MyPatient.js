@@ -34,6 +34,7 @@ const PatientScreen = () => {
         gender: patient.gender,  // Include gender
         symptom: patient.symptom,  // Include symptom
         date: patient.date,
+        complications: patient.complications,
         time: patient.morningSlot || patient.eveningSlot,
         createdAt: firestore.FieldValue.serverTimestamp(),
       });
@@ -92,7 +93,7 @@ const PatientScreen = () => {
               <Text style={styles.modalDetail}>Age: {selectedPatient.age}</Text>
               <Text style={styles.modalDetail}>Gender: {selectedPatient.gender}</Text>
               <Text style={styles.modalDetail}>Symptom: {selectedPatient.symptom}</Text>
-              {/* <Text style={styles.modalDetail}>Complication: {selectedPatient.complication}</Text> */}
+              <Text style={styles.modalDetail}>Complication: {selectedPatient.complications}</Text>
               <Text style={styles.modalDetail}>Appointment Date: {selectedPatient.date}</Text>
               <Text style={styles.modalDetail}>Time: {selectedPatient.morningSlot || selectedPatient.eveningSlot}</Text>
               <View style={styles.buttonContainer}>

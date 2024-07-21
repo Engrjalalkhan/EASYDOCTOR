@@ -250,11 +250,19 @@ const PaymentScreen = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={doctors}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-      />
+      {selectedDoctorId ? (
+        <FlatList
+          data={doctors.filter(doc => doc.id === selectedDoctorId)}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+        />
+      ) : (
+        <FlatList
+          data={doctors}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+        />
+      )}
     </View>
   );
 };
@@ -279,82 +287,78 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     marginBottom: 10,
   },
   doctorDetails: {
     flex: 1,
-    marginLeft: 20,
+    justifyContent: 'center',
+    marginLeft: 10,
   },
   doctorName: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#0D4744',
   },
   specialty: {
     fontSize: 16,
-    fontStyle: 'italic',
+    color: '#555',
   },
   experience: {
     fontSize: 14,
-    marginTop: 5,
-  },
-  appointment: {
-    fontSize: 14,
-    marginTop: 5,
-    fontWeight: 'bold',
-    alignSelf: 'center',
+    color: '#888',
   },
   paymentOptions: {
     marginTop: 10,
   },
   paymentLabel: {
+    fontSize: 16,
     fontWeight: 'bold',
   },
   radioButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 5,
+    marginBottom: 5,
   },
   addAttachmentButton: {
     backgroundColor: '#0D4744',
-    padding: 10,
     borderRadius: 5,
-    marginTop: 10,
+    padding: 10,
     alignItems: 'center',
+    marginTop: 10,
   },
   addAttachmentText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontSize: 16,
   },
   verificationMessage: {
-    color: 'green',
-    fontWeight: 'bold',
+    color: '#0D4744',
     marginTop: 10,
-    textAlign: 'center',
   },
   bookAppointmentButton: {
     backgroundColor: '#0D4744',
-    padding: 10,
     borderRadius: 5,
-    marginTop: 10,
+    padding: 10,
     alignItems: 'center',
+    marginTop: 10,
   },
   bookAppointmentText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontSize: 16,
   },
   bookingContainer: {
-    borderColor: '#00000',
-    borderRadius: 5,
+    marginTop: 10,
     padding: 10,
-    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    backgroundColor: '#f9f9f9',
   },
   booking: {
-    fontSize: 18,
-    textAlign: 'center',
-    color: 'black',
+    fontSize: 14,
+    color: '#333',
   },
 });
 

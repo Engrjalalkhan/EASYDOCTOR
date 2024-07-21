@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,9 +10,11 @@ import {
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 
-const NewAppointment = ({route, navigation}) => {
-  const {profileImage, userName} = route.params;
+const NewAppointment = ({ route, navigation }) => {
+  const { profileImage, userName } = route.params;
   const [topDoctors, setTopDoctors] = useState([]);
+  const [filteredDoctors, setFilteredDoctors] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchTopDoctors = async () => {
@@ -31,11 +33,12 @@ const NewAppointment = ({route, navigation}) => {
             .collection('Doctor')
             .doc(id)
             .get();
-          return {id: doctorDoc.id, ...doctorDoc.data()};
+          return { id: doctorDoc.id, ...doctorDoc.data() };
         });
 
         const doctorsList = await Promise.all(doctorPromises);
         setTopDoctors(doctorsList);
+        setFilteredDoctors(doctorsList); // Initialize filteredDoctors
       } catch (error) {
         console.error('Error fetching top doctors:', error);
       }
@@ -44,24 +47,39 @@ const NewAppointment = ({route, navigation}) => {
     fetchTopDoctors();
   }, []);
 
+  useEffect(() => {
+    // Filter doctors based on search query
+    const filtered = topDoctors.filter(doctor => {
+      const query = searchQuery.toLowerCase();
+      return (
+        doctor.name.toLowerCase().includes(query) ||
+        doctor.specialty.toLowerCase().includes(query) ||
+        doctor.clinicAddress.toLowerCase().includes(query)
+      );
+    });
+    setFilteredDoctors(filtered);
+  }, [searchQuery, topDoctors]);
+
   const handlePress = option => {
     navigation.navigate(option, {
       profileImage: profileImage,
       userName: userName,
     });
   };
+
   const handleViewProfile = (doctorId) => {
     navigation.navigate('FeedbackScreen', { doctorId });
   };
 
   const handleBookAppointment = () => {
     // Implement booking functionality here
-    navigation.navigate("Book")
+    navigation.navigate("Book");
   };
 
   const handleCallDoctor = () => {
     // Implement calling functionality here
   };
+
   const [bookmarkedDoctors, setBookmarkedDoctors] = useState([]);
 
   const handleBookmarkDoctor = async (doctor) => {
@@ -71,7 +89,7 @@ const NewAppointment = ({route, navigation}) => {
         .collection('BookmarkedDoctors')
         .where('id', '==', doctor.id)
         .get();
-  
+
       if (!bookmarkSnapshot.empty) {
         // Doctor is already bookmarked, remove it
         const docId = bookmarkSnapshot.docs[0].id;
@@ -95,18 +113,20 @@ const NewAppointment = ({route, navigation}) => {
         <Text style={styles.headerText}>EASY + DOCTOR</Text>
         <View style={styles.profileContainer}>
           <Text style={styles.userName}>{userName}</Text>
-          <Image source={{uri: profileImage}} style={styles.profileImage} />
+          <Image source={{ uri: profileImage }} style={styles.profileImage} />
         </View>
         <View style={styles.mainContent}>
           <View style={styles.searchBar}>
+            <TextInput
+              placeholder="Search name, specialty, location"
+              style={styles.searchInput}
+              placeholderTextColor="#999"
+              onChangeText={text => setSearchQuery(text)}
+              value={searchQuery}
+            />
             <Image
               source={require('../Src/images/search.png')}
               style={styles.searchIcon}
-            />
-            <TextInput
-              placeholder="Search specialties"
-              style={styles.searchInput}
-              placeholderTextColor="#999"
             />
           </View>
           <Text style={styles.specialtiesTitle}>Specialties</Text>
@@ -170,11 +190,11 @@ const NewAppointment = ({route, navigation}) => {
             </TouchableOpacity>
           </ScrollView>
           <Text style={styles.topDoctorsTitle}>Top Doctors</Text>
-          {topDoctors.map(doctor => (
+          {filteredDoctors.map(doctor => (
             <View key={doctor.id} style={styles.card}>
               <View style={styles.profileContainer1}>
                 <Image
-                  source={{uri: doctor.imageUrl}}
+                  source={{ uri: doctor.imageUrl }}
                   style={styles.profileImage1}
                 />
                 <TouchableOpacity onPress={() => handleViewProfile(doctor.id)}>
@@ -191,7 +211,6 @@ const NewAppointment = ({route, navigation}) => {
                   Location: {doctor.clinicAddress}
                 </Text>
                 <Text style={styles.experience}>Rasst: {doctor.rasst}</Text>
-                {/* Add more doctor details here */}
               </View>
               <View style={styles.buttonContainer}>
                 <View style={styles.bookmarkContainer}>
