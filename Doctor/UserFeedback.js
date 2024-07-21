@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     color: '#888',
+    paddingTop:350
   },
     feedbackText: {
       fontSize: 16,

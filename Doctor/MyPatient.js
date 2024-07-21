@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import { Ionicons } from '@expo/vector-icons'; // Import Ionicons for delete icon
 
 const PatientScreen = () => {
   const [patients, setPatients] = useState([]);

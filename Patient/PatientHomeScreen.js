@@ -74,7 +74,7 @@ const PatientHome = ({route, navigation}) => {
             <Text style={styles.cardText}>My Appointment</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => handlePress('TextCheckup')}
+            onPress={() => handlePress('PatientText CheckUp')}
             style={styles.card}>
             <Image
               source={require('../Src/images/chat.png')}
@@ -83,7 +83,7 @@ const PatientHome = ({route, navigation}) => {
             <Text style={styles.cardText}>Text Checkup</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => handlePress('VideoConsultation')}
+            onPress={() => handlePress('PatientVideo Consultation')}
             style={styles.card}>
             <Image
               source={require('../Src/images/consultation.png')}

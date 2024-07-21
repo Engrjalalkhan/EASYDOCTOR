@@ -38,6 +38,10 @@ import LogoutScreen from '../Src/Screen/LogoutScreen';
 import ProceedScreen from '../Patient/ProceedScreen';
 import PaymentScreen from '../Patient/PaymentScreen';
 import MyAppointmentsScreen from '../Patient/MyAppointmentScreen';
+import DoctorChat from '../Doctor/DoctorChat';
+import PatientChat from '../Patient/PatientChat';
+import PatientVideo from '../Patient/PatientVideo';
+import DoctorVideo from '../Doctor/DoctorVideo';
 
 const Stack = createNativeStackNavigator();
 
@@ -200,7 +204,7 @@ const Navigator = () => {
         <Stack.Screen
           name="PatientFeedback"
           component={UserFeedback}
-          options={{headerShown: false}}
+          options={{headerTitleAlign:"center"}}
         />
         <Stack.Screen
           name="Bookmark"
@@ -236,6 +240,26 @@ const Navigator = () => {
         <Stack.Screen
           name="MyAppointment"
           component={MyAppointmentsScreen}
+          options={{headerTitleAlign:"center"}}
+        />
+        <Stack.Screen
+          name="DoctorText CheckUp"
+          component={DoctorChat}
+          options={{headerTitleAlign:"center"}}
+        />
+        <Stack.Screen
+          name="PatientText CheckUp"
+          component={PatientChat}
+          options={{headerTitleAlign:"center"}}
+        />
+        <Stack.Screen
+          name="PatientVideo Consultation"
+          component={PatientVideo}
+          options={{headerTitleAlign:"center"}}
+        />
+        <Stack.Screen
+          name="DoctorVideo Consultation"
+          component={DoctorVideo}
           options={{headerTitleAlign:"center"}}
         />
       </Stack.Navigator>
