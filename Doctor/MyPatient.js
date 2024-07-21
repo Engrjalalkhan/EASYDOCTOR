@@ -1,177 +1,120 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import { Calendar } from 'react-native-calendars';
+import { Ionicons } from '@expo/vector-icons'; // Import Ionicons for delete icon
 
-// Calendar Card Component
-const CalendarCard = ({ selectedDate, setSelectedDate }) => {
-  // Function to handle date selection
-  const handleDateSelection = (date) => {
-    setSelectedDate(date);
-  };
-
-  return (
-    <View>
-      <Calendar
-        style={{ borderRadius: 15, borderWidth: 2, borderColor: 'gray' }}
-        onDayPress={(day) => handleDateSelection(day.dateString)}
-        markedDates={{
-          [selectedDate]: { selected: true, selectedColor: '#0D4744' }
-        }}
-      />
-    </View>
-  );
-};
-
-const BookingScreen = ({ navigation }) => {
-  const [morningSlots, setMorningSlots] = useState([]);
-  const [eveningSlots, setEveningSlots] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedMorningSlot, setSelectedMorningSlot] = useState(null);
-  const [selectedEveningSlot, setSelectedEveningSlot] = useState(null);
-  const [existingBookings, setExistingBookings] = useState([]);
-  const [showProceedButton, setShowProceedButton] = useState(true);
+const PatientScreen = () => {
+  const [patients, setPatients] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    const fetchSlots = async () => {
-      const docRef = firestore().collection('Schedules').doc('doctorSchedule');
-      const doc = await docRef.get();
-
-      if (doc.exists) {
-        const data = doc.data();
-        setMorningSlots(data.morning || []);
-        setEveningSlots(data.evening || []);
+    const fetchPatients = async () => {
+      try {
+        const querySnapshot = await firestore().collection('Bookings').get();
+        const patientsData = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return data.patient ? { ...data.patient, id: doc.id, date: data.date, morningSlot: data.morningSlot, eveningSlot: data.eveningSlot } : null;
+        }).filter(patient => patient !== null);
+        setPatients(patientsData);
+      } catch (error) {
+        console.error('Error fetching patients:', error);
       }
     };
 
-    fetchSlots();
+    fetchPatients();
   }, []);
 
-  const handleProceed = async () => {
-    if (selectedDate || (selectedMorningSlot || selectedEveningSlot)) {
-      const bookingsRef = firestore().collection('Bookings');
-      const querySnapshot = await bookingsRef
-        .where('date', '==', selectedDate)
-        .where('morningSlot', '==', selectedMorningSlot ? selectedMorningSlot + ' AM' : null)
-        .where('eveningSlot', '==', selectedEveningSlot ? selectedEveningSlot + ' PM' : null)
-        .get();
-
-      if (!querySnapshot.empty) {
-        const bookings = querySnapshot.docs.map(doc => doc.data());
-        setExistingBookings(bookings);
-        setShowProceedButton(false);
-      } else {
-        firestore()
-          .collection('Bookings')
-          .add({
-            date: selectedDate,
-            morningSlot: selectedMorningSlot ? selectedMorningSlot + ' AM' : null,
-            eveningSlot: selectedEveningSlot ? selectedEveningSlot + ' PM' : null,
-            name: "John Doe",
-            age: 30,
-            gender: "Male",
-            symptom: "Cough",
-            complication: "None"
-          })
-          .then(() => {
-            console.log('Booking saved successfully!');
-            navigation.navigate('Proceed');
-          })
-          .catch((error) => {
-            console.error('Error saving booking: ', error);
-          });
-      }
-    } else {
-      Alert.alert('Error', 'Please select a date and at least one time slot.');
+  const handlePing = async (patient) => {
+    try {
+      // Send notification data to Firestore
+      await firestore().collection('Notifications').add({
+        patientId: patient.id,
+        name: patient.name,
+        age: patient.age,  // Include age
+        gender: patient.gender,  // Include gender
+        symptom: patient.symptom,  // Include symptom
+        date: patient.date,
+        time: patient.morningSlot || patient.eveningSlot,
+        createdAt: firestore.FieldValue.serverTimestamp(),
+      });
+      Alert.alert('Ping', `Notification sent to ${patient.name} for appointment on ${patient.date} at ${patient.morningSlot || patient.eveningSlot}`);
+    } catch (error) {
+      console.error('Error sending notification:', error);
     }
   };
+  
+  
 
-  const handleSlotClick = (slot, period) => {
-    if (period === 'morning') {
-      setSelectedMorningSlot(slot.startTime);
-    } else {
-      setSelectedEveningSlot(slot.startTime);
-    }
-    console.log(`Slot ${slot.startTime} clicked`);
-  };
-
-  const renderSlotCard = (slots, period) => {
-    if (slots.length > 0) {
-      return slots.map((slot, index) => (
-        <TouchableOpacity
-          key={index}
-          style={[
-            styles.slotButton,
-            (period === 'morning' && selectedMorningSlot === slot.startTime) ||
-            (period === 'evening' && selectedEveningSlot === slot.startTime)
-              ? styles.selectedSlotButton
-              : null,
-          ]}
-          onPress={() => handleSlotClick(slot, period)}
-        >
-          <Text
-            style={[
-              styles.slotText,
-              (period === 'morning' && selectedMorningSlot === slot.startTime) ||
-              (period === 'evening' && selectedEveningSlot === slot.startTime)
-                ? styles.selectedSlotText
-                : null,
-            ]}
-          >
-            {slot.startTime} {period === 'morning' ? 'AM' : 'PM'}
-          </Text>
-        </TouchableOpacity>
-      ));
-    } else {
-      return <Text>No slots available</Text>;
+  const handleDelete = async (patientId) => {
+    try {
+      await firestore().collection('Bookings').doc(patientId).delete();
+      setPatients(patients.filter(patient => patient.id !== patientId));
+      Alert.alert('Deleted', 'Patient record removed successfully');
+    } catch (error) {
+      console.error('Error deleting patient:', error);
     }
   };
-
-  const renderBookingCard = ({ item }) => (
-    <View style={styles.bookingCard}>
-      <Text style={styles.bookingText}>Date: {item.date}</Text>
-      <Text style={styles.bookingText}>Morning Slot: {item.morningSlot}</Text>
-      <Text style={styles.bookingText}>Evening Slot: {item.eveningSlot}</Text>
-      <Text style={styles.bookingText}>Name: {item.name}</Text>
-      <Text style={styles.bookingText}>Age: {item.age}</Text>
-      <Text style={styles.bookingText}>Gender: {item.gender}</Text>
-      <Text style={styles.bookingText}>Symptom: {item.symptom}</Text>
-      <Text style={styles.bookingText}>Complication: {item.complication}</Text>
-    </View>
-  );
 
   return (
-    <View style={styles.container}>
-      <CalendarCard selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
-
+    <ScrollView style={styles.container}>
       <View style={styles.cardContainer}>
-        <View style={styles.card}>
-          <Text style={styles.sectionHeader}>MORNING</Text>
-          <View style={styles.slotRow}>{renderSlotCard(morningSlots, 'morning')}</View>
-        </View>
-      </View>
-      <View style={styles.cardContainer}>
-        <View style={styles.card}>
-          <Text style={styles.sectionHeader}>EVENING</Text>
-          <View style={styles.slotRow}>{renderSlotCard(eveningSlots, 'evening')}</View>
-        </View>
+        {patients.map((patient, index) => (
+          <View key={index} style={styles.patientCard}>
+            <TouchableOpacity onPress={() => { setSelectedPatient(patient); setModalVisible(true); }}>
+              <Text style={styles.patientDetail}>Name: {patient.name}</Text>
+              <Text style={styles.patientDetail}>Age: {patient.age}</Text>
+              <Text style={styles.patientDetail}>Gender: {patient.gender}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => handleDelete(patient.id)}
+            >
+              <Image
+                source={require('../Src/images/red.png')} // Replace with the path to your delete icon image
+                style={styles.deleteIcon}
+              />
+            </TouchableOpacity>
+          </View>
+        ))}
       </View>
 
-      {existingBookings.length > 0 && (
-        <FlatList
-          data={existingBookings}
-          renderItem={renderBookingCard}
-          keyExtractor={(item, index) => index.toString()}
-          style={styles.bookingList}
-        />
+      {selectedPatient && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalTitle}>Patient Details</Text>
+              <Text style={styles.modalDetail}>Name: {selectedPatient.name}</Text>
+              <Text style={styles.modalDetail}>Age: {selectedPatient.age}</Text>
+              <Text style={styles.modalDetail}>Gender: {selectedPatient.gender}</Text>
+              <Text style={styles.modalDetail}>Symptom: {selectedPatient.symptom}</Text>
+              {/* <Text style={styles.modalDetail}>Complication: {selectedPatient.complication}</Text> */}
+              <Text style={styles.modalDetail}>Appointment Date: {selectedPatient.date}</Text>
+              <Text style={styles.modalDetail}>Time: {selectedPatient.morningSlot || selectedPatient.eveningSlot}</Text>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => { handlePing(selectedPatient); setModalVisible(false); }}
+                >
+                  <Text style={styles.buttonText}>Ping</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.closeButton]}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.buttonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       )}
-
-      {showProceedButton && (
-        <TouchableOpacity style={styles.proceedButton} onPress={handleProceed}>
-          <Text style={styles.proceedButtonText}>PROCEED</Text>
-        </TouchableOpacity>
-      )}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -182,68 +125,79 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     marginTop: 10,
-    borderRadius: 5,
-    borderWidth: 1,
     padding: 10,
   },
-  card: {
-    backgroundColor: '#f0f0f0',
-    padding: 10,
-    borderRadius: 5,
+  patientCard: {
+    backgroundColor: '#e0e0e0',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+    position: 'relative', // Required for positioning the delete button
   },
-  sectionHeader: {
+  patientDetail: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'transparent',
+    borderRadius: 20,
+    padding: 5,
+  },
+  deleteIcon: {
+    width: 30,
+    height: 30,
+    borderRadius:15
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '80%',
+  },
+  modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#0D4744',
+    marginBottom: 15,
   },
-  slotRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-  },
-  slotButton: {
-    backgroundColor: 'lightgray',
-    padding: 6,
-    margin: 3,
-    borderRadius: 5,
-  },
-  selectedSlotButton: {
-    backgroundColor: '#0D4744',
-  },
-  slotText: {
-    fontSize: 14,
-    color: '#000',
-  },
-  selectedSlotText: {
-    color: '#fff',
-  },
-  bookingCard: {
-    backgroundColor: '#fff',
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  bookingText: {
+  modalDetail: {
     fontSize: 16,
+    marginBottom: 10,
   },
-  bookingList: {
-    marginTop: 10,
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
   },
-  proceedButton: {
-    height: 50,
-    width: '60%',
+  button: {
     backgroundColor: '#0D4744',
-    alignSelf: 'center',
-    justifyContent: 'center',
     borderRadius: 10,
-    marginTop: 10,
+    padding: 10,
+    marginHorizontal: 10,
   },
-  proceedButtonText: {
-    fontSize: 18,
-    color: '#fff',
-    alignSelf: 'center',
+  closeButton: {
+    backgroundColor: '#f44336',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
   },
 });
 
-export default BookingScreen;
+export default PatientScreen;
