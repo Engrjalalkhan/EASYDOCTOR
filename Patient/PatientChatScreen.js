@@ -4,20 +4,20 @@ import {
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 
-const ChatScreen = ({ route }) => {
-  const { patientData } = route.params;
+const PatientChatScreen = ({ route }) => {
+  const { doctorData } = route.params;
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    if (!patientData?.id) {
-      console.error('Invalid patient data');
+    if (!doctorData?.id) {
+      console.error('Invalid doctor data');
       return;
     }
 
     const unsubscribe = firestore()
       .collection('Chats')
-      .where('doctorId', '==', patientData.id)
+      .where('doctorId', '==', doctorData.id)
       .orderBy('timestamp', 'asc')
       .onSnapshot(querySnapshot => {
         const messagesData = querySnapshot.docs.map(doc => ({
@@ -28,14 +28,14 @@ const ChatScreen = ({ route }) => {
       });
 
     return () => unsubscribe();
-  }, [patientData]);
+  }, [doctorData]);
 
   const handleSend = async () => {
     if (message.trim()) {
       try {
         await firestore().collection('Chats').add({
-          doctorId: patientData.id,
-          sender: 'doctor',
+          doctorId: doctorData.id,
+          sender: 'patient',
           message,
           timestamp: firestore.FieldValue.serverTimestamp(),
         });
@@ -50,7 +50,7 @@ const ChatScreen = ({ route }) => {
     <View
       style={[
         styles.messageContainer,
-        item.sender === 'doctor' ? styles.sentMessage : styles.receivedMessage
+        item.sender === 'patient' ? styles.sentMessage : styles.receivedMessage
       ]}
     >
       <Text style={styles.messageText}>{item.message}</Text>
@@ -138,4 +138,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatScreen;
+export default PatientChatScreen;

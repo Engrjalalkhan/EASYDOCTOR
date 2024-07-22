@@ -42,6 +42,8 @@ import DoctorChat from '../Doctor/DoctorChat';
 import PatientChat from '../Patient/PatientChat';
 import PatientVideo from '../Patient/PatientVideo';
 import DoctorVideo from '../Doctor/DoctorVideo';
+import ChatScreen from '../Doctor/chatScreen';
+import PatientChatScreen from '../Patient/PatientChatScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -260,6 +262,16 @@ const Navigator = () => {
         <Stack.Screen
           name="DoctorVideo Consultation"
           component={DoctorVideo}
+          options={{headerTitleAlign:"center"}}
+        />
+        <Stack.Screen
+          name="chatScreen"
+          component={ChatScreen}
+          options={{headerTitleAlign:"center"}}
+        />
+        <Stack.Screen
+          name="PatientChat"
+          component={PatientChatScreen}
           options={{headerTitleAlign:"center"}}
         />
       </Stack.Navigator>

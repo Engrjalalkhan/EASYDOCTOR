@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import { useNavigation } from '@react-navigation/native';
 
 const PatientScreen = () => {
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -24,10 +26,6 @@ const PatientScreen = () => {
     fetchPatients();
   }, []);
 
-  
-  
-  
-
   const handleDelete = async (patientId) => {
     try {
       await firestore().collection('Bookings').doc(patientId).delete();
@@ -36,6 +34,11 @@ const PatientScreen = () => {
     } catch (error) {
       console.error('Error deleting patient:', error);
     }
+  };
+
+  const handleChat = (patient) => {
+    // Navigate to the ChatScreen and pass the selected patient information
+    navigation.navigate('chatScreen', { patient });
   };
 
   return (
@@ -55,6 +58,15 @@ const PatientScreen = () => {
               <Image
                 source={require('../Src/images/red.png')} // Replace with the path to your delete icon image
                 style={styles.deleteIcon}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.chatButton}
+              onPress={() => handleChat(patient)}
+            >
+              <Image
+                source={require('../Src/images/chat.png')} // Replace with the path to your chat icon image
+                style={styles.chatIcon}
               />
             </TouchableOpacity>
           </View>
@@ -78,7 +90,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
-    position: 'relative', // Required for positioning the delete button
+    position: 'relative', // Required for positioning the buttons
   },
   patientDetail: {
     fontSize: 16,
@@ -95,54 +107,21 @@ const styles = StyleSheet.create({
   deleteIcon: {
     width: 30,
     height: 30,
-    borderRadius:15
+    borderRadius: 15,
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalView: {
-    backgroundColor: 'white',
+  chatButton: {
+    position: 'absolute',
+    top: 50,
+    right: 10,
+    backgroundColor: 'transparent',
     borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    width: '80%',
+    padding: 5,
   },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-  },
-  modalDetail: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    marginTop: 20,
-  },
-  button: {
-    backgroundColor: '#0D4744',
-    borderRadius: 10,
-    padding: 10,
-    marginHorizontal: 10,
-  },
-  closeButton: {
-    backgroundColor: '#f44336',
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
+  chatIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginTop:10
   },
 });
 
