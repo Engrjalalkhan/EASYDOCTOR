@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
   },
   modalImage: {
     width: '100%',
-    height: 400,
+    height: 500,
   },
   closeButton: {
     backgroundColor: '#f44336',

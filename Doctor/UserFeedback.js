@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
   flatListContent: {
     paddingHorizontal: 20,
     paddingBottom: 20,
+    paddingTop:10
   },
   feedbackCard: {
     borderWidth: 1,
