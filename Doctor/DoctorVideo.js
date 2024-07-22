@@ -1,95 +1,78 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import { getAuth } from '@react-native-firebase/auth';
+import { useNavigation } from '@react-navigation/native';
 
-const DoctorVideoScreen = () => {
-  const [bookings, setBookings] = useState([]);
-  const [doctorId, setDoctorId] = useState(null);
+const PatientScreen = () => {
+  const [patients, setPatients] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
-    const fetchDoctorId = async () => {
+    const fetchPatients = async () => {
       try {
-        const auth = getAuth();
-        const user = auth.currentUser;
-
-        if (user) {
-          // Fetch the doctor's document using the logged-in user's ID
-          const doctorSnapshot = await firestore().collection('Doctor').where('userId', '==', user.uid).get();
-          
-          if (!doctorSnapshot.empty) {
-            const doctorData = doctorSnapshot.docs[0].data();
-            setDoctorId(doctorData.doctorId);
-          } else {
-            Alert.alert('Error', 'Doctor profile not found.');
-          }
-        } else {
-          Alert.alert('Error', 'User is not logged in.');
-        }
+        const querySnapshot = await firestore().collection('Bookings').get();
+        const patientsData = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return data.patient ? { ...data.patient, id: doc.id, date: data.date, morningSlot: data.morningSlot, eveningSlot: data.eveningSlot } : null;
+        }).filter(patient => patient !== null);
+        setPatients(patientsData);
       } catch (error) {
-        console.error('Error fetching doctor ID:', error);
-        Alert.alert('Error', 'There was an issue fetching doctor details.');
+        console.error('Error fetching patients:', error);
       }
     };
 
-    fetchDoctorId();
+    fetchPatients();
   }, []);
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      if (doctorId) {
-        try {
-          const querySnapshot = await firestore()
-            .collection('Bookings')
-            .where('doctorId', '==', doctorId)
-            .get();
+  const handleDelete = async (patientId) => {
+    try {
+      await firestore().collection('Bookings').doc(patientId).delete();
+      setPatients(patients.filter(patient => patient.id !== patientId));
+      Alert.alert('Deleted', 'Patient record removed successfully');
+    } catch (error) {
+      console.error('Error deleting patient:', error);
+    }
+  };
 
-          const bookingsData = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-
-          setBookings(bookingsData);
-        } catch (error) {
-          console.error('Error fetching bookings:', error);
-          Alert.alert('Error', 'There was an issue fetching bookings.');
-        }
-      }
-    };
-
-    fetchBookings();
-  }, [doctorId]);
-
-  const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <Text style={styles.cardTitle}>Patient Name: {item.patientName}</Text>
-      <Text style={styles.cardDetail}>Date: {item.date}</Text>
-      <Text style={styles.cardDetail}>Time: {item.time}</Text>
-      <Text style={styles.cardDetail}>Symptom: {item.symptom}</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => Alert.alert('Booking Details', `Patient Name: ${item.patientName}\nDate: ${item.date}\nTime: ${item.time}\nSymptom: ${item.symptom}`)}
-      >
-        <Text style={styles.buttonText}>View Details</Text>
-      </TouchableOpacity>
-    </View>
-  );
+  const handleChat = (patient) => {
+    // Navigate to the ChatScreen and pass the selected patient information
+    navigation.navigate('chatScreen', { patient });
+  };
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={bookings}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-      />
-    </View>
+    <ScrollView style={styles.container}>
+      <View style={styles.cardContainer}>
+        {patients.map((patient, index) => (
+          <View key={index} style={styles.patientCard}>
+            <TouchableOpacity onPress={() => { setSelectedPatient(patient); setModalVisible(true); }}>
+              <Text style={styles.patientDetail}>Name: {patient.name}</Text>
+              <Text style={styles.patientDetail}>Age: {patient.age}</Text>
+              <Text style={styles.patientDetail}>Gender: {patient.gender}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => handleDelete(patient.id)}
+            >
+              <Image
+                source={require('../Src/images/red.png')} // Replace with the path to your delete icon image
+                style={styles.deleteIcon}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.chatButton}
+              onPress={() => handleChat(patient)}
+            >
+              <Image
+                source={require('../Src/images/consultation.png')} // Replace with the path to your chat icon image
+                style={styles.chatIcon}
+              />
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
+    </ScrollView>
   );
 };
 
@@ -97,42 +80,49 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5',
   },
-  card: {
-    backgroundColor: '#fff',
+  cardContainer: {
+    marginTop: 10,
+    padding: 10,
+  },
+  patientCard: {
+    backgroundColor: '#e0e0e0',
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    position: 'relative', // Required for positioning the buttons
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  cardDetail: {
+  patientDetail: {
     fontSize: 16,
     marginBottom: 5,
   },
-  button: {
-    marginTop: 10,
-    backgroundColor: '#0D4744',
-    padding: 10,
-    borderRadius: 5,
+  deleteButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'transparent',
+    borderRadius: 20,
+    padding: 5,
   },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    textAlign: 'center',
+  deleteIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+  },
+  chatButton: {
+    position: 'absolute',
+    top: 50,
+    right: 10,
+    backgroundColor: 'transparent',
+    borderRadius: 20,
+    padding: 5,
+  },
+  chatIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginTop:10
   },
 });
 
-export default DoctorVideoScreen;
+export default PatientScreen;

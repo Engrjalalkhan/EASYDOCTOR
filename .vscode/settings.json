@@ -7,6 +7,7 @@
         "currentpatients",
         "datepicker",
         "datetimepicker",
+        "easydoctor",
         "firestore",
         "hotpink",
         "Inwith",
@@ -22,9 +23,12 @@
         "paymentstatus",
         "Quetta",
         "Rasst",
+        "Sceen",
         "Selction",
+        "soloader",
         "Tesseract",
         "toslot",
-        "Upwith"
+        "Upwith",
+        "Voic"
     ]
 }

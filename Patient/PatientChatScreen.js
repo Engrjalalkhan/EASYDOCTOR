@@ -1,60 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 
-const PatientChatScreen = ({ route }) => {
-  const { doctorData } = route.params;
-  const [message, setMessage] = useState('');
+// Import the image for the send button
+import sendIcon from '../Src/images/send.png'; // Replace with your image path
+
+const ReceiverChatScreen = ({ route, navigation }) => {
   const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
-    if (!doctorData?.id) {
-      console.error('Invalid doctor data');
-      return;
-    }
-
     const unsubscribe = firestore()
-      .collection('Chats')
-      .where('doctorId', '==', doctorData.id)
-      .orderBy('timestamp', 'asc')
+      .collection('chats')
+      .orderBy('createdAt', 'desc')
       .onSnapshot(querySnapshot => {
-        const messagesData = querySnapshot.docs.map(doc => ({
+        const messages = querySnapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data(),
+          ...doc.data()
         }));
-        setMessages(messagesData);
+        setMessages(messages);
       });
 
     return () => unsubscribe();
-  }, [doctorData]);
+  }, []);
 
-  const handleSend = async () => {
-    if (message.trim()) {
-      try {
-        await firestore().collection('Chats').add({
-          doctorId: doctorData.id,
-          sender: 'patient',
-          message,
-          timestamp: firestore.FieldValue.serverTimestamp(),
-        });
-        setMessage('');
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
+  const sendMessage = async () => {
+    if (message.length > 0) {
+      await firestore().collection('chats').add({
+        text: message,
+        createdAt: firestore.FieldValue.serverTimestamp(),
+        user: 'Receiver'
+      });
+      setMessage('');
     }
   };
 
   const renderItem = ({ item }) => (
-    <View
-      style={[
-        styles.messageContainer,
-        item.sender === 'patient' ? styles.sentMessage : styles.receivedMessage
-      ]}
-    >
-      <Text style={styles.messageText}>{item.message}</Text>
-      <Text style={styles.timestamp}>{new Date(item.timestamp?.toDate()).toLocaleString()}</Text>
+    <View style={item.user === 'Receiver' ? styles.receiverMessage : styles.senderMessage}>
+      <Text>{item.text}</Text>
     </View>
   );
 
@@ -64,17 +47,17 @@ const PatientChatScreen = ({ route }) => {
         data={messages}
         renderItem={renderItem}
         keyExtractor={item => item.id}
-        contentContainerStyle={styles.messageList}
+        inverted
       />
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
           value={message}
           onChangeText={setMessage}
-          placeholder="Type your message"
+          placeholder="Type a message"
         />
-        <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-          <Text style={styles.sendButtonText}>Send</Text>
+        <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
+          <Image source={sendIcon} style={styles.sendIcon} />
         </TouchableOpacity>
       </View>
     </View>
@@ -84,58 +67,45 @@ const PatientChatScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'space-between',
-  },
-  messageList: {
-    padding: 10,
-  },
-  messageContainer: {
-    borderRadius: 10,
-    padding: 10,
-    marginVertical: 5,
-    maxWidth: '80%',
-  },
-  sentMessage: {
-    backgroundColor: '#DCF8C6',
-    alignSelf: 'flex-end',
-  },
-  receivedMessage: {
-    backgroundColor: '#ECECEC',
-    alignSelf: 'flex-start',
-  },
-  messageText: {
-    fontSize: 16,
-  },
-  timestamp: {
-    fontSize: 12,
-    color: '#555',
-    textAlign: 'right',
-    marginTop: 5,
+    backgroundColor: '#fff'
   },
   inputContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
     padding: 10,
     borderTopWidth: 1,
-    borderTopColor: '#ccc',
+    borderColor: '#ccc',
+    alignItems: 'center'
   },
   input: {
     flex: 1,
-    borderRadius: 20,
-    borderColor: '#ccc',
     borderWidth: 1,
+    borderColor: '#ccc',
     padding: 10,
+    borderRadius: 20
   },
   sendButton: {
-    backgroundColor: '#0D4744',
+    paddingTop: 5,
+    margin:5
+  },
+  sendIcon: {
+    width: 50,
+    height: 45,
+    borderRadius:7
+  },
+  senderMessage: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#DCF8C6',
     borderRadius: 20,
-    padding: 10,
-    marginLeft: 10,
+    marginVertical: 5,
+    padding: 10
   },
-  sendButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
+  receiverMessage: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#ECECEC',
+    borderRadius: 20,
+    marginVertical: 5,
+    padding: 10
+  }
 });
 
-export default PatientChatScreen;
+export default ReceiverChatScreen;
