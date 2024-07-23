@@ -14,11 +14,12 @@ const ProceedScreen = () => {
   const [symptom, setSymptom] = useState('');
   const [complications, setComplications] = useState('');
   const [fieldsValid, setFieldsValid] = useState(true);
-  const [patientname,setPatientName] = useState('');
+  const [patientname, setPatientName] = useState('');
   const [patientage, setPatientage] = useState('');
   const [patientgender, setPatientgender] = useState('');
   const [patientsymptom, setPatientsymptom] = useState('');
   const [patientcomplications, setPatientcomplications] = useState('');
+  const [patientId, setPatientId] = useState('');
 
   const navigation = useNavigation();
 
@@ -28,7 +29,7 @@ const ProceedScreen = () => {
     setShowForSomeoneElseFields(value === 'forSomeoneElse');
   };
 
-  const handleProceed = () => {
+  const handleProceed = async () => {
     let bookingData = {};
   
     if (selectedOption === 'forMe') {
@@ -47,6 +48,8 @@ const ProceedScreen = () => {
       }
     } else if (selectedOption === 'forSomeoneElse') {
       if (validateFieldsForSomeoneElse()) {
+        // Fetch the patientId from the Patients collection
+        const patientId = await getPatientId(patientname);
         bookingData = {
           type: 'forSomeoneElse',
           patient: {
@@ -55,6 +58,7 @@ const ProceedScreen = () => {
             gender: patientgender,
             symptom: patientsymptom,
             complications: patientcomplications,
+            patientId: patientId,
             // Add other relevant patient data here
           }
         };
@@ -91,6 +95,24 @@ const ProceedScreen = () => {
     }
   };
   
+  const getPatientId = async (patientName) => {
+    try {
+      const snapshot = await firestore().collection('Patients')
+        .where('name', '==', patientName)
+        .limit(1)
+        .get();
+      if (!snapshot.empty) {
+        return snapshot.docs[0].id;
+      } else {
+        console.log('No patient found with the given name.');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching patientId: ', error);
+      return null;
+    }
+  };
+
   const updateBooking = async (bookingId, bookingData) => {
     try {
       await firestore()
@@ -103,8 +125,6 @@ const ProceedScreen = () => {
       console.error('Error updating booking: ', error);
     }
   };
-  
-  
 
   const validateFieldsForMe = () => {
     if (!name || !age || !gender || !symptom || !complications) {

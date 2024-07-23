@@ -13,7 +13,7 @@ const PatientScreen = () => {
         const querySnapshot = await firestore().collection('Bookings').get();
         const patientsData = querySnapshot.docs.map(doc => {
           const data = doc.data();
-          return data.patient ? { ...data.patient, id: doc.id, date: data.date, morningSlot: data.morningSlot, eveningSlot: data.eveningSlot } : null;
+          return data.patient ? { ...data.patient, id: doc.id, date: data.date, morningSlot: data.morningSlot, eveningSlot: data.eveningSlot,  paymentStatus: data.paymentStatus } : null;
         }).filter(patient => patient !== null);
         setPatients(patientsData);
       } catch (error) {
@@ -26,25 +26,33 @@ const PatientScreen = () => {
 
   const handlePing = async (patient) => {
     try {
-      // Send notification data to Firestore
-      await firestore().collection('Notifications').add({
-        patientId: patient.id,
-        name: patient.name,
-        age: patient.age,  // Include age
-        gender: patient.gender,  // Include gender
-        symptom: patient.symptom,  // Include symptom
-        date: patient.date,
-        complications: patient.complications,
-        time: patient.morningSlot || patient.eveningSlot,
-        createdAt: firestore.FieldValue.serverTimestamp(),
-      });
-      Alert.alert('Ping', `Notification sent to ${patient.name} for appointment on ${patient.date} at ${patient.morningSlot || patient.eveningSlot}`);
+      // Fetch the patientId from the Patients collection
+      const patientsQuerySnapshot = await firestore().collection('Patients').where('name', '==', patient.name).get();
+      if (!patientsQuerySnapshot.empty) {
+        const patientDoc = patientsQuerySnapshot.docs[0];
+        const patientId = patientDoc.id;
+        
+        // Send notification data to Firestore
+        await firestore().collection('Notifications').add({
+          patientId: patientId,
+          name: patient.name,
+          age: patient.age,
+          gender: patient.gender,
+          symptom: patient.symptom,
+          date: patient.date,
+          paymentStatus: patient.paymentStatus,
+          complications: patient.complications,
+          time: patient.morningSlot || patient.eveningSlot,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        });
+        Alert.alert('Ping', `Notification sent to ${patient.name} for appointment on ${patient.date} at ${patient.morningSlot || patient.eveningSlot}`);
+      } else {
+        Alert.alert('Error', 'Patient not found in Patients collection');
+      }
     } catch (error) {
       console.error('Error sending notification:', error);
     }
   };
-  
-  
 
   const handleDelete = async (patientId) => {
     try {
@@ -65,6 +73,7 @@ const PatientScreen = () => {
               <Text style={styles.patientDetail}>Name: {patient.name}</Text>
               <Text style={styles.patientDetail}>Age: {patient.age}</Text>
               <Text style={styles.patientDetail}>Gender: {patient.gender}</Text>
+              <Text style={styles.patientDetail}>Status: {patient.paymentStatus}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.deleteButton}
@@ -95,6 +104,7 @@ const PatientScreen = () => {
               <Text style={styles.modalDetail}>Symptom: {selectedPatient.symptom}</Text>
               <Text style={styles.modalDetail}>Complication: {selectedPatient.complications}</Text>
               <Text style={styles.modalDetail}>Appointment Date: {selectedPatient.date}</Text>
+              <Text style={styles.patientDetail}>Status: {selectedPatient.paymentStatus}</Text>
               <Text style={styles.modalDetail}>Time: {selectedPatient.morningSlot || selectedPatient.eveningSlot}</Text>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
@@ -132,7 +142,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
-    position: 'relative', // Required for positioning the delete button
+    position: 'relative',
   },
   patientDetail: {
     fontSize: 16,
@@ -149,7 +159,7 @@ const styles = StyleSheet.create({
   deleteIcon: {
     width: 30,
     height: 30,
-    borderRadius:15
+    borderRadius: 15,
   },
   modalContainer: {
     flex: 1,
