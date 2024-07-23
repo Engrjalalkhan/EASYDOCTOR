@@ -1,19 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth'; // Add this to import authentication
 
 const PatientScreen = () => {
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [doctorId, setDoctorId] = useState(null); // Add state for storing doctorId
+
+  useEffect(() => {
+    const fetchDoctorId = async () => {
+      const user = auth().currentUser;
+      if (user) {
+        const doctorSnapshot = await firestore().collection('Doctor').where('email', '==', user.email).get();
+        if (!doctorSnapshot.empty) {
+          const doctorData = doctorSnapshot.docs[0].data();
+          setDoctorId(doctorSnapshot.docs[0].id);
+        }
+      }
+    };
+
+    fetchDoctorId();
+  }, []);
 
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const querySnapshot = await firestore().collection('Bookings').get();
+        const querySnapshot = await firestore().collection('Bookings').where('doctorId', '==', doctorId).get();
         const patientsData = querySnapshot.docs.map(doc => {
           const data = doc.data();
-          return data.patient ? { ...data.patient, id: doc.id, date: data.date, morningSlot: data.morningSlot, eveningSlot: data.eveningSlot,  paymentStatus: data.paymentStatus } : null;
+          return data.patient ? { ...data.patient, id: doc.id, date: data.date, morningSlot: data.morningSlot, eveningSlot: data.eveningSlot, paymentStatus: data.paymentStatus } : null;
         }).filter(patient => patient !== null);
         setPatients(patientsData);
       } catch (error) {
@@ -21,18 +38,18 @@ const PatientScreen = () => {
       }
     };
 
-    fetchPatients();
-  }, []);
+    if (doctorId) {
+      fetchPatients();
+    }
+  }, [doctorId]);
 
   const handlePing = async (patient) => {
     try {
-      // Fetch the patientId from the Patients collection
       const patientsQuerySnapshot = await firestore().collection('Patients').where('name', '==', patient.name).get();
       if (!patientsQuerySnapshot.empty) {
         const patientDoc = patientsQuerySnapshot.docs[0];
         const patientId = patientDoc.id;
         
-        // Send notification data to Firestore
         await firestore().collection('Notifications').add({
           patientId: patientId,
           name: patient.name,
