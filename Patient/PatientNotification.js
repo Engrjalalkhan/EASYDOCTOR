@@ -52,6 +52,7 @@ const PatientNotificationScreen = () => {
               <Text style={styles.modalDetail}>Symptom: {selectedNotification.symptom}</Text>
               <Text style={styles.modalDetail}>complications: {selectedNotification.complications}</Text>
               <Text style={styles.modalDetail}>Date: {selectedNotification.date}</Text>
+              <Text style={styles.modalDetail}>Status: {selectedNotification.paymentStatus}</Text>
               <Text style={styles.modalDetail}>Time: {selectedNotification.time}</Text>
             </>
           )}
@@ -77,6 +78,7 @@ const PatientNotificationScreen = () => {
             <Text style={styles.notificationDetail}>Name: {notification.name}</Text>
             <Text style={styles.notificationDetail}>Date: {notification.date}</Text>
             <Text style={styles.notificationDetail}>Time: {notification.time}</Text>
+            <Text style={styles.notificationDetail}>Status: {notification.paymentStatus}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.deleteButton}
