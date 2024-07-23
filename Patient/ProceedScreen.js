@@ -34,7 +34,6 @@ const ProceedScreen = () => {
   
     if (selectedOption === 'forMe') {
       if (validateFieldsForMe()) {
-        let patientId = await getOrCreatePatientId(name);
         bookingData = {
           type: 'forMe',
           patient: {
@@ -43,13 +42,13 @@ const ProceedScreen = () => {
             gender: gender,
             symptom: symptom,
             complications: complications,
-            patientId: patientId,
             // Add other relevant patient data here
           }
         };
       }
     } else if (selectedOption === 'forSomeoneElse') {
       if (validateFieldsForSomeoneElse()) {
+        // Fetch the patientId from the Patients collection
         const patientId = await getPatientId(patientname);
         bookingData = {
           type: 'forSomeoneElse',
@@ -112,20 +111,6 @@ const ProceedScreen = () => {
       console.error('Error fetching patientId: ', error);
       return null;
     }
-  };
-
-  const getOrCreatePatientId = async (patientName) => {
-    let patientId = await getPatientId(patientName);
-    if (!patientId) {
-      // Create a new patient record if not found
-      const newPatientRef = firestore().collection('Patients').doc();
-      await newPatientRef.set({
-        name: patientName,
-        // Add other relevant patient data here if needed
-      });
-      patientId = newPatientRef.id;
-    }
-    return patientId;
   };
 
   const updateBooking = async (bookingId, bookingData) => {
@@ -266,7 +251,7 @@ const ProceedScreen = () => {
             value={patientsymptom}
             onChangeText={setPatientsymptom}
           />
-                    <TextInput
+          <TextInput
             style={[
               styles.input,
               { borderColor: fieldsValid ? '#0D4744' : 'red' },
@@ -289,7 +274,6 @@ const ProceedScreen = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -321,4 +305,3 @@ const styles = StyleSheet.create({
 });
 
 export default ProceedScreen;
-

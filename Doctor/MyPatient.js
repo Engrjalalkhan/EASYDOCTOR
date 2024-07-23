@@ -97,7 +97,7 @@ const PatientScreen = () => {
               <Text style={styles.modalDetail}>Symptom: {selectedPatient.symptom}</Text>
               <Text style={styles.modalDetail}>Complication: {selectedPatient.complications}</Text>
               <Text style={styles.modalDetail}>Appointment Date: {selectedPatient.date}</Text>
-              <Text style={styles.patientDetail}>Status: {selectedPatient.paymentStatus}</Text>
+              <Text style={styles.modalDetail}>Status: {selectedPatient.paymentStatus}</Text>
               <Text style={styles.modalDetail}>Time: {selectedPatient.morningSlot || selectedPatient.eveningSlot}</Text>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
