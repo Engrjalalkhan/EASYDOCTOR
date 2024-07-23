@@ -1,21 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import { useNavigation } from '@react-navigation/native';
+import auth from '@react-native-firebase/auth'; // Add this to import authentication
 
 const PatientScreen = () => {
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const navigation = useNavigation();
+  const [doctorId, setDoctorId] = useState(null); // Add state for storing doctorId
+
+  useEffect(() => {
+    const fetchDoctorId = async () => {
+      const user = auth().currentUser;
+      if (user) {
+        const doctorSnapshot = await firestore().collection('Doctor').where('email', '==', user.email).get();
+        if (!doctorSnapshot.empty) {
+          const doctorData = doctorSnapshot.docs[0].data();
+          setDoctorId(doctorSnapshot.docs[0].id);
+        }
+      }
+    };
+
+    fetchDoctorId();
+  }, []);
 
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const querySnapshot = await firestore().collection('Bookings').get();
+        const querySnapshot = await firestore().collection('Bookings').where('doctorId', '==', doctorId).get();
         const patientsData = querySnapshot.docs.map(doc => {
           const data = doc.data();
-          return data.patient ? { ...data.patient, id: doc.id, date: data.date, morningSlot: data.morningSlot, eveningSlot: data.eveningSlot } : null;
+          return data.patient ? { ...data.patient, id: doc.id, date: data.date, morningSlot: data.morningSlot, eveningSlot: data.eveningSlot, paymentStatus: data.paymentStatus } : null;
         }).filter(patient => patient !== null);
         setPatients(patientsData);
       } catch (error) {
@@ -23,8 +38,38 @@ const PatientScreen = () => {
       }
     };
 
-    fetchPatients();
-  }, []);
+    if (doctorId) {
+      fetchPatients();
+    }
+  }, [doctorId]);
+
+  const handlePing = async (patient) => {
+    try {
+      const patientsQuerySnapshot = await firestore().collection('Patients').where('name', '==', patient.name).get();
+      if (!patientsQuerySnapshot.empty) {
+        const patientDoc = patientsQuerySnapshot.docs[0];
+        const patientId = patientDoc.id;
+        
+        await firestore().collection('Notifications').add({
+          patientId: patientId,
+          name: patient.name,
+          age: patient.age,
+          gender: patient.gender,
+          symptom: patient.symptom,
+          date: patient.date,
+          paymentStatus: patient.paymentStatus,
+          complications: patient.complications,
+          time: patient.morningSlot || patient.eveningSlot,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        });
+        Alert.alert('Ping', `Notification sent to ${patient.name} for appointment on ${patient.date} at ${patient.morningSlot || patient.eveningSlot}`);
+      } else {
+        Alert.alert('Error', 'Patient not found in Patients collection');
+      }
+    } catch (error) {
+      console.error('Error sending notification:', error);
+    }
+  };
 
   const handleDelete = async (patientId) => {
     try {
@@ -90,7 +135,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
-    position: 'relative', // Required for positioning the buttons
+    position: 'relative',
   },
   patientDetail: {
     fontSize: 16,
@@ -108,6 +153,53 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '80%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  modalDetail: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
+  },
+  button: {
+    backgroundColor: '#0D4744',
+    borderRadius: 10,
+    padding: 10,
+    marginHorizontal: 10,
+  },
+  closeButton: {
+    backgroundColor: '#f44336',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
   },
   chatButton: {
     position: 'absolute',
