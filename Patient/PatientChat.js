@@ -192,9 +192,10 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   deleteIcon: {
-    width: 30,
-    height: 30,
+    width: 25,
+    height: 25,
     borderRadius: 15,
+    marginVertical:5
   },
   chatIcon: {
     width: 30,
