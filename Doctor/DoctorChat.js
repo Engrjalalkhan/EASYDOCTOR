@@ -45,34 +45,6 @@ const PatientScreen = () => {
     }
   }, [doctorId]);
 
-  const handlePing = async (patient) => {
-    try {
-      const patientsQuerySnapshot = await firestore().collection('Patients').where('name', '==', patient.name).get();
-      if (!patientsQuerySnapshot.empty) {
-        const patientDoc = patientsQuerySnapshot.docs[0];
-        const patientId = patientDoc.id;
-        
-        await firestore().collection('Notifications').add({
-          patientId: patientId,
-          name: patient.name,
-          age: patient.age,
-          gender: patient.gender,
-          symptom: patient.symptom,
-          date: patient.date,
-          paymentStatus: patient.paymentStatus,
-          complications: patient.complications,
-          time: patient.morningSlot || patient.eveningSlot,
-          createdAt: firestore.FieldValue.serverTimestamp(),
-        });
-        Alert.alert('Ping', `Notification sent to ${patient.name} for appointment on ${patient.date} at ${patient.morningSlot || patient.eveningSlot}`);
-      } else {
-        Alert.alert('Error', 'Patient not found in Patients collection');
-      }
-    } catch (error) {
-      console.error('Error sending notification:', error);
-    }
-  };
-
   const handleDelete = async (patientId) => {
     try {
       await firestore().collection('Bookings').doc(patientId).delete();
