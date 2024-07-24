@@ -44,40 +44,18 @@ const PatientScreen = () => {
 
   const handlePing = async (patient) => {
     try {
-      // Ensure patient.phone is defined
-      if (!patient.phone) {
-        Alert.alert('Error', 'Patient phone number is missing');
-        return;
-      }
-
-      // Fetch the patient document from the Patients collection using the phone number
-      const patientsQuerySnapshot = await firestore().collection('Patients').where('phone', '==', patient.phone).get();
-      if (!patientsQuerySnapshot.empty) {
-        const patientDoc = patientsQuerySnapshot.docs[0];
-        const patientData = patientDoc.data();
-
-        // Check if the phone number matches in the Patients and Bookings collections
-        if (patientData.phone === patient.phone) {
-          // Send notification data to Firestore
-          await firestore().collection('Notifications').add({
-            patientId: patientDoc.id,
-            name: patient.name,
-            age: patient.age,
-            gender: patient.gender,
-            symptom: patient.symptom,
-            date: patient.date,
-            paymentStatus: patient.paymentStatus,
-            complications: patient.complications,
-            time: patient.morningSlot || patient.eveningSlot,
-            createdAt: firestore.FieldValue.serverTimestamp(),
-          });
-          Alert.alert('Ping', `Notification sent to ${patient.name} for appointment on ${patient.date} at ${patient.morningSlot || patient.eveningSlot}`);
-        } else {
-          Alert.alert('Error', 'Phone number mismatch between Bookings and Patients collections');
-        }
-      } else {
-        Alert.alert('Error', 'Patient not found in Patients collection');
-      }
+        await firestore().collection('Notifications').add({
+          name: patient.name,
+          age: patient.age,
+          gender: patient.gender,
+          symptom: patient.symptom,
+          date: patient.date,
+          paymentStatus: patient.paymentStatus,
+          complications: patient.complications,
+          time: patient.morningSlot || patient.eveningSlot,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        });
+        Alert.alert('Ping', `Notification sent to ${patient.phone} for appointment on ${patient.date} at ${patient.morningSlot || patient.eveningSlot}`);
     } catch (error) {
       console.error('Error sending notification:', error);
     }

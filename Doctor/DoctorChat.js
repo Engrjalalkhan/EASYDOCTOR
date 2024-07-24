@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth'; // Add this to import authentication
+import { useNavigation } from '@react-navigation/native';
 
 const PatientScreen = () => {
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [doctorId, setDoctorId] = useState(null); // Add state for storing doctorId
+  const navigation=useNavigation();
 
   useEffect(() => {
     const fetchDoctorId = async () => {
