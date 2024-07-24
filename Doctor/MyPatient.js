@@ -1,19 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 const PatientScreen = () => {
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [doctorId, setDoctorId] = useState(null);
+
+  useEffect(() => {
+    const fetchDoctorId = async () => {
+      const user = auth().currentUser;
+      if (user) {
+        const doctorSnapshot = await firestore().collection('Doctor').where('email', '==', user.email).get();
+        if (!doctorSnapshot.empty) {
+          setDoctorId(doctorSnapshot.docs[0].id);
+        }
+      }
+    };
+
+    fetchDoctorId();
+  }, []);
 
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const querySnapshot = await firestore().collection('Bookings').get();
+        const querySnapshot = await firestore().collection('Bookings').where('doctorId', '==', doctorId).get();
         const patientsData = querySnapshot.docs.map(doc => {
           const data = doc.data();
-          return data.patient ? { ...data.patient, id: doc.id, date: data.date, morningSlot: data.morningSlot, eveningSlot: data.eveningSlot, paymentStatus: data.paymentStatus } : null;
+          return data.patient ? { ...data.patient, id: doc.id, patientId: data.patientId, phone: data.phone, date: data.date, morningSlot: data.morningSlot, eveningSlot: data.eveningSlot, paymentStatus: data.paymentStatus } : null;
         }).filter(patient => patient !== null);
         setPatients(patientsData);
       } catch (error) {
@@ -21,31 +37,51 @@ const PatientScreen = () => {
       }
     };
 
-    fetchPatients();
-  }, []);
+    if (doctorId) {
+      fetchPatients();
+    }
+  }, [doctorId]);
 
   const handlePing = async (patient) => {
     try {
-      // Send notification data to Firestore
-      await firestore().collection('Notifications').add({
-        patientId: patient.id,
-        name: patient.name,
-        age: patient.age,  // Include age
-        gender: patient.gender,  // Include gender
-        symptom: patient.symptom,  // Include symptom
-        date: patient.date,
-        complications: patient.complications,
-        paymentStatus: patient.paymentStatus,
-        time: patient.morningSlot || patient.eveningSlot,
-        createdAt: firestore.FieldValue.serverTimestamp(),
-      });
-      Alert.alert('Ping', `Notification sent to ${patient.name} for appointment on ${patient.date} at ${patient.morningSlot || patient.eveningSlot}`);
+      // Ensure patient.phone is defined
+      if (!patient.phone) {
+        Alert.alert('Error', 'Patient phone number is missing');
+        return;
+      }
+
+      // Fetch the patient document from the Patients collection using the phone number
+      const patientsQuerySnapshot = await firestore().collection('Patients').where('phone', '==', patient.phone).get();
+      if (!patientsQuerySnapshot.empty) {
+        const patientDoc = patientsQuerySnapshot.docs[0];
+        const patientData = patientDoc.data();
+
+        // Check if the phone number matches in the Patients and Bookings collections
+        if (patientData.phone === patient.phone) {
+          // Send notification data to Firestore
+          await firestore().collection('Notifications').add({
+            patientId: patientDoc.id,
+            name: patient.name,
+            age: patient.age,
+            gender: patient.gender,
+            symptom: patient.symptom,
+            date: patient.date,
+            paymentStatus: patient.paymentStatus,
+            complications: patient.complications,
+            time: patient.morningSlot || patient.eveningSlot,
+            createdAt: firestore.FieldValue.serverTimestamp(),
+          });
+          Alert.alert('Ping', `Notification sent to ${patient.name} for appointment on ${patient.date} at ${patient.morningSlot || patient.eveningSlot}`);
+        } else {
+          Alert.alert('Error', 'Phone number mismatch between Bookings and Patients collections');
+        }
+      } else {
+        Alert.alert('Error', 'Patient not found in Patients collection');
+      }
     } catch (error) {
       console.error('Error sending notification:', error);
     }
   };
-  
-  
 
   const handleDelete = async (patientId) => {
     try {
@@ -97,7 +133,7 @@ const PatientScreen = () => {
               <Text style={styles.modalDetail}>Symptom: {selectedPatient.symptom}</Text>
               <Text style={styles.modalDetail}>Complication: {selectedPatient.complications}</Text>
               <Text style={styles.modalDetail}>Appointment Date: {selectedPatient.date}</Text>
-              <Text style={styles.modalDetail}>Status: {selectedPatient.paymentStatus}</Text>
+              <Text style={styles.patientDetail}>Status: {selectedPatient.paymentStatus}</Text>
               <Text style={styles.modalDetail}>Time: {selectedPatient.morningSlot || selectedPatient.eveningSlot}</Text>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
@@ -135,7 +171,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
-    position: 'relative', // Required for positioning the delete button
+    position: 'relative',
   },
   patientDetail: {
     fontSize: 16,
@@ -152,7 +188,7 @@ const styles = StyleSheet.create({
   deleteIcon: {
     width: 30,
     height: 30,
-    borderRadius:15
+    borderRadius: 15,
   },
   modalContainer: {
     flex: 1,

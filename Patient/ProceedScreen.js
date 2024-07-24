@@ -13,13 +13,13 @@ const ProceedScreen = () => {
   const [gender, setGender] = useState('');
   const [symptom, setSymptom] = useState('');
   const [complications, setComplications] = useState('');
+  const [phone, setPhone] = useState('');
   const [fieldsValid, setFieldsValid] = useState(true);
   const [patientname, setPatientName] = useState('');
   const [patientage, setPatientage] = useState('');
   const [patientgender, setPatientgender] = useState('');
   const [patientsymptom, setPatientsymptom] = useState('');
   const [patientcomplications, setPatientcomplications] = useState('');
-  const [patientId, setPatientId] = useState('');
 
   const navigation = useNavigation();
 
@@ -31,45 +31,58 @@ const ProceedScreen = () => {
 
   const handleProceed = async () => {
     let bookingData = {};
-  
+
     if (selectedOption === 'forMe') {
       if (validateFieldsForMe()) {
-        bookingData = {
-          type: 'forMe',
-          patient: {
-            name: name,
-            age: age,
-            gender: gender,
-            symptom: symptom,
-            complications: complications,
-            // Add other relevant patient data here
-          }
-        };
+        // Fetch the patientId from the Patients collection based on the phone number
+        const patientId = await getPatientIdByPhone(phone);
+        if (patientId) {
+          bookingData = {
+            type: 'forMe',
+            patient: {
+              name: name,
+              age: age,
+              gender: gender,
+              symptom: symptom,
+              complications: complications,
+              patientId: patientId,
+              phone: phone,
+            }
+          };
+        } else {
+          Alert.alert('Patient not found', 'No patient found with the given phone number.');
+          return;
+        }
       }
     } else if (selectedOption === 'forSomeoneElse') {
       if (validateFieldsForSomeoneElse()) {
-        // Fetch the patientId from the Patients collection
-        const patientId = await getPatientId(patientname);
-        bookingData = {
-          type: 'forSomeoneElse',
-          patient: {
-            name: patientname,
-            age: patientage,
-            gender: patientgender,
-            symptom: patientsymptom,
-            complications: patientcomplications,
-            patientId: patientId,
-            // Add other relevant patient data here
-          }
-        };
-      } 
+        // Fetch the patientId from the Patients collection based on the phone number
+        const patientId = await getPatientIdByPhone(phone);
+        if (patientId) {
+          bookingData = {
+            type: 'forSomeoneElse',
+            patient: {
+              name: patientname,
+              age: patientage,
+              gender: patientgender,
+              symptom: patientsymptom,
+              complications: patientcomplications,
+              patientId: patientId,
+              phone: phone,
+            }
+          };
+        } else {
+          Alert.alert('Patient not found', 'No patient found with the given phone number.');
+          return;
+        }
+      }
     }
-  
+
     if (Object.keys(bookingData).length > 0) {
       checkAndUpdateBooking(bookingData);
     }
   };
-  
+
   const checkAndUpdateBooking = async (bookingData) => {
     try {
       const bookingId = await getRandomBookingId();
@@ -77,13 +90,12 @@ const ProceedScreen = () => {
         updateBooking(bookingId, bookingData);
       } else {
         console.log('No bookings found.');
-        // Handle case where there are no bookings in the collection
       }
     } catch (error) {
       console.error('Error checking and updating booking: ', error);
     }
   };
-  
+
   const getRandomBookingId = async () => {
     try {
       const snapshot = await firestore().collection('Bookings').get();
@@ -94,17 +106,17 @@ const ProceedScreen = () => {
       throw error;
     }
   };
-  
-  const getPatientId = async (patientName) => {
+
+  const getPatientIdByPhone = async (phone) => {
     try {
       const snapshot = await firestore().collection('Patients')
-        .where('name', '==', patientName)
+        .where('phone', '==', phone)
         .limit(1)
         .get();
       if (!snapshot.empty) {
         return snapshot.docs[0].id;
       } else {
-        console.log('No patient found with the given name.');
+        console.log('No patient found with the given phone number.');
         return null;
       }
     } catch (error) {
@@ -127,7 +139,7 @@ const ProceedScreen = () => {
   };
 
   const validateFieldsForMe = () => {
-    if (!name || !age || !gender || !symptom || !complications) {
+    if (!name || !age || !gender || !symptom || !complications || !phone) {
       setFieldsValid(false);
       return false;
     }
@@ -136,7 +148,7 @@ const ProceedScreen = () => {
   };
 
   const validateFieldsForSomeoneElse = () => {
-    if (!patientname || !patientage || !patientgender || !patientsymptom || !patientcomplications) {
+    if (!patientname || !patientage || !patientgender || !patientsymptom || !patientcomplications || !phone) {
       setFieldsValid(false);
       return false;
     }
@@ -210,7 +222,15 @@ const ProceedScreen = () => {
             value={complications}
             onChangeText={setComplications}
           />
-          {/* Add other fields for "For Me" option */}
+          <TextInput
+            style={[
+              styles.input,
+              { borderColor: fieldsValid ? '#0D4744' : 'red' },
+            ]}
+            placeholder="Your Phone Number"
+            value={phone}
+            onChangeText={setPhone}
+          />
         </View>
       )}
       {showForSomeoneElseFields && (
@@ -260,7 +280,15 @@ const ProceedScreen = () => {
             value={patientcomplications}
             onChangeText={setPatientcomplications}
           />
-          {/* Add other fields for "For Someone Else" option */}
+          <TextInput
+            style={[
+              styles.input,
+              { borderColor: fieldsValid ? '#0D4744' : 'red' },
+            ]}
+            placeholder="Patient's Phone Number"
+            value={phone}
+            onChangeText={setPhone}
+          />
         </View>
       )}
       <Button
@@ -274,6 +302,7 @@ const ProceedScreen = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
