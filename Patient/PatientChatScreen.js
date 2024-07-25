@@ -198,7 +198,7 @@ const ReceiverChatScreen = ({ route, navigation }) => {
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Delete Messages</Text>
+              <Text style={styles.modalTitle}>Delete Messages ?</Text>
               <TouchableOpacity onPress={() => handleDelete('deleteForEveryone')} style={styles.modalButton}>
                 <Text style={styles.modalButtonText}>Delete for Everyone</Text>
               </TouchableOpacity>
@@ -242,8 +242,9 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   attachmentIcon: {
-    width: 24,
-    height: 24,
+    width: 30,
+    height: 30,
+    borderRadius:3
   },
   inputContainer: {
     flexDirection: 'row',
@@ -317,12 +318,11 @@ const styles = StyleSheet.create({
     width: '80%',
     backgroundColor: '#fff',
     borderRadius: 10,
-    padding: 20,
-    alignItems: 'center'
+    padding: 10,
+    alignItems: 'flax-start'
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 14,
     marginBottom: 10,
     color: 'black'
   },
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 5,
     width: '100%',
-    alignItems: 'center'
+    alignItems: 'flex-end'
   },
   modalButtonText: {
     fontSize: 16,

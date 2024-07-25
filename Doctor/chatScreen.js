@@ -199,7 +199,7 @@ const SenderChatScreen = ({ route, navigation }) => {
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Delete Messages</Text>
+              <Text style={styles.modalTitle}>Delete Messages ?</Text>
               <TouchableOpacity onPress={() => handleDelete('deleteForEveryone')} style={styles.modalButton}>
                 <Text style={styles.modalButtonText}>Delete for Everyone</Text>
               </TouchableOpacity>
@@ -242,8 +242,9 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   attachmentIcon: {
-    width: 24,
-    height: 24,
+    width: 30,
+    height: 30,
+    borderRadius:3
   },
   inputContainer: {
     flexDirection: 'row',
@@ -316,24 +317,23 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     width: '80%',
-    alignItems: 'center'
+    alignItems:'flex-start'
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 20
+    fontSize: 14,
+    marginBottom: 10,
+    color: 'black',
   },
   modalButton: {
+    padding: 10,
+    marginVertical: 5,
     width: '100%',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 10,
-    backgroundColor: '#007BFF'
+    alignItems: 'flex-end'
   },
   modalButtonText: {
-    color: '#fff',
-    fontWeight: 'bold'
+    fontSize: 16,
+    color: '#0D4744',
+    paddingStart:30
   },
   imageModalContainer: {
     flex: 1,
