@@ -9,6 +9,7 @@ import deleteIcon from '../Src/images/delete.png'; // Replace with your image pa
 import attachmentIcon from '../Src/images/attachment.png'; // Replace with your image path
 
 const ReceiverChatScreen = ({ route, navigation }) => {
+  const { doctorId } = route.params; // Assuming you pass the doctorId through route params
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
   const [attachment, setAttachment] = useState(null);
@@ -20,6 +21,8 @@ const ReceiverChatScreen = ({ route, navigation }) => {
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('chats')
+      .doc(doctorId)
+      .collection('messages')
       .orderBy('createdAt', 'desc')
       .onSnapshot(querySnapshot => {
         const messages = querySnapshot.docs.map(doc => ({
@@ -30,11 +33,11 @@ const ReceiverChatScreen = ({ route, navigation }) => {
       });
 
     return () => unsubscribe();
-  }, []);
+  }, [doctorId]);
 
   const sendMessage = async () => {
     if (message.length > 0 || attachment) {
-      await firestore().collection('chats').add({
+      await firestore().collection('chats').doc(doctorId).collection('messages').add({
         text: message,
         attachment: attachment,
         createdAt: firestore.FieldValue.serverTimestamp(),
@@ -59,7 +62,7 @@ const ReceiverChatScreen = ({ route, navigation }) => {
 
     const batch = firestore().batch();
     selectedMessages.forEach(id => {
-      const docRef = firestore().collection('chats').doc(id);
+      const docRef = firestore().collection('chats').doc(doctorId).collection('messages').doc(id);
       if (option === 'deleteForEveryone') {
         batch.update(docRef, { deletedForEveryone: true, text: '🚫 Message deleted', attachment: null });
       } else if (option === 'deleteForMe') {
@@ -172,18 +175,17 @@ const ReceiverChatScreen = ({ route, navigation }) => {
         inverted
       />
       <View style={styles.inputContainer}>
-      <View style={styles.inputInnerContainer}>
-       
-        <TextInput
-          style={styles.input}
-          value={message}
-          onChangeText={setMessage}
-          placeholder="Type a message"
-          multiline
-        />
-         <TouchableOpacity onPress={selectAttachment} style={styles.attachmentButton}>
-          <Image source={attachmentIcon} style={styles.attachmentIcon} />
-        </TouchableOpacity>
+        <View style={styles.inputInnerContainer}>
+          <TextInput
+            style={styles.input}
+            value={message}
+            onChangeText={setMessage}
+            placeholder="Type a message"
+            multiline
+          />
+          <TouchableOpacity onPress={selectAttachment} style={styles.attachmentButton}>
+            <Image source={attachmentIcon} style={styles.attachmentIcon} />
+          </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
           <Image source={sendIcon} style={styles.sendIcon} />
@@ -198,7 +200,7 @@ const ReceiverChatScreen = ({ route, navigation }) => {
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Delete Messages ?</Text>
+              <Text style={styles.modalTitle}>Delete Messages?</Text>
               <TouchableOpacity onPress={() => handleDelete('deleteForEveryone')} style={styles.modalButton}>
                 <Text style={styles.modalButtonText}>Delete for Everyone</Text>
               </TouchableOpacity>
@@ -244,7 +246,7 @@ const styles = StyleSheet.create({
   attachmentIcon: {
     width: 30,
     height: 30,
-    borderRadius:3
+    borderRadius: 3
   },
   inputContainer: {
     flexDirection: 'row',
@@ -265,7 +267,6 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    // borderWidth: 1,
     padding: 10,
     borderRadius: 20,
     maxHeight: 100,
@@ -273,7 +274,10 @@ const styles = StyleSheet.create({
     color: '#000' // Text color
   },
   sendButton: {
+    marginLeft: 5,
     padding: 10,
+    borderRadius: 20,
+    
   },
   sendIcon: {
     width: 40,
@@ -282,70 +286,68 @@ const styles = StyleSheet.create({
     width:50
   },
   senderMessage: {
-    alignSelf: 'flex-start', // Sent messages are aligned to the right
-    backgroundColor: '#ECECEC',
-    borderRadius: 20,
-    marginVertical: 5,
+    alignSelf: 'flex-start',
+    backgroundColor: '#E8E8E8', // WhatsApp-like sender message color
+    borderRadius: 25,
     padding: 10,
-    maxWidth: '70%',
-    marginHorizontal:7
+    margin: 5,
+    maxWidth: '80%'
   },
   receiverMessage: {
-    alignSelf: 'flex-end', // Received messages are aligned to the left
-    backgroundColor: '#DCF8C6',
-    borderRadius: 20,
-    marginVertical: 5,
+    alignSelf: 'flex-end',
+    backgroundColor: '#DCF8C6', // WhatsApp-like receiver message color
+    borderRadius: 25,
     padding: 10,
-    maxWidth: '70%',
-    marginHorizontal:7
+    margin: 5,
+    maxWidth: '80%'
   },
   selectedMessage: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#ADD8E6', // Light blue color for selected messages
   },
   messageImage: {
     width: 200,
     height: 250,
     borderRadius: 10,
-    // marginTop: 10
+    marginTop: 5
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)'
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
     width: '80%',
     backgroundColor: '#fff',
     borderRadius: 10,
-    padding: 10,
-    alignItems: 'flax-start'
+    padding: 20,
+    alignItems: 'flex-start',
   },
   modalTitle: {
     fontSize: 14,
-    marginBottom: 10,
-    color: 'black'
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   modalButton: {
-    padding: 10,
-    marginVertical: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
     width: '100%',
-    alignItems: 'flex-end'
+    alignItems: 'flex-end',
   },
   modalButtonText: {
+    color: '#0D4744',
     fontSize: 16,
-    color: '#0D4744'
   },
   imageModalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.8)'
   },
   fullscreenImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'contain'
+    resizeMode: 'contain',
   }
 });
 

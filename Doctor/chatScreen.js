@@ -16,25 +16,43 @@ const SenderChatScreen = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [doctorId, setDoctorId] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = firestore()
-      .collection('chats')
-      .orderBy('createdAt', 'desc')
-      .onSnapshot(querySnapshot => {
-        const messages = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setMessages(messages);
-      });
+    // Fetch the bookings collection and set the doctorId
+    const fetchDoctorId = async () => {
+      const bookingsSnapshot = await firestore().collection('Bookings').get();
+      if (!bookingsSnapshot.empty) {
+        const bookingData = bookingsSnapshot.docs[0].data();
+        setDoctorId(bookingData.doctorId);
+      }
+    };
 
-    return () => unsubscribe();
+    fetchDoctorId();
   }, []);
+
+  useEffect(() => {
+    if (doctorId) {
+      const unsubscribe = firestore()
+        .collection('chats')
+        .doc(doctorId)
+        .collection('messages')
+        .orderBy('createdAt', 'desc')
+        .onSnapshot(querySnapshot => {
+          const messages = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          setMessages(messages);
+        });
+
+      return () => unsubscribe();
+    }
+  }, [doctorId]);
 
   const sendMessage = async () => {
     if (message.length > 0 || attachment) {
-      await firestore().collection('chats').add({
+      await firestore().collection('chats').doc(doctorId).collection('messages').add({
         text: message,
         attachment: attachment,
         createdAt: firestore.FieldValue.serverTimestamp(),
@@ -59,7 +77,7 @@ const SenderChatScreen = ({ route, navigation }) => {
 
     const batch = firestore().batch();
     selectedMessages.forEach(id => {
-      const docRef = firestore().collection('chats').doc(id);
+      const docRef = firestore().collection('chats').doc(doctorId).collection('messages').doc(id);
       if (option === 'deleteForEveryone') {
         batch.update(docRef, { deletedForEveryone: true, text: '🚫 Message deleted', attachment: null });
       } else if (option === 'deleteForMe') {
@@ -256,19 +274,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    borderWidth: 1,
-    padding: 5,
+    backgroundColor: '#f0f0f0',
     borderRadius: 20,
-    maxHeight: 100,
-    backgroundColor: '#F0F0F0', // Background color
-    color: '#000', // Text color
+    padding: 10,
+    marginRight: 10,
   },
   input: {
     flex: 1,
-    padding: 10,
-    borderRadius: 20,
-    backgroundColor: '#F0F0F0', // Background color
-    color: '#000', // Text color
+    maxHeight: 100,
+    paddingRight: 10,
   },
   sendButton: {
     padding: 10,
@@ -276,75 +290,71 @@ const styles = StyleSheet.create({
   sendIcon: {
     width: 40,
     height: 40,
-    borderRadius: 10,
+    borderRadius:10,
     width:50
   },
   senderMessage: {
-    alignSelf: 'flex-start', // Sent messages are aligned to the left
+    alignSelf: 'flex-start',
     backgroundColor: '#ECECEC',
-    borderRadius: 20,
-    marginVertical: 5,
+    borderRadius: 25,
     padding: 10,
-    maxWidth: '70%',
-    marginHorizontal:7
+    margin: 5,
+    maxWidth: '80%',
   },
   receiverMessage: {
-    alignSelf: 'flex-end', // Received messages are aligned to the right
+    alignSelf: 'flex-end',
     backgroundColor: '#DCF8C6',
-    borderRadius: 20,
-    marginVertical: 5,
+    borderRadius: 25,
     padding: 10,
-    maxWidth: '70%',
-    marginHorizontal:7
+    margin: 5,
+    maxWidth: '80%',
   },
   selectedMessage: {
-    backgroundColor: '#E0E0E0'
+    backgroundColor: '#D3D3D3'
   },
   messageImage: {
     width: 200,
     height: 250,
-    borderRadius: 10,
-    // marginTop: 10
+    borderRadius: 5,
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)'
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
     width: '80%',
-    alignItems:'flex-start'
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'flex-start',
   },
   modalTitle: {
     fontSize: 14,
-    marginBottom: 10,
-    color: 'black',
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   modalButton: {
-    padding: 10,
-    marginVertical: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
     width: '100%',
-    alignItems: 'flex-end'
+    alignItems: 'flex-end',
   },
   modalButtonText: {
-    fontSize: 16,
     color: '#0D4744',
-    paddingStart:30
+    fontSize: 16,
   },
   imageModalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.9)',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   fullscreenImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'contain'
+    resizeMode: 'contain',
   }
 });
 
