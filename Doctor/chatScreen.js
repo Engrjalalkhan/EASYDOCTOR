@@ -61,7 +61,7 @@ const SenderChatScreen = ({ route, navigation }) => {
     selectedMessages.forEach(id => {
       const docRef = firestore().collection('chats').doc(id);
       if (option === 'deleteForEveryone') {
-        batch.update(docRef, { deletedForEveryone: true });
+        batch.update(docRef, { deletedForEveryone: true, text: '🚫 Message deleted', attachment: null });
       } else if (option === 'deleteForMe') {
         batch.update(docRef, { deletedBy: firestore.FieldValue.arrayUnion('Sender') });
       }
@@ -114,23 +114,30 @@ const SenderChatScreen = ({ route, navigation }) => {
   };
 
   const renderItem = ({ item }) => {
+    // Check if the message should be displayed
     if (item.deletedBy && item.deletedBy.includes('Sender') && item.user === 'Sender') {
-      return null;
+      return null; // Skip rendering if deleted by the current user
     }
 
     return (
       <TouchableOpacity
         onLongPress={() => handleLongPress(item.id)}
         style={[
-          item.user === 'Sender' ? styles.senderMessage : styles.receiverMessage,
+          item.user === 'Sender' ? styles.receiverMessage : styles.senderMessage,
           selectedMessages.includes(item.id) && styles.selectedMessage
         ]}
       >
-        <Text>{item.deletedForEveryone ? '🚫 You deleted this message' : item.text}</Text>
-        {item.attachment && (
-          <TouchableOpacity onPress={() => openImageViewer(item.attachment.path)}>
-            <Image source={{ uri: item.attachment.path }} style={styles.messageImage} />
-          </TouchableOpacity>
+        {item.deletedForEveryone ? (
+          <Text>🚫 Message deleted</Text>
+        ) : (
+          <>
+            {item.text ? <Text>{item.text}</Text> : null}
+            {item.attachment && (
+              <TouchableOpacity onPress={() => openImageViewer(item.attachment.path)}>
+                <Image source={{ uri: item.attachment.path }} style={styles.messageImage} />
+              </TouchableOpacity>
+            )}
+          </>
         )}
       </TouchableOpacity>
     );
@@ -167,16 +174,18 @@ const SenderChatScreen = ({ route, navigation }) => {
         inverted
       />
       <View style={styles.inputContainer}>
-        <TouchableOpacity onPress={selectAttachment} style={styles.attachmentButton}>
-          <Image source={attachmentIcon} style={styles.attachmentIcon} />
-        </TouchableOpacity>
-        <TextInput
-          style={styles.input}
-          value={message}
-          onChangeText={setMessage}
-          placeholder="Type a message"
-          multiline
-        />
+        <View style={styles.inputInnerContainer}>
+          <TextInput
+            style={styles.input}
+            value={message}
+            onChangeText={setMessage}
+            placeholder="Type a message"
+            multiline
+          />
+          <TouchableOpacity onPress={selectAttachment} style={styles.attachmentButton}>
+            <Image source={attachmentIcon} style={styles.attachmentIcon} />
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
           <Image source={sendIcon} style={styles.sendIcon} />
         </TouchableOpacity>
@@ -223,64 +232,78 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff'
   },
   headerRight: {
-    flexDirection: 'row',
     padding: 10,
-  },
-  attachmentButton: {
-    padding: 10,
-    marginRight: 5,
-  },
-  attachmentIcon: {
-    width: 24,
-    height: 24,
   },
   deleteIcon: {
     width: 24,
     height: 24
   },
+  attachmentButton: {
+    padding: 5,
+  },
+  attachmentIcon: {
+    width: 24,
+    height: 24,
+  },
   inputContainer: {
     flexDirection: 'row',
-    padding: 10,
-    borderTopWidth: 1,
     alignItems: 'center',
-    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    padding: 10,
+  },
+  inputInnerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    borderWidth: 1,
+    padding: 5,
+    borderRadius: 20,
+    maxHeight: 100,
+    backgroundColor: '#F0F0F0', // Background color
+    color: '#000', // Text color
   },
   input: {
     flex: 1,
-    borderWidth: 1,
     padding: 10,
     borderRadius: 20,
-    maxHeight: 100,
-    backgroundColor: '#F0F0F0',
-    color: '#000'
+    backgroundColor: '#F0F0F0', // Background color
+    color: '#000', // Text color
   },
   sendButton: {
     padding: 10,
   },
   sendIcon: {
-    width: 24,
-    height: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    width:50
   },
   senderMessage: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#DCF8C6',
-    borderRadius: 20,
-    marginVertical: 5,
-    padding: 10,
-    maxWidth: '70%',
-    marginHorizontal: 7
-  },
-  receiverMessage: {
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-start', // Sent messages are aligned to the left
     backgroundColor: '#ECECEC',
     borderRadius: 20,
     marginVertical: 5,
     padding: 10,
     maxWidth: '70%',
-    marginHorizontal: 7
+    marginHorizontal:7
+  },
+  receiverMessage: {
+    alignSelf: 'flex-end', // Received messages are aligned to the right
+    backgroundColor: '#DCF8C6',
+    borderRadius: 20,
+    marginVertical: 5,
+    padding: 10,
+    maxWidth: '70%',
+    marginHorizontal:7
   },
   selectedMessage: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#E0E0E0'
+  },
+  messageImage: {
+    width: 200,
+    height: 250,
+    borderRadius: 10,
+    // marginTop: 10
   },
   modalContainer: {
     flex: 1,
@@ -289,39 +312,34 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)'
   },
   modalContent: {
-    width: '80%',
     backgroundColor: '#fff',
-    borderRadius: 10,
     padding: 20,
+    borderRadius: 10,
+    width: '80%',
     alignItems: 'center'
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: 'black'
+    marginBottom: 20
   },
   modalButton: {
-    padding: 10,
-    marginVertical: 5,
     width: '100%',
-    alignItems: 'center'
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+    backgroundColor: '#007BFF'
   },
   modalButtonText: {
-    fontSize: 16,
-    color: '#0D4744'
-  },
-  messageImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    marginTop: 10
+    color: '#fff',
+    fontWeight: 'bold'
   },
   imageModalContainer: {
     flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.9)',
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.8)'
+    alignItems: 'center'
   },
   fullscreenImage: {
     width: '100%',

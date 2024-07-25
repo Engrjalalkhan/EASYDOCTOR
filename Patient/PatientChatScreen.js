@@ -172,9 +172,8 @@ const ReceiverChatScreen = ({ route, navigation }) => {
         inverted
       />
       <View style={styles.inputContainer}>
-        <TouchableOpacity onPress={selectAttachment} style={styles.attachmentButton}>
-          <Image source={attachmentIcon} style={styles.attachmentIcon} />
-        </TouchableOpacity>
+      <View style={styles.inputInnerContainer}>
+       
         <TextInput
           style={styles.input}
           value={message}
@@ -182,6 +181,10 @@ const ReceiverChatScreen = ({ route, navigation }) => {
           placeholder="Type a message"
           multiline
         />
+         <TouchableOpacity onPress={selectAttachment} style={styles.attachmentButton}>
+          <Image source={attachmentIcon} style={styles.attachmentIcon} />
+        </TouchableOpacity>
+        </View>
         <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
           <Image source={sendIcon} style={styles.sendIcon} />
         </TouchableOpacity>
@@ -248,9 +251,20 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     alignItems: 'center'
   },
-  input: {
+  inputInnerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
     borderWidth: 1,
+    padding: 5,
+    borderRadius: 20,
+    maxHeight: 100,
+    backgroundColor: '#F0F0F0', // Background color
+    color: '#000', // Text color
+  },
+  input: {
+    flex: 1,
+    // borderWidth: 1,
     padding: 10,
     borderRadius: 20,
     maxHeight: 100,
@@ -331,7 +345,7 @@ const styles = StyleSheet.create({
   fullscreenImage: {
     width: '100%',
     height: '100%',
-    // resizeMode: 'contain'
+    resizeMode: 'contain'
   }
 });
 
