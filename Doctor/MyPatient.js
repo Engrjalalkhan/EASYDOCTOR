@@ -29,8 +29,17 @@ const PatientScreen = () => {
         const querySnapshot = await firestore().collection('Bookings').where('doctorId', '==', doctorId).get();
         const patientsData = querySnapshot.docs.map(doc => {
           const data = doc.data();
-          return data.patient ? { ...data.patient, id: doc.id, patientId: data.patientId, phone: data.phone, date: data.date, morningSlot: data.morningSlot, eveningSlot: data.eveningSlot, paymentStatus: data.paymentStatus } : null;
-        }).filter(patient => patient !== null);
+          return {
+            id: doc.id,  // Booking document ID
+            patientId: data.patientId, // patientId field from Booking document
+            ...data.patient, // Patient data if present
+            phone: data.phone,
+            date: data.date,
+            morningSlot: data.morningSlot,
+            eveningSlot: data.eveningSlot,
+            paymentStatus: data.paymentStatus
+          };
+        }).filter(patient => patient.patientId); // Ensure we only include valid patientId
         setPatients(patientsData);
       } catch (error) {
         console.error('Error fetching patients:', error);
@@ -43,19 +52,25 @@ const PatientScreen = () => {
   }, [doctorId]);
 
   const handlePing = async (patient) => {
+    if (!patient.patientId) {
+      console.error('Patient ID is missing');
+      return;
+    }
+
     try {
-        await firestore().collection('Notifications').add({
-          name: patient.name,
-          age: patient.age,
-          gender: patient.gender,
-          symptom: patient.symptom,
-          date: patient.date,
-          paymentStatus: patient.paymentStatus,
-          complications: patient.complications,
-          time: patient.morningSlot || patient.eveningSlot,
-          createdAt: firestore.FieldValue.serverTimestamp(),
-        });
-        Alert.alert('Ping', `Notification sent to ${patient.phone} for appointment on ${patient.date} at ${patient.morningSlot || patient.eveningSlot}`);
+      await firestore().collection('Notifications').add({
+        name: patient.name,
+        age: patient.age,
+        gender: patient.gender,
+        symptom: patient.symptom,
+        date: patient.date,
+        paymentStatus: patient.paymentStatus,
+        complications: patient.complications,
+        time: patient.morningSlot || patient.eveningSlot,
+        patientId: patient.patientId, // Store patientId from Booking collection
+        createdAt: firestore.FieldValue.serverTimestamp(),
+      });
+      Alert.alert('Ping', `Notification sent to ${patient.phone} for appointment on ${patient.date} at ${patient.morningSlot || patient.eveningSlot}`);
     } catch (error) {
       console.error('Error sending notification:', error);
     }
