@@ -1,9 +1,37 @@
-// FeedbackCard.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { Rating } from 'react-native-ratings';
+import firestore from '@react-native-firebase/firestore';
 
 const FeedbackCard = ({ feedback }) => {
+  useEffect(() => {
+    const fetchDoctorIdAndStoreFeedback = async () => {
+      try {
+        // Fetch the booking document from the Bookings collection
+        const bookingDoc = await firestore().collection('Bookings').doc(feedback.bookingId).get();
+
+        if (bookingDoc.exists) {
+          const bookingData = bookingDoc.data();
+          const doctorId = bookingData.doctorId;
+
+          // Store the feedback in the Feedback collection with the doctorId
+          await firestore().collection('Feedback').doc(feedback.id).set({
+            ...feedback,
+            doctorId: doctorId,
+          });
+
+          console.log('Feedback stored successfully with doctorId');
+        } else {
+          console.log('No such booking document found!');
+        }
+      } catch (error) {
+        console.error('Error fetching doctorId and storing feedback: ', error);
+      }
+    };
+
+    fetchDoctorIdAndStoreFeedback();
+  }, [feedback]);
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>
