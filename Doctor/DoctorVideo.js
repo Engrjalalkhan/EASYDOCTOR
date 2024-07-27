@@ -57,7 +57,7 @@ const PatientScreen = () => {
 
   const handleChat = (patient) => {
     // Navigate to the ChatScreen and pass the selected patient information
-    navigation.navigate('chatScreen', { patient });
+    navigation.navigate('CallScreen', { patient });
   };
 
   return (

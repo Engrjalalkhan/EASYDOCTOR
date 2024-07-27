@@ -70,9 +70,9 @@ const MyAppointmentsScreen = ({ route, navigation }) => {
         messagesRef.onSnapshot((snapshot) => {
           if (snapshot.exists) {
             const messages = snapshot.data();
-            navigation.navigate('PatientChat', { doctorId, doctorData, messages });
+            navigation.navigate('CallScreen', { doctorId, doctorData, messages });
           } else {
-            navigation.navigate('PatientChat', { doctorId, doctorData, messages: [] });
+            navigation.navigate('CallScreen', { doctorId, doctorData, messages: [] });
           }
         });
       } else {

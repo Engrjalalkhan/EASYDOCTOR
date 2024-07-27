@@ -14,6 +14,8 @@
         "Inwith",
         "latlng",
         "lightgray",
+        "munteon",
+        "muteoff",
         "Notificationscreen",
         "patientage",
         "patientcomplications",
@@ -30,6 +32,8 @@
         "soloader",
         "Tesseract",
         "toslot",
+        "turnof",
+        "turnone",
         "Upwith",
         "Voic"
     ]

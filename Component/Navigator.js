@@ -44,6 +44,7 @@ import PatientVideo from '../Patient/PatientVideo';
 import DoctorVideo from '../Doctor/DoctorVideo';
 import ChatScreen from '../Doctor/chatScreen';
 import PatientChatScreen from '../Patient/PatientChatScreen';
+import CallScreen from './CallScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -272,6 +273,11 @@ const Navigator = () => {
         <Stack.Screen
           name="PatientChat"
           component={PatientChatScreen}
+          options={{headerTitleAlign:"center"}}
+        />
+        <Stack.Screen
+          name="CallScreen"
+          component={CallScreen}
           options={{headerTitleAlign:"center"}}
         />
       </Stack.Navigator>
