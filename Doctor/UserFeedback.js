@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, FlatList, TouchableOpacity, Alert, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { AirbnbRating } from 'react-native-ratings';
 
@@ -36,8 +36,19 @@ const DoctorHomeScreen = () => {
     fetchFeedbacks();
   }, []);
 
+  const handleDeleteFeedback = async (feedbackId) => {
+    try {
+      await firestore().collection('feedback').doc(feedbackId).delete();
+      setFeedbacks(feedbacks.filter(feedback => feedback.id !== feedbackId));
+      Alert.alert('Deleted', 'Feedback has been deleted.');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Unable to delete feedback. Please try again later.');
+    }
+  };
+
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.feedbackCard}>
+    <View style={styles.feedbackCard}>
       <View style={styles.feedbackContainer}>
         <Text style={styles.feedbackText}>{item.feedback}</Text>
         <View style={styles.ratingContainer}>
@@ -53,7 +64,10 @@ const DoctorHomeScreen = () => {
           />
         </View>
       </View>
-    </TouchableOpacity>
+      <TouchableOpacity onPress={() => handleDeleteFeedback(item.id)} style={styles.deleteButton}>
+        <Image source={require('../Src/images/delete.png')} style={styles.deleteIcon} />
+      </TouchableOpacity>
+    </View>
   );
 
   if (loading) {
@@ -98,6 +112,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   feedbackText: {
     fontSize: 16,
@@ -124,6 +141,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#888',
+  },
+  deleteButton: {
+    paddingTop: 5,
+    alignSelf:'baseline',
+    
+  },
+  deleteIcon: {
+    width: 20,
+    height: 20,
   },
 });
 
