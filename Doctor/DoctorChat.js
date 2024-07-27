@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth'; // Add this to import authentication
+import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 
 const PatientScreen = () => {
   const [patients, setPatients] = useState([]);
-  const [selectedPatient, setSelectedPatient] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [doctorId, setDoctorId] = useState(null); // Add state for storing doctorId
-  const navigation=useNavigation();
+  const [doctorId, setDoctorId] = useState(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchDoctorId = async () => {
@@ -29,20 +27,20 @@ const PatientScreen = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const querySnapshot = await firestore().collection('Bookings').where('doctorId', '==', doctorId).get();
-        const patientsData = querySnapshot.docs.map(doc => {
-          const data = doc.data();
-          return data.patient ? { ...data.patient, id: doc.id, date: data.date, morningSlot: data.morningSlot, eveningSlot: data.eveningSlot, paymentStatus: data.paymentStatus } : null;
-        }).filter(patient => patient !== null);
-        setPatients(patientsData);
+        if (doctorId) {
+          const querySnapshot = await firestore().collection('Bookings').where('doctorId', '==', doctorId).get();
+          const patientsData = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return data.patient ? { ...data.patient, id: doc.id, date: data.date, morningSlot: data.morningSlot, eveningSlot: data.eveningSlot, paymentStatus: data.paymentStatus, doctorId: data.doctorId } : null;
+          }).filter(patient => patient !== null);
+          setPatients(patientsData);
+        }
       } catch (error) {
         console.error('Error fetching patients:', error);
       }
     };
 
-    if (doctorId) {
-      fetchPatients();
-    }
+    fetchPatients();
   }, [doctorId]);
 
   const handleDelete = async (patientId) => {
@@ -56,8 +54,8 @@ const PatientScreen = () => {
   };
 
   const handleChat = (patient) => {
-    // Navigate to the ChatScreen and pass the selected patient information
-    navigation.navigate('chatScreen', { patient });
+    // Navigate to the ChatScreen and pass the selected patient information along with doctorId
+    navigation.navigate('chatScreen', { patient, doctorId });
   };
 
   return (
@@ -75,7 +73,7 @@ const PatientScreen = () => {
               onPress={() => handleDelete(patient.id)}
             >
               <Image
-                source={require('../Src/images/red.png')} // Replace with the path to your delete icon image
+                source={require('../Src/images/red.png')}
                 style={styles.deleteIcon}
               />
             </TouchableOpacity>
@@ -84,7 +82,7 @@ const PatientScreen = () => {
               onPress={() => handleChat(patient)}
             >
               <Image
-                source={require('../Src/images/chat.png')} // Replace with the path to your chat icon image
+                source={require('../Src/images/chat.png')}
                 style={styles.chatIcon}
               />
             </TouchableOpacity>
@@ -128,53 +126,6 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalView: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    width: '80%',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-  },
-  modalDetail: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    marginTop: 20,
-  },
-  button: {
-    backgroundColor: '#0D4744',
-    borderRadius: 10,
-    padding: 10,
-    marginHorizontal: 10,
-  },
-  closeButton: {
-    backgroundColor: '#f44336',
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-  },
   chatButton: {
     position: 'absolute',
     top: 50,
@@ -187,7 +138,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    marginTop:10
+    marginTop: 10,
   },
 });
 

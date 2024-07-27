@@ -16,40 +16,28 @@ const SenderChatScreen = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [doctorId, setDoctorId] = useState(null);
+  const [doctorId, setDoctorId] = useState(route.params.doctorId); // Get doctorId from route params
 
   useEffect(() => {
-    // Fetch the bookings collection and set the doctorId
-    const fetchDoctorId = async () => {
-      const bookingsSnapshot = await firestore().collection('Bookings').get();
-      if (!bookingsSnapshot.empty) {
-        const bookingData = bookingsSnapshot.docs[0].data();
-        setDoctorId(bookingData.doctorId);
-      }
-    };
+    const unsubscribe = firestore()
+      .collection('chats')
+      .doc(doctorId)
+      .collection('messages') // Assuming messages are stored in sub-collection named 'messages'
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(querySnapshot => {
+        const messages = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setMessages(messages);
+      });
 
-    fetchDoctorId();
-  }, []);
-
-  useEffect(() => {
-      const unsubscribe = firestore()
-        .collection('chats')
-        .orderBy('createdAt', 'desc')
-        .onSnapshot(querySnapshot => {
-          const messages = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          setMessages(messages);
-        });
-
-      return () => unsubscribe();
-    
-  }, []);
+    return () => unsubscribe();
+  }, [doctorId]);
 
   const sendMessage = async () => {
     if (message.length > 0 || attachment) {
-      await firestore().collection('chats').add({
+      await firestore().collection('chats').doc(doctorId).collection('messages').add({
         text: message,
         attachment: attachment,
         createdAt: firestore.FieldValue.serverTimestamp(),
@@ -74,7 +62,7 @@ const SenderChatScreen = ({ route, navigation }) => {
 
     const batch = firestore().batch();
     selectedMessages.forEach(id => {
-      const docRef = firestore().collection('Bookings').doc(doctorId).collection('messages').doc(id);
+      const docRef = firestore().collection('chats').doc(doctorId).collection('messages').doc(id);
       if (option === 'deleteForEveryone') {
         batch.update(docRef, { deletedForEveryone: true, text: '🚫 Message deleted', attachment: null });
       } else if (option === 'deleteForMe') {
@@ -129,7 +117,6 @@ const SenderChatScreen = ({ route, navigation }) => {
   };
 
   const renderItem = ({ item }) => {
-    // Check if the message should be displayed
     if (item.deletedBy && item.deletedBy.includes('Sender') && item.user === 'Sender') {
       return null; // Skip rendering if deleted by the current user
     }
@@ -287,32 +274,30 @@ const styles = StyleSheet.create({
   sendIcon: {
     width: 40,
     height: 40,
-    borderRadius:10,
-    width:50
   },
   senderMessage: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#ECECEC',
-    borderRadius: 25,
+    backgroundColor: '#e0e0e0',
     padding: 10,
-    margin: 5,
-    maxWidth: '80%',
+    borderRadius: 10,
+    marginBottom: 10,
+    alignSelf: 'flex-end',
   },
   receiverMessage: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#DCF8C6',
-    borderRadius: 25,
+    backgroundColor: '#d0f0c0',
     padding: 10,
-    margin: 5,
-    maxWidth: '80%',
+    borderRadius: 10,
+    marginBottom: 10,
+    alignSelf: 'flex-start',
   },
   selectedMessage: {
-    backgroundColor: '#D3D3D3'
+    borderColor: '#007BFF',
+    borderWidth: 2,
   },
   messageImage: {
-    width: 200,
-    height: 250,
-    borderRadius: 5,
+    width: 150,
+    height: 150,
+    borderRadius: 10,
+    marginTop: 5,
   },
   modalContainer: {
     flex: 1,
@@ -321,26 +306,22 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: '80%',
     backgroundColor: '#fff',
-    borderRadius: 10,
     padding: 20,
-    alignItems: 'flex-start',
+    borderRadius: 10,
+    width: '80%',
   },
   modalTitle: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   modalButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    width: '100%',
-    alignItems: 'flex-end',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
   modalButtonText: {
-    color: '#0D4744',
     fontSize: 16,
   },
   imageModalContainer: {
@@ -352,7 +333,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
-  }
+  },
 });
 
 export default SenderChatScreen;

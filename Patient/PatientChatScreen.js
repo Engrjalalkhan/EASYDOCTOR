@@ -21,7 +21,8 @@ const ReceiverChatScreen = ({ route, navigation }) => {
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('chats')
-      
+      .doc(doctorId) // Use doctorId to target the specific chat
+      .collection('messages') // Use a subcollection for messages
       .orderBy('createdAt', 'desc')
       .onSnapshot(querySnapshot => {
         const messages = querySnapshot.docs.map(doc => ({
@@ -32,16 +33,19 @@ const ReceiverChatScreen = ({ route, navigation }) => {
       });
 
     return () => unsubscribe();
-  }, []);
+  }, [doctorId]);
 
   const sendMessage = async () => {
     if (message.length > 0 || attachment) {
-      await firestore().collection('chats').add({
-        text: message,
-        attachment: attachment,
-        createdAt: firestore.FieldValue.serverTimestamp(),
-        user: 'Receiver'
-      });
+      await firestore().collection('chats')
+        .doc(doctorId) // Target the specific chat
+        .collection('messages') // Use a subcollection for messages
+        .add({
+          text: message,
+          attachment: attachment,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+          user: 'Receiver'
+        });
       setMessage('');
       setAttachment(null);
     }
@@ -61,7 +65,11 @@ const ReceiverChatScreen = ({ route, navigation }) => {
 
     const batch = firestore().batch();
     selectedMessages.forEach(id => {
-      const docRef = firestore().collection('chats').doc(id);
+      const docRef = firestore().collection('chats')
+        .doc(doctorId) // Target the specific chat
+        .collection('messages') // Use a subcollection for messages
+        .doc(id);
+
       if (option === 'deleteForEveryone') {
         batch.update(docRef, { deletedForEveryone: true, text: '🚫 Message deleted', attachment: null });
       } else if (option === 'deleteForMe') {
@@ -258,95 +266,85 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     borderWidth: 1,
-    padding: 5,
-    borderRadius: 20,
-    maxHeight: 100,
-    backgroundColor: '#F0F0F0', // Background color
-    color: '#000', // Text color
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 5
   },
   input: {
     flex: 1,
-    padding: 10,
-    borderRadius: 20,
-    maxHeight: 100,
-    backgroundColor: '#F0F0F0', // Background color
-    color: '#000' // Text color
+    padding: 5,
+    fontSize: 16,
   },
   sendButton: {
-    marginLeft: 5,
     padding: 10,
-    borderRadius: 20,
-    
+    marginLeft: 10
   },
   sendIcon: {
-    width: 40,
-    height: 40,
-    borderRadius:10,
-    width:50
-  },
-  senderMessage: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#E8E8E8', // WhatsApp-like sender message color
-    borderRadius: 25,
-    padding: 10,
-    margin: 5,
-    maxWidth: '80%'
+    width: 30,
+    height: 30,
   },
   receiverMessage: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#DCF8C6', // WhatsApp-like receiver message color
-    borderRadius: 25,
+    backgroundColor: '#e0e0e0',
+    alignSelf: 'flex-start',
     padding: 10,
-    margin: 5,
-    maxWidth: '80%'
+    borderRadius: 15,
+    marginVertical: 5,
+    marginHorizontal: 10
+  },
+  senderMessage: {
+    backgroundColor: '#007bff',
+    alignSelf: 'flex-end',
+    padding: 10,
+    borderRadius: 15,
+    marginVertical: 5,
+    marginHorizontal: 10,
+    color: '#fff'
   },
   selectedMessage: {
-    backgroundColor: '#ADD8E6', // Light blue color for selected messages
+    backgroundColor: '#c0c0c0',
   },
   messageImage: {
-    width: 200,
-    height: 250,
+    width: 100,
+    height: 100,
     borderRadius: 10,
-    marginTop: 5
+    marginVertical: 5
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0,0,0,0.5)'
   },
   modalContent: {
-    width: '80%',
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,
-    alignItems: 'flex-start',
+    width: '80%',
+    alignItems: 'center'
   },
   modalTitle: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10
   },
   modalButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
+    padding: 10,
     width: '100%',
-    alignItems: 'flex-end',
+    alignItems: 'center'
   },
   modalButtonText: {
-    color: '#0D4744',
-    fontSize: 16,
+    fontSize: 16
   },
   imageModalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.8)'
   },
   fullscreenImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'contain',
+    resizeMode: 'contain'
   }
 });
 
