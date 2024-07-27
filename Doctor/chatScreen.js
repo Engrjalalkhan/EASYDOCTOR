@@ -274,28 +274,32 @@ const styles = StyleSheet.create({
   sendIcon: {
     width: 40,
     height: 40,
+    borderRadius:10,
+    width:50
   },
   senderMessage: {
     backgroundColor: '#e0e0e0',
     padding: 10,
     borderRadius: 10,
     marginBottom: 10,
-    alignSelf: 'flex-end',
+    alignSelf: 'flex-start',
+    marginHorizontal:7
   },
   receiverMessage: {
     backgroundColor: '#d0f0c0',
     padding: 10,
     borderRadius: 10,
     marginBottom: 10,
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-end',
+    marginHorizontal:7
   },
   selectedMessage: {
     borderColor: '#007BFF',
     borderWidth: 2,
   },
   messageImage: {
-    width: 150,
-    height: 150,
+    width: 200,
+    height: 250,
     borderRadius: 10,
     marginTop: 5,
   },
@@ -303,26 +307,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0,0,0,0.5)'
   },
   modalContent: {
     backgroundColor: '#fff',
-    padding: 20,
     borderRadius: 10,
+    padding: 20,
     width: '80%',
+    alignItems: 'flex-start'
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 10
   },
   modalButton: {
     padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    width: '100%',
+    alignItems: 'flex-end',
+    
   },
   modalButtonText: {
     fontSize: 16,
+    color:'#0D4744'
   },
   imageModalContainer: {
     flex: 1,
