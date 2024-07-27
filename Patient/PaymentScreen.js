@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  Modal,
+  Pressable,
   Alert,
 } from 'react-native';
 import { RadioButton } from 'react-native-paper';
@@ -20,6 +22,8 @@ const PaymentScreen = () => {
   const [paymentOption, setPaymentOption] = useState('cash');
   const [verificationMessage, setVerificationMessage] = useState('');
   const [selectedDoctorId, setSelectedDoctorId] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalImage, setModalImage] = useState('');
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -159,19 +163,9 @@ const PaymentScreen = () => {
       });
       setBookings(updatedBookings);
 
-      Alert.alert(
-        'Appointment Booked',
-        'Your appointment has been successfully booked!',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.navigate('Book');
-            },
-          },
-        ],
-        { cancelable: false }
-      );
+      // Show modal with image
+      setModalImage(require('../Src/images/tik.png')); // Replace with your image path
+      setModalVisible(true);
 
     } catch (error) {
       console.error('Error booking appointment:', error);
@@ -248,6 +242,11 @@ const PaymentScreen = () => {
     );
   };
 
+  const handleModalClose = () => {
+    setModalVisible(false);
+    navigation.navigate('Book'); // Replace with your actual route name
+  };
+
   return (
     <View style={styles.container}>
       {selectedDoctorId ? (
@@ -263,9 +262,28 @@ const PaymentScreen = () => {
           keyExtractor={item => item.id}
         />
       )}
+
+      {/* Modal for Image */}
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Image source={modalImage} style={styles.modalImage} />
+            <Pressable
+              style={styles.closeButton}
+              onPress={handleModalClose}>
+              <Text style={styles.closeButtonText}>BOOKING SUCCESSFUL</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -359,6 +377,38 @@ const styles = StyleSheet.create({
   booking: {
     fontSize: 14,
     color: '#333',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+  },
+  modalContent: {
+    width: '80%',
+    height:300,
+    backgroundColor: 'white',
+    borderRadius: 25,
+    padding: 20,
+    alignItems: 'center',
+    elevation: 5,
+  },
+  modalImage: {
+    width: 100,
+    height: 100,
+    borderRadius:50,
+    resizeMode: 'contain',
+    marginTop:70
+  },
+  closeButton: {
+    marginTop: 20,
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: 'black',
+    fontSize: 20,
+    fontWeight:'bold'
   },
 });
 
