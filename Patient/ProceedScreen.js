@@ -227,9 +227,10 @@ const ProceedScreen = () => {
               styles.input,
               { borderColor: fieldsValid ? '#0D4744' : 'red' },
             ]}
-            placeholder="Your Phone Number"
+            placeholder="Account Holder Number"
             value={phone}
             onChangeText={setPhone}
+            keyboardType='numeric'
           />
         </View>
       )}
@@ -285,9 +286,10 @@ const ProceedScreen = () => {
               styles.input,
               { borderColor: fieldsValid ? '#0D4744' : 'red' },
             ]}
-            placeholder="Patient's Phone Number"
+            placeholder="Account Holder Number"
             value={phone}
             onChangeText={setPhone}
+            keyboardType='numeric'
           />
         </View>
       )}

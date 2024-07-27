@@ -283,7 +283,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     alignSelf: 'flex-start',
-    marginHorizontal:7
+    marginHorizontal:7,
+    maxWidth: '80%',
   },
   receiverMessage: {
     backgroundColor: '#d0f0c0',
@@ -291,7 +292,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     alignSelf: 'flex-end',
-    marginHorizontal:7
+    marginHorizontal:7,
+    maxWidth: '80%',
   },
   selectedMessage: {
     borderColor: '#007BFF',
