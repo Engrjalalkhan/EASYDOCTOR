@@ -32,11 +32,8 @@ const SenderChatScreen = ({ route, navigation }) => {
   }, []);
 
   useEffect(() => {
-    if (doctorId) {
       const unsubscribe = firestore()
         .collection('chats')
-        .doc(doctorId)
-        .collection('messages')
         .orderBy('createdAt', 'desc')
         .onSnapshot(querySnapshot => {
           const messages = querySnapshot.docs.map(doc => ({
@@ -47,12 +44,12 @@ const SenderChatScreen = ({ route, navigation }) => {
         });
 
       return () => unsubscribe();
-    }
-  }, [doctorId]);
+    
+  }, []);
 
   const sendMessage = async () => {
     if (message.length > 0 || attachment) {
-      await firestore().collection('chats').doc(doctorId).collection('messages').add({
+      await firestore().collection('chats').add({
         text: message,
         attachment: attachment,
         createdAt: firestore.FieldValue.serverTimestamp(),
@@ -77,7 +74,7 @@ const SenderChatScreen = ({ route, navigation }) => {
 
     const batch = firestore().batch();
     selectedMessages.forEach(id => {
-      const docRef = firestore().collection('chats').doc(doctorId).collection('messages').doc(id);
+      const docRef = firestore().collection('Bookings').doc(doctorId).collection('messages').doc(id);
       if (option === 'deleteForEveryone') {
         batch.update(docRef, { deletedForEveryone: true, text: '🚫 Message deleted', attachment: null });
       } else if (option === 'deleteForMe') {
