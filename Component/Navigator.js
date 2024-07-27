@@ -96,47 +96,47 @@ const Navigator = () => {
         <Stack.Screen
           name="About"
           component={AboutScreen}
-          options={{headerShown: true}}
+          options={{headerTitleAlign:"center"}}
         />
         <Stack.Screen
           name="OnlineScreen"
           component={OnlineScreen}
-          options={{headerShown: true}}
+          options={{headerTitleAlign:"center"}}
         />
         <Stack.Screen
           name="Help"
           component={HelpScreen}
-          options={{headerShown: true}}
+          options={{headerTitleAlign:"center"}}
         />
         <Stack.Screen
           name="DeleteAccount"
           component={DeleteAccountScreen}
-          options={{headerShown: true}}
+          options={{headerTitleAlign:"center"}}
         />
         <Stack.Screen
           name="PatientDelete"
           component={PatientDelete}
-          options={{headerShown: true}}
+          options={{headerTitleAlign:"center"}}
         />
         <Stack.Screen
           name="Logout"
           component={LogoutScreen}
-          options={{headerShown: true}}
+          options={{headerTitleAlign:"center"}}
         />
         <Stack.Screen
           name="MyCalendar"
           component={MyCalendarScreen}
-          options={{headerShown: true}}
+          options={{headerTitleAlign:"center"}}
         />
         <Stack.Screen
           name="Calendar"
           component={CalendarComponent}
-          options={{headerShown: true}}
+          options={{headerTitleAlign:"center"}}
         />
         <Stack.Screen
           name="MyPatient"
           component={MyPatient}
-          options={{headerShown: true}}
+          options={{headerTitleAlign:"center"}}
         />
         <Stack.Screen
           name="PatientProfile"
