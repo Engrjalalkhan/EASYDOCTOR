@@ -18,9 +18,7 @@ export default function VoiceCallPage(props) {
                 callID={callID}
                 config={{
                     ...ONE_ON_ONE_VIDEO_CALL_CONFIG,
-                    onCallEnd: (callID, reason, duration) => {
-                        console.log(`Call ended. CallID: ${callID}, Reason: ${reason}, Duration: ${duration}`);
-                    },
+                    onCallEnd: (callID, reason, duration) => {props.navigation.navigate('PatientVideo Consultation')},
                 }}
             />
         </View>
