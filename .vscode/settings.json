@@ -30,11 +30,14 @@
         "Sceen",
         "Selction",
         "soloader",
+        "speakeroff",
         "Tesseract",
         "toslot",
         "turnof",
         "turnone",
         "Upwith",
-        "Voic"
+        "Voic",
+        "zego",
+        "zegocloud"
     ]
 }
