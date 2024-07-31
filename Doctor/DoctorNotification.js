@@ -10,6 +10,7 @@ import {
   Modal,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const DoctorNotificationScreen = () => {
   const [notifications, setNotifications] = useState([]);
@@ -67,10 +68,7 @@ const DoctorNotificationScreen = () => {
         style={styles.deleteButton}
         onPress={() => handleDelete(item.id)}
       >
-        <Image
-          source={require('../Src/images/red.png')} // Replace with your delete icon image
-          style={styles.deleteIcon}
-        />
+        <Icon name="delete" size={30} color="#dc3d3d" />
       </TouchableOpacity>
       <Image source={{ uri: item.attachmentUrl }} style={styles.attachmentImage} />
       <Text style={styles.timestamp}>{new Date(item.timestamp?.toDate()).toLocaleString()}</Text>

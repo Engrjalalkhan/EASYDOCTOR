@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert, Ima
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth'; // Add this to import authentication
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import Feather from 'react-native-vector-icons/Feather';
 
 const PatientScreen = () => {
   const [patients, setPatients] = useState([]);
@@ -74,19 +76,13 @@ const PatientScreen = () => {
               style={styles.deleteButton}
               onPress={() => handleDelete(patient.id)}
             >
-              <Image
-                source={require('../Src/images/red.png')} // Replace with the path to your delete icon image
-                style={styles.deleteIcon}
-              />
+              <Icon name="delete" size={30} color="#dc3d3d" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.chatButton}
               onPress={() => handleChat(patient)}
             >
-              <Image
-                source={require('../Src/images/consultation.png')} // Replace with the path to your chat icon image
-                style={styles.chatIcon}
-              />
+              <Feather name="phone" size={20} color="#dc3d3d" style={{marginHorizontal:7}} />
             </TouchableOpacity>
           </View>
         ))}

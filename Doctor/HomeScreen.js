@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Switch,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome'; // Import Icon
 
 const Home = ({route, navigation}) => {
   const {profileImage, userName} = route.params;
@@ -59,10 +60,7 @@ const Home = ({route, navigation}) => {
           <TouchableOpacity
             onPress={() => handlePress('MyPatient')}
             style={styles.card}>
-            <Image
-              source={require('../Src/images/Patient.png')}
-              style={styles.logo}
-            />
+            <Icon name="user" size={50} color="white" style={styles.logo} />
             <Text style={styles.cardText}>My Patients</Text>
           </TouchableOpacity>
           <TouchableOpacity

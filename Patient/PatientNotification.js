@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 
 const PatientNotificationScreen = () => {
   const [notifications, setNotifications] = useState([]);
@@ -67,10 +69,7 @@ const PatientNotificationScreen = () => {
               style={styles.deleteButton}
               onPress={() => handleDeleteNotification(notification.id)}
             >
-              <Image
-                source={require('../Src/images/red.png')} // Replace with the path to your delete icon image
-                style={styles.deleteIcon}
-              />
+              <Icon name="delete" size={30} color="#dc3d3d" />
             </TouchableOpacity>
           </View>
         ))}

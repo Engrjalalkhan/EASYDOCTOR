@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, FlatList, TouchableOpacity, Alert, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { AirbnbRating } from 'react-native-ratings';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const DoctorHomeScreen = () => {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -65,7 +66,7 @@ const DoctorHomeScreen = () => {
         </View>
       </View>
       <TouchableOpacity onPress={() => handleDeleteFeedback(item.id)} style={styles.deleteButton}>
-        <Image source={require('../Src/images/delete.png')} style={styles.deleteIcon} />
+      <Icon name="delete" size={30} color="#dc3d3d" />
       </TouchableOpacity>
     </View>
   );

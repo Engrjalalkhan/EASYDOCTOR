@@ -8,6 +8,7 @@ import {
   Alert
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const MyAppointmentsScreen = ({ route, navigation }) => {
   const [bookings, setBookings] = useState([]);
@@ -113,18 +114,12 @@ const MyAppointmentsScreen = ({ route, navigation }) => {
             <TouchableOpacity
               onPress={() => handleDelete(bookingId)}
               style={styles.actionButton}>
-              <Image
-                source={require('../Src/images/red.png')} // Replace with the path to your delete icon image
-                style={styles.deleteIcon}
-              />
+              <Icon name="delete" size={30} color="#dc3d3d" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => handleChat(doctorId)}
               style={styles.actionButton}>
-              <Image
-                source={require('../Src/images/chat.png')} // Replace with the path to your chat icon image
-                style={styles.chatIcon}
-              />
+              <Icon name="comment" size={30} color="white" style={styles.logo} />
             </TouchableOpacity>
           </View>
         </View>
