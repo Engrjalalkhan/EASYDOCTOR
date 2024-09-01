@@ -3,6 +3,7 @@ import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity } from 'react
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 
+
 const PatientHome = ({ route }) => {
   const [doctors, setDoctors] = useState([]);
   const specialtyFilter = 'Dentistry'; // Replace this with the desired specialty
@@ -91,7 +92,7 @@ const PatientHome = ({ route }) => {
       <View style={styles.buttonContainer}>
         <View style={styles.bookmarkContainer}>
           <TouchableOpacity onPress={() => handleBookmarkDoctor(item)} style={styles.bookmarkButton}>
-            <Text style={[styles.bookmarkText, { color: bookmarkedDoctors.includes(item.id) ? 'gold' : 'gray' }]}>🔖</Text>
+            <Text style={[styles.bookmarkText, { color: bookmarkedDoctors.includes(item.id) ? 'gold' : 'gray' }]}>⭐</Text>
           </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={handleBookAppointment} style={styles.actionButton}>
@@ -174,24 +175,29 @@ const styles = StyleSheet.create({
   doctorDetails: {
     flex: 1,
     marginLeft: 10,
+    
   },
   doctorName: {
     fontSize: 18,
     fontWeight: 'bold',
+    color:'gray'
   },
   specialty: {
     fontSize: 16,
     fontStyle: 'italic',
+    color:'gray'
   },
   experience: {
     fontSize: 14,
     marginTop: 5,
+    color:'gray'
   },
   viewProfileButton: {
     color: '#0D4744',
     fontWeight: 'bold',
     textDecorationLine: 'underline',
     marginTop: 5,
+    color:'gray'
   },
   buttonContainer: {
     justifyContent: 'center',

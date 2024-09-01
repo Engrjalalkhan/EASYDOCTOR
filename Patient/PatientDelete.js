@@ -19,7 +19,7 @@ const DeleteAccountScreen = () => {
 
       Alert.alert(
         'Success',
-        'All accounts have been deleted successfully.',
+        'Your account have been deleted successfully.',
         [{ text: 'OK', onPress: () => navigation.navigate('Splash') }]
       );
     } catch (error) {

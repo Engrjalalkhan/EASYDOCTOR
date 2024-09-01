@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
   },
   signInText: {
     fontSize: 18,
+    color:'black'
   },
 });
 

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert,ScrollView } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/Feather'; // Import Feather icons
 
 const SignInWithMobileScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
@@ -12,7 +13,7 @@ const SignInWithMobileScreen = ({ navigation }) => {
         const checkAuth = async () => {
             const lastLogin = await AsyncStorage.getItem('lastLogin');
             const currentTime = new Date().getTime();
-            
+
             if (lastLogin && (currentTime - parseInt(lastLogin) <= 3600000)) {
                 navigation.navigate('Splash');
             } else {
@@ -50,53 +51,53 @@ const SignInWithMobileScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <View style={styles.container1}>
-                <Text
-                    style={{
-                        fontSize: 24,
-                        textAlign: 'center',
-                        color: 'white',
-                        fontWeight: 'bold',
-                    }}>
-                    EASY + DOCTOR
-                </Text>
+                <Text style={styles.title}>EASY + DOCTOR</Text>
             </View>
 
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Enter your email"
-                value={email}
-                onChangeText={text => setEmail(text)}
-            />
+            <ScrollView contentContainerStyle={styles.scrollContainer} >
+                <Text style={styles.label}>Email</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Enter your email"
+                    placeholderTextColor="#888888"
+                    value={email}
+                    onChangeText={text => setEmail(text)}
+                />
 
-            <Text style={[styles.label, { marginTop: 20 }]}>Password</Text>
-            <TouchableOpacity style={styles.showPasswordContainer} onPress={() => setShowPassword(!showPassword)}>
-                <Text style={styles.showPasswordText}>
-                    {showPassword ? 'Hide' : 'Show'} password
-                </Text>
-            </TouchableOpacity>
-            <TextInput
-                style={styles.input}
-                placeholder="Enter your password"
-                secureTextEntry={!showPassword}
-                value={password}
-                onChangeText={text => setPassword(text)}
-            />
+                <Text style={[styles.label, { marginTop: 20 }]}>Password</Text>
+                <View style={styles.passwordContainer}>
+                    <TextInput
+                        style={{flex: 1,color:"gray"}}
+                        placeholder="Enter your password"
+                        placeholderTextColor="#888888"
+                        secureTextEntry={!showPassword}
+                        value={password}
+                        onChangeText={text => setPassword(text)}
+                    />
+                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                        <Icon
+                            name={showPassword ? 'eye-off' : 'eye'}
+                            size={24}
+                            color="gray"
+                        />
+                    </TouchableOpacity>
+                </View>
 
-            <TouchableOpacity style={styles.forgotPassword} onPress={() => navigation.navigate('Forgot')}>
-                <Text style={styles.forgotPasswordText}>Forgot password?</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={handleSignIn}>
-                <Text style={styles.buttonText}>Sign In</Text>
-            </TouchableOpacity>
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={styles.signInText}>Don't have an account?</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-                    <Text style={{ color: '#599CA5', fontSize: 18, marginTop: 20 }}>
-                        Sign Up
-                    </Text>
+                <TouchableOpacity style={styles.forgotPassword} onPress={() => navigation.navigate('Forgot')}>
+                    <Text style={styles.forgotPasswordText}>Forgot password?</Text>
                 </TouchableOpacity>
-            </View>
+
+                <TouchableOpacity style={styles.button} onPress={handleSignIn}>
+                    <Text style={styles.buttonText}>Sign In</Text>
+                </TouchableOpacity>
+
+                <View style={styles.signUpContainer}>
+                    <Text style={styles.signInText}>Don't have an account?</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+                        <Text style={styles.signUpText}>Sign Up</Text>
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
         </View>
     );
 };
@@ -113,30 +114,46 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 10,
         backgroundColor: '#0D4744',
-        height: 450,
+        height: 350,
         width: '120%',
         marginBottom: 50,
         borderBottomEndRadius: 500,
         borderBottomStartRadius: 500,
         paddingTop: 50
     },
+    scrollContainer: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingBottom: 20, // Padding at the bottom to ensure elements are not cut off
+    },
+    title: {
+        fontSize: 24,
+        textAlign: 'center',
+        color: 'white',
+        fontWeight: 'bold',
+    },
     label: {
         fontSize: 16,
         marginBottom: 5,
         alignSelf: 'flex-start',
         paddingHorizontal: 30,
-    },
-    showPasswordContainer: {
-        alignSelf: 'flex-end',
-        marginBottom: 5,
-        paddingHorizontal: 30,
-    },
-    showPasswordText: {
-        color: '#599CA5',
-        fontSize: 16,
+        color: "gray"
     },
     input: {
         height: 40,
+        width: '85%',
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        marginBottom: 10,
+        color: "gray"
+    },
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
         width: '85%',
         borderColor: '#ccc',
         borderWidth: 1,
@@ -157,10 +174,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
     },
-    signInText: {
-        fontSize: 18,
-        marginTop: 20,
-    },
     forgotPassword: {
         paddingLeft: "50%"
     },
@@ -168,5 +181,18 @@ const styles = StyleSheet.create({
         color: '#599CA5',
         fontSize: 16,
         textAlign: 'center',
+    },
+    signUpContainer: {
+        flexDirection: 'row',
+    },
+    signInText: {
+        fontSize: 18,
+        marginTop: 20,
+        color:"black"
+    },
+    signUpText: {
+        color: '#599CA5',
+        fontSize: 18,
+        marginTop: 20,
     },
 });

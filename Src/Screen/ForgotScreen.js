@@ -48,6 +48,7 @@ const ForgotScreen = ({navigation}) => {
         <TextInput
           style={styles.input}
           placeholder="Enter your email"
+          placeholderTextColor={"gray"}
           value={email}
           onChangeText={text => setEmail(text)}
         />
@@ -88,6 +89,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     alignSelf: 'flex-start',
     paddingHorizontal: 30,
+    color:'gray'
   },
   showPasswordContainer: {
     alignSelf: 'flex-end',
@@ -106,6 +108,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
+    color:"gray"
   },
   button: {
     backgroundColor: '#0D4744',

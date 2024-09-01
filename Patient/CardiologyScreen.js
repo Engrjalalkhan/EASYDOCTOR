@@ -93,7 +93,7 @@ const PatientHome = ({ route }) => {
       <View style={styles.buttonContainer}>
         <View style={styles.bookmarkContainer}>
           <TouchableOpacity onPress={() => handleBookmarkDoctor(item)} style={styles.bookmarkButton}>
-            <Text style={[styles.bookmarkText, { color: bookmarkedDoctors.includes(item.id) ? 'gold' : 'gray' }]}>🔖</Text>
+            <Text style={[styles.bookmarkText, { color: bookmarkedDoctors.includes(item.id) ? 'gold' : 'gray' }]}>⭐</Text>
           </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={handleBookAppointment} style={styles.actionButton}>
@@ -184,14 +184,24 @@ const styles = StyleSheet.create({
   doctorName: {
     fontSize: 18,
     fontWeight: 'bold',
+    color:'gray'
   },
   specialty: {
     fontSize: 16,
     fontStyle: 'italic',
+    color:'gray'
   },
   experience: {
     fontSize: 14,
     marginTop: 5,
+    color:'gray'
+  },
+  viewProfileButton: {
+    color: '#0D4744',
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
+    marginTop: 5,
+    color:'gray'
   },
   viewProfileButton: {
     color: '#0D4744',

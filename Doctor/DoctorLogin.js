@@ -7,18 +7,21 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
-  TouchableOpacity
+  TouchableOpacity,
+  TouchableWithoutFeedback
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/FontAwesome'; // Import FontAwesome icons
 
 const DoctorLoginScreen = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(true);
+  const [passwordVisible, setPasswordVisible] = useState(false); // State to toggle password visibility
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -80,7 +83,7 @@ const DoctorLoginScreen = () => {
           userName: doctorData.name,
         });
       } else {
-        navigation.navigate('DoctorProfile')
+        navigation.navigate('DoctorProfile');
         Alert.alert('Error', 'Doctor profile not found.');
       }
     } catch (error) {
@@ -108,15 +111,25 @@ const DoctorLoginScreen = () => {
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
+        placeholderTextColor={"gray"}
         style={styles.input}
       />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-      />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          placeholder="Password"
+          placeholderTextColor={"gray"}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!passwordVisible} // Toggle secureTextEntry based on state
+          style={[styles.input, {paddingRight: 40}]}
+        />
+        <TouchableOpacity
+          style={styles.eyeIcon}
+          onPress={() => setPasswordVisible(!passwordVisible)}
+        >
+          <Icon name={passwordVisible ? 'eye' : 'eye-slash'} size={20} color="gray" />
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity
         onPress={handleLogin}
@@ -158,6 +171,18 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
     borderRadius: 10,
+    color:"gray"
+  },
+  passwordContainer: {
+    width: '100%',
+    position: 'relative',
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 10,
+    top: -5,
+    height: '100%',
+    justifyContent: 'center',
   },
   loadingContainer: {
     flex: 1,

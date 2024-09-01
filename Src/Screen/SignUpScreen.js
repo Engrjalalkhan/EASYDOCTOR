@@ -12,6 +12,7 @@ import CountryPicker from 'react-native-country-picker-modal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const SignUpWithMobileScreen = ({ navigation }) => {
   const [country, setCountry] = useState({
@@ -85,6 +86,7 @@ const SignUpWithMobileScreen = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Enter your name"
+            placeholderTextColor="#888888"
             value={name}
             onChangeText={text => setName(text)}
           />
@@ -92,6 +94,7 @@ const SignUpWithMobileScreen = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Enter your email"
+            placeholderTextColor="#888888"
             value={email}
             onChangeText={text => setEmail(text)}
           />
@@ -117,6 +120,7 @@ const SignUpWithMobileScreen = ({ navigation }) => {
             <TextInput
               style={styles.input}
               placeholder=" Phone Number"
+              placeholderTextColor="#888888"
               keyboardType="numeric"
               value={phone}
               onChangeText={text => setPhone(text)}
@@ -124,29 +128,46 @@ const SignUpWithMobileScreen = ({ navigation }) => {
           </View>
 
           <Text style={[styles.label, {marginTop: 20}]}>Password</Text>
-          <TouchableOpacity
-            style={styles.showPasswordContainer}
-            onPress={() => setShowPassword(!showPassword)}>
-            <Text style={styles.showPasswordText}>
-              {showPassword ? 'Hide' : 'Show'} password
-            </Text>
-          </TouchableOpacity>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your password"
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={text => setPassword(text)}
-          />
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={{flex: 1,color:'gray'}}
+              placeholder="Enter your password"
+              placeholderTextColor="#888888"
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={text => setPassword(text)}
+            />
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.eyeIcon}>
+              <Icon
+                name={showPassword ? 'eye-off' : 'eye'}
+                size={20}
+                color="gray"
+              />
+            </TouchableOpacity>
+          </View>
 
           <Text style={styles.label}>Confirm Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm your password"
-            secureTextEntry={!showPassword}
-            value={confirmPassword}
-            onChangeText={text => setConfirmPassword(text)}
-          />
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={{flex: 1,color:'gray'}}
+              placeholder="Confirm your password"
+              placeholderTextColor="#888888"
+              secureTextEntry={!showPassword}
+              value={confirmPassword}
+              onChangeText={text => setConfirmPassword(text)}
+            />
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.eyeIcon}>
+              <Icon
+                name={showPassword ? 'eye-off' : 'eye'}
+                size={20}
+                color="gray"
+              />
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity style={styles.button} onPress={handleSignUp}>
             <Text style={styles.buttonText}>Sign Up</Text>
@@ -156,7 +177,9 @@ const SignUpWithMobileScreen = ({ navigation }) => {
     </View>
   );
 };
+
 export default SignUpWithMobileScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -179,15 +202,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     alignSelf: 'flex-start',
     paddingHorizontal: 30,
-  },
-  showPasswordContainer: {
-    alignSelf: 'flex-end',
-    marginBottom: 5,
-    paddingHorizontal: 30,
-  },
-  showPasswordText: {
-    color: '#599CA5',
-    fontSize: 16,
+    color: 'gray',
   },
   input: {
     height: 40,
@@ -197,6 +212,20 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
+    color: 'gray',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '80%',
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  eyeIcon: {
+    paddingHorizontal: 10,
   },
   button: {
     backgroundColor: '#0D4744',

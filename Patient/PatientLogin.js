@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/FontAwesome'; // Import FontAwesome for the eye icon
 
 const PatientLoginScreen = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false); // State to toggle password visibility
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -84,31 +86,33 @@ const PatientLoginScreen = () => {
       <Text style={styles.title}>Patient Login</Text>
       <TextInput
         placeholder="Email"
+        placeholderTextColor={"gray"}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
         style={styles.input}
       />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-      />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          placeholder="Password"
+          placeholderTextColor={"gray"}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!passwordVisible}
+          style={styles.input}
+        />
+        <TouchableOpacity
+          onPress={() => setPasswordVisible(!passwordVisible)}
+          style={styles.eyeIcon}
+        >
+          <Icon name={passwordVisible ? 'eye' : 'eye-slash'} size={20} color="gray" />
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity
         onPress={handleLogin}
-        style={{
-          height: 40,
-          width: '50%',
-          backgroundColor: '#0D4744',
-          borderRadius: 15,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <Text style={{fontSize: 18, fontWeight: 'bold', color: 'white'}}>
-          Login
-        </Text>
+        style={styles.loginButton}
+      >
+        <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>
     </View>
   );
@@ -136,6 +140,29 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
     borderRadius: 10,
+    color:"gray"
+  },
+  passwordContainer: {
+    width: '100%',
+    position: 'relative',
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 10,
+    top: 10,
+  },
+  loginButton: {
+    height: 40,
+    width: '50%',
+    backgroundColor: '#0D4744',
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loginButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white',
   },
   loadingContainer: {
     flex: 1,

@@ -108,10 +108,10 @@ const Home = ({route, navigation}) => {
             navigation.navigate('MyCalendar');
             setIsDrawerOpen(false); // Close drawer after navigating
           }}>
-          <Text>My Calendar</Text>
+          <Text style={{color:"gray"}}>My Calendar</Text>
         </TouchableOpacity>
         <View style={styles.drawerItem}>
-          <Text>Enable Online Consultation</Text>
+          <Text style={{color:"gray"}}>Enable Online Consultation</Text>
           <Switch
             value={onlineConsultation}
             onValueChange={toggleOnlineConsultation}
@@ -125,7 +125,7 @@ const Home = ({route, navigation}) => {
             navigation.navigate('DoctorNotification');
             setIsDrawerOpen(false); // Close drawer after navigating
           }}>
-          <Text style={styles.notificationText}>Notification</Text>
+          <Text style={{color:"gray"}}>Notification</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.drawerItem}
@@ -133,7 +133,7 @@ const Home = ({route, navigation}) => {
             navigation.navigate('About');
             setIsDrawerOpen(false); // Close drawer after navigating
           }}>
-          <Text>About Doctor Easy</Text>
+          <Text style={{color:"gray"}}>About Doctor Easy</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.drawerItem}
@@ -141,7 +141,7 @@ const Home = ({route, navigation}) => {
             navigation.navigate('Help');
             setIsDrawerOpen(false); // Close drawer after navigating
           }}>
-          <Text>Help</Text>
+          <Text style={{color:"gray"}}>Help</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.drawerItem}
@@ -149,7 +149,7 @@ const Home = ({route, navigation}) => {
             navigation.navigate('DeleteAccount');
             setIsDrawerOpen(false); // Close drawer after navigating
           }}>
-          <Text>Delete Account</Text>
+          <Text style={{color:"gray"}}>Delete Account</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.drawerItem}
@@ -157,7 +157,7 @@ const Home = ({route, navigation}) => {
             navigation.navigate('Logout');
             setIsDrawerOpen(false); // Close drawer after navigating
           }}>
-          <Text>Logout</Text>
+          <Text style={{color:"gray"}}>Logout</Text>
           <Image
             source={require('../Src/images/Logout.png')}
             style={styles.logoutImage}
@@ -227,6 +227,7 @@ const styles = StyleSheet.create({
   userName1: {
     fontSize: 20,
     fontWeight: 'bold',
+    color:"gray"
   },
   drawerItem: {
     fontSize: 20,

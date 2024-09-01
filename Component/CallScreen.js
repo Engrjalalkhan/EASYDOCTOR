@@ -11,8 +11,8 @@ export default function VoiceCallPage(props) {
     return (
         <View style={styles.container}>
             <ZegoUIKitPrebuiltCall
-                appID={361838410}
-                appSign={"3cc9885240d99c7998a6c5188d38e562722f42061dc3e7acd95ec6b5084c27be"}
+                appID={1707879943}
+                appSign={"0ff6f967a32834d22c4ec294ba0e33083f2cf1b0ba06589930926b5b90f622bf"}
                 userID={userID}
                 userName={`user_${userID}`}
                 callID={callID}

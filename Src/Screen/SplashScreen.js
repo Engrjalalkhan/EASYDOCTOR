@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
   choiceText: {
     fontSize: 24,
     marginBottom: 30,
+    color:"gray"
   },
   buttonsContainer: {
     marginBottom: 20,

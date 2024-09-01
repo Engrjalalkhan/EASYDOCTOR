@@ -202,15 +202,15 @@ const NewAppointment = ({ route, navigation }) => {
                 </TouchableOpacity>
               </View>
               <View style={styles.doctorDetails}>
-                <Text style={styles.doctorName}>{doctor.name}</Text>
-                <Text style={styles.specialty}>{doctor.specialty}</Text>
-                <Text style={styles.experience}>
+                <Text style={{color:'gray'}}>{doctor.name}</Text>
+                <Text style={{color:'gray'}}>{doctor.specialty}</Text>
+                <Text style={{color:'gray'}}>
                   Experience: {doctor.experience} year
                 </Text>
-                <Text style={styles.experience}>
+                <Text style={{color:'gray'}}>
                   Location: {doctor.clinicAddress}
                 </Text>
-                <Text style={styles.experience}>Rasst: {doctor.rasst}</Text>
+                <Text style={{color:'gray'}}>Rasst: {doctor.rasst}</Text>
               </View>
               <View style={styles.buttonContainer}>
                 <View style={styles.bookmarkContainer}>
@@ -226,7 +226,7 @@ const NewAppointment = ({ route, navigation }) => {
                             : 'gray',
                         },
                       ]}>
-                      🔖
+                      ⭐
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -349,6 +349,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginVertical: 10,
     alignSelf: 'flex-start',
+    color:'gray'
   },
   card: {
     flexDirection: 'row',

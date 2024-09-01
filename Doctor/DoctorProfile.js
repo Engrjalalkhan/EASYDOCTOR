@@ -16,6 +16,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import {useNavigation} from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const specialties = [
   'Cardiology',
@@ -48,6 +49,7 @@ const DoctorProfile = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
   const [specialty, setSpecialty] = useState('');
   const [experience, setExperience] = useState('');
   const [rasst, setRasst] = useState('');
@@ -169,7 +171,7 @@ const DoctorProfile = () => {
             borderTopLeftRadius: 25,
             borderTopRightRadius: 25,
           }}>
-          <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+          <Text style={{fontSize: 20, fontWeight: 'bold',color:"gray"}}>
             Please Provide Your Details !!
           </Text>
           {/* Profile image placeholder */}
@@ -213,6 +215,7 @@ const DoctorProfile = () => {
           </Modal>
           <TextInput
             placeholder="Name"
+            placeholderTextColor={"gray"}
             value={name}
             onChangeText={setName}
             style={{
@@ -223,10 +226,12 @@ const DoctorProfile = () => {
               marginBottom: 10,
               paddingHorizontal: 10,
               borderRadius: 10,
+              color:'gray'
             }}
           />
           <TextInput
             placeholder="Email"
+            placeholderTextColor={"gray"}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -238,23 +243,24 @@ const DoctorProfile = () => {
               marginBottom: 10,
               paddingHorizontal: 10,
               borderRadius: 10,
+              color:'gray'
             }}
           />
-          <TextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={true}
-            style={{
-              width: 300,
-              height: 40,
-              borderColor: 'gray',
-              borderWidth: 1,
-              marginBottom: 10,
-              paddingHorizontal: 10,
-              borderRadius: 10,
-            }}
-          />
+          <View style={styles.passwordContainer}>
+            <TextInput
+              placeholder="Password"
+              placeholderTextColor={"gray"}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              style={styles.passwordInput}
+            />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword(!showPassword)}>
+              <Icon name={showPassword ? 'eye' : 'eye-slash'} size={20} color="gray" />
+            </TouchableOpacity>
+          </View>
           <View
             style={{
               width: 300,
@@ -266,7 +272,7 @@ const DoctorProfile = () => {
             <Picker
               selectedValue={specialty}
               onValueChange={itemValue => setSpecialty(itemValue)}
-              style={{height: '8%', width: '100%'}}>
+              style={{height: '8%', width: '100%',color:'gray'}}>
               <Picker.Item label="Select Specialty" value="" />
               {specialties.map(spec => (
                 <Picker.Item label={spec} value={spec} key={spec} />
@@ -284,7 +290,7 @@ const DoctorProfile = () => {
             <Picker
               selectedValue={clinicAddress}
               onValueChange={itemValue => setClinicAddress(itemValue)}
-              style={{height: '8%', width: '100%'}}>
+              style={{height: '8%', width: '100%',color:'gray'}}>
               <Picker.Item label="Select Clinic Address" value="" />
               {clinicAddresses.map(address => (
                 <Picker.Item label={address} value={address} key={address} />
@@ -293,6 +299,7 @@ const DoctorProfile = () => {
           </View>
           <TextInput
             placeholder="Years of Experience"
+            placeholderTextColor={"gray"}
             value={experience}
             onChangeText={setExperience}
             keyboardType="numeric"
@@ -304,10 +311,12 @@ const DoctorProfile = () => {
               marginBottom: 20,
               paddingHorizontal: 10,
               borderRadius: 10,
+              color:'gray'
             }}
           />
           <TextInput
             placeholder="Rasst ID for Payment"
+            placeholderTextColor={"gray"}
             value={rasst}
             onChangeText={setRasst}
             keyboardType="numeric"
@@ -319,6 +328,7 @@ const DoctorProfile = () => {
               marginBottom: 20,
               paddingHorizontal: 10,
               borderRadius: 10,
+              color:'gray'
             }}
           />
           <TouchableOpacity
@@ -382,5 +392,23 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 18,
     color: 'black',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 10,
+    width: 300,
+    marginBottom: 20,
+  },
+  passwordInput: {
+    width: '90%',
+    height: 40,
+    paddingHorizontal: 10,
+    color: 'gray',
+  },
+  eyeIcon: {
+    padding: -5,
   },
 });
