@@ -113,6 +113,7 @@ const FeedbackScreen = ({ route }) => {
           <TextInput
             style={styles.input}
             placeholder="Write your feedback here"
+            placeholderTextColor={"gray"}
             value={feedback}
             onChangeText={setFeedback}
             multiline
@@ -187,6 +188,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color:"gray"
   },
   input: {
     height: 100,
@@ -196,7 +198,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlignVertical: 'top',
     width: "80%",
-    borderRadius: 10
+    borderRadius: 10,
+    color:"gray"
   },
   submitButton: {
     height: 40,

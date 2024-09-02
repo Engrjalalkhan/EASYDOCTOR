@@ -168,14 +168,15 @@ const styles = StyleSheet.create({
   doctorName: {
     fontSize: 16,
     fontWeight: 'bold',
+    color:'gray'
   },
   specialty: {
     fontSize: 14,
-    color: '#777',
+    color:'gray'
   },
   experience: {
     fontSize: 14,
-    color: '#777',
+    color:'gray'
   },
   buttonContainer: {
     justifyContent: 'center',

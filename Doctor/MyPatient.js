@@ -167,6 +167,7 @@ const styles = StyleSheet.create({
   patientDetail: {
     fontSize: 16,
     marginBottom: 5,
+    color:"gray"
   },
   deleteButton: {
     position: 'absolute',
@@ -206,10 +207,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
+    color:"gray"
   },
   modalDetail: {
     fontSize: 16,
     marginBottom: 10,
+    color:"gray"
   },
   buttonContainer: {
     flexDirection: 'row',

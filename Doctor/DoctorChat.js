@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
   patientDetail: {
     fontSize: 16,
     marginBottom: 5,
+    color:"gray"
   },
   deleteButton: {
     position: 'absolute',

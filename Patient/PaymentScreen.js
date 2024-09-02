@@ -209,7 +209,7 @@ const PaymentScreen = () => {
               onPress={() => setPaymentOption('cash')}
               color="#0D4744"
             />
-            <Text>Cash on Arrival</Text>
+            <Text style={{color:'gray'}}>Cash on Arrival</Text>
           </View>
           <View style={styles.radioButton}>
             <RadioButton
@@ -218,7 +218,7 @@ const PaymentScreen = () => {
               onPress={() => setPaymentOption('online')}
               color="#0D4744"
             />
-            <Text>Online Payment</Text>
+            <Text style={{color:"gray"}}>Online Payment</Text>
           </View>
         </View>
         {paymentOption === 'online' && (

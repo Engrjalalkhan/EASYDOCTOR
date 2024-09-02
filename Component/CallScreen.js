@@ -3,10 +3,8 @@ import { View, StyleSheet } from 'react-native';
 import { ZegoUIKitPrebuiltCall, ONE_ON_ONE_VIDEO_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 
 export default function VoiceCallPage(props) {
-    // const userID = '121212'; // Replace with dynamic user ID
-    // const userName = 'user_12345'; // Replace with dynamic user name
     const callID = 'group123'; // Replace with dynamic call ID
-    const userID= String(Math.floor(Math.random()*100000));
+    const userID = String(Math.floor(Math.random() * 100000));
 
     return (
         <View style={styles.container}>
@@ -18,7 +16,9 @@ export default function VoiceCallPage(props) {
                 callID={callID}
                 config={{
                     ...ONE_ON_ONE_VIDEO_CALL_CONFIG,
-                    onCallEnd: (callID, reason, duration) => {props.navigation.navigate('PatientVideo Consultation')},
+                    onCallEnd: (callID, reason, duration) => {
+                        props.navigation.goBack();
+                    },
                 }}
             />
         </View>

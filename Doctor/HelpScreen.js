@@ -100,27 +100,33 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
+    color:'gray'
   },
   subHeading: {
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: 20,
     marginBottom: 10,
+    color:'gray'
   },
   text: {
     fontSize: 16,
     marginBottom: 10,
+    color:'gray'
   },
   descriptionContainer: {
     marginBottom: 15,
+    color:'gray'
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
+    color:'gray'
   },
   description: {
     fontSize: 16,
+    color:'gray'
   },
 });
 

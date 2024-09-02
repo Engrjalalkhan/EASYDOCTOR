@@ -45,6 +45,7 @@ import DoctorVideo from '../Doctor/DoctorVideo';
 import ChatScreen from '../Doctor/chatScreen';
 import PatientChatScreen from '../Patient/PatientChatScreen';
 import CallScreen from './CallScreen';
+import UpdateBookings from '../Patient/UpdateBookings';
 
 const Stack = createNativeStackNavigator();
 
@@ -278,6 +279,11 @@ const Navigator = () => {
         <Stack.Screen
           name="CallScreen"
           component={CallScreen}
+          options={{headerTitleAlign:"center"}}
+        />
+        <Stack.Screen
+          name="UpdateBook"
+          component={UpdateBookings}
           options={{headerTitleAlign:"center"}}
         />
       </Stack.Navigator>

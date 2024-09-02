@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { Calendar } from 'react-native-calendars';
 
 // Calendar Card Component
 const CalendarCard = ({ selectedDate, setSelectedDate }) => {
-  // Function to handle date selection
   const handleDateSelection = (date) => {
     setSelectedDate(date);
   };
 
   return (
     <View>
-      {/* Your calendar UI here */}
       <Calendar
         style={{ borderRadius: 15, borderWidth: 2, borderColor: "gray" }}
         onDayPress={(day) => handleDateSelection(day.dateString)}
@@ -25,31 +23,41 @@ const CalendarCard = ({ selectedDate, setSelectedDate }) => {
 };
 
 const BookingScreen = ({ navigation }) => {
-  const [morningSlots, setMorningSlots] = useState([]);
-  const [eveningSlots, setEveningSlots] = useState([]);
+  const [doctorSlots, setDoctorSlots] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedMorningSlot, setSelectedMorningSlot] = useState(null);
   const [selectedEveningSlot, setSelectedEveningSlot] = useState(null);
 
   useEffect(() => {
-    const fetchSlots = async () => {
-      // Fetching slots from Firestore
-      const docRef = firestore().collection('Schedules').doc('doctorSchedule');
-      const doc = await docRef.get();
+    const fetchDoctorSlots = async () => {
+      try {
+        // Fetch all doctor documents
+        const doctorSnapshot = await firestore().collection('Doctor').get();
+        const doctorIds = doctorSnapshot.docs.map(doc => doc.id);
 
-      if (doc.exists) {
-        const data = doc.data();
-        setMorningSlots(data.morning || []);
-        setEveningSlots(data.evening || []);
+        const slots = {};
+
+        // Fetch the schedule for each doctor
+        await Promise.all(
+          doctorIds.map(async (doctorId) => {
+            const scheduleSnapshot = await firestore().collection('Schedules').doc(doctorId).get();
+            if (scheduleSnapshot.exists) {
+              slots[doctorId] = scheduleSnapshot.data();
+            }
+          })
+        );
+
+        setDoctorSlots(slots);
+      } catch (error) {
+        console.error('Error fetching schedules: ', error);
       }
     };
 
-    fetchSlots();
+    fetchDoctorSlots();
   }, []);
 
   const handleProceed = () => {
     if (selectedDate || (selectedMorningSlot || selectedEveningSlot)) {
-      // Storing selected date and time slots in Firestore
       firestore()
         .collection('Bookings')
         .add({
@@ -65,11 +73,9 @@ const BookingScreen = ({ navigation }) => {
           console.error('Error saving booking: ', error);
         });
     } else {
-      // Display alert if date or time slot is not selected
       Alert.alert('Error', 'Please select a date and at least one time slot.');
     }
   };
-  
 
   const handleSlotClick = (slot, period) => {
     if (period === 'morning') {
@@ -82,60 +88,70 @@ const BookingScreen = ({ navigation }) => {
 
   const renderSlotCard = (slots, period) => {
     if (slots.length > 0) {
-      return slots.map((slot, index) => (
-        <TouchableOpacity
-          key={index}
-          style={[
-            styles.slotButton,
-            (period === 'morning' && selectedMorningSlot === slot.startTime) ||
-            (period === 'evening' && selectedEveningSlot === slot.startTime)
-              ? styles.selectedSlotButton
-              : null,
-          ]}
-          onPress={() => handleSlotClick(slot, period)}
-        >
-          <Text
-            style={[
-              styles.slotText,
-              (period === 'morning' && selectedMorningSlot === slot.startTime) ||
-              (period === 'evening' && selectedEveningSlot === slot.startTime)
-                ? styles.selectedSlotText
-                : null,
-            ]}
-          >
-            {slot.startTime} {period === 'morning' ? 'PM' : 'AM'}
-          </Text>
-        </TouchableOpacity>
-      ));
+      return (
+        <ScrollView horizontal>
+          {slots.map((slot, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.slotButton,
+                (period === 'morning' && selectedMorningSlot === slot.startTime) ||
+                (period === 'evening' && selectedEveningSlot === slot.startTime)
+                  ? styles.selectedSlotButton
+                  : null,
+              ]}
+              onPress={() => handleSlotClick(slot, period)}
+            >
+              <Text
+                style={[
+                  styles.slotText,
+                  (period === 'morning' && selectedMorningSlot === slot.startTime) ||
+                  (period === 'evening' && selectedEveningSlot === slot.startTime)
+                    ? styles.selectedSlotText
+                    : null,
+                ]}
+              >
+                {slot.startTime} {period === 'morning' ? 'AM' : 'PM'}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      );
     } else {
       return <Text>No slots available</Text>;
     }
   };
-  
 
   return (
     <View style={styles.container}>
-      {/* Calendar Card */}
       <CalendarCard selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
 
-      <View style={styles.cardContainer}>
-        <View style={styles.card}>
-          <Text style={styles.sectionHeader}>MORNING</Text>
-          <View style={styles.slotRow}>{renderSlotCard(morningSlots, 'morning')}</View>
-        </View>
-      </View>
-      <View style={styles.cardContainer}>
-        <View style={styles.card}>
-          <Text style={styles.sectionHeader}>EVENING</Text>
-          <View style={styles.slotRow}>{renderSlotCard(eveningSlots, 'evening')}</View>
-        </View>
-      </View>
+      {Object.keys(doctorSlots).map((doctorId) => {
+        const { morning = [], evening = [] } = doctorSlots[doctorId];
+        
+        return (
+          <View key={doctorId} style={styles.cardContainer}>
+            <View style={styles.card}>
+              <Text style={styles.sectionHeader}>MORNING</Text>
+              <View style={styles.slotRow}>{renderSlotCard(morning, 'morning')}</View>
+            </View>
+            <View >
+              <View style={styles.card}>
+                <Text style={styles.sectionHeader}>EVENING</Text>
+                <View style={styles.slotRow}>{renderSlotCard(evening, 'evening')}</View>
+              </View>
+            </View>
+          </View>
+        );
+      })}
+      
       <TouchableOpacity style={styles.proceedButton} onPress={handleProceed}>
         <Text style={styles.proceedButtonText}>PROCEED</Text>
       </TouchableOpacity>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -159,7 +175,7 @@ const styles = StyleSheet.create({
   },
   slotRow: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    marginVertical: 5,
   },
   slotButton: {
     backgroundColor: 'lightgray',
@@ -172,10 +188,10 @@ const styles = StyleSheet.create({
   },
   slotText: {
     fontSize: 14,
-    color: '#000', // default text color
+    color: '#000',
   },
   selectedSlotText: {
-    color: '#fff', // selected text color
+    color: '#fff',
   },
   proceedButton: {
     height: 50,

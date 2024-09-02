@@ -235,11 +235,11 @@ const NewAppointment = ({ route, navigation }) => {
                   style={styles.actionButton}>
                   <Text style={styles.actionButtonText}>Book</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={handleCallDoctor}
                   style={styles.actionButton}>
                   <Text style={styles.actionButtonText}>Call</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
             </View>
           ))}

@@ -14,21 +14,21 @@ const DeleteAccountScreen = () => {
       const doctorSnapshot = await firestore().collection('Doctor').get();
       const doctorDocs = doctorSnapshot.docs;
 
-      // Fetch all documents from the TopDoctor collection
-      const topDoctorSnapshot = await firestore().collection('TopDoctor').get();
-      const topDoctorDocs = topDoctorSnapshot.docs;
+      // Create an array of delete operations
+      const deletePromises = doctorDocs.map(async doc => {
+        const doctorId = doc.id;
 
-      // Create a map of doctorId from TopDoctor collection
-      const topDoctorIds = new Set(topDoctorDocs.map(doc => doc.data().doctorId));
+        // Check if there's a corresponding document in the TopDoctor collection and delete it
+        const topDoctorDoc = await firestore().collection('TopDoctor').doc(doctorId).get();
+        if (topDoctorDoc.exists) {
+          await topDoctorDoc.ref.delete();
+        }
 
-      // Find matching documents in Doctor collection and delete from both collections
-      const deletePromises = doctorDocs
-        .filter(doc => topDoctorIds.has(doc.id))  // Check if document ID exists in TopDoctor collection
-        .flatMap(doc => [
-          doc.ref.delete(),  // Delete from Doctor collection
-          firestore().collection('TopDoctor').doc(doc.id).delete(),  // Delete from TopDoctor collection
-        ]);
+        // Delete the document from the Doctor collection
+        await doc.ref.delete();
+      });
 
+      // Wait for all deletions to complete
       await Promise.all(deletePromises);
 
       Alert.alert('Success', 'The accounts have been deleted successfully.', [
@@ -43,7 +43,7 @@ const DeleteAccountScreen = () => {
 
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text style={{fontSize: 18, fontWeight: 'bold', color: "black"}}>
+      <Text style={{fontSize: 18, fontWeight: 'bold', color: 'black'}}>
         Are you sure you want to delete accounts?
       </Text>
       <TouchableOpacity

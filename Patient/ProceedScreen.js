@@ -183,6 +183,7 @@ const ProceedScreen = () => {
               { borderColor: fieldsValid ? '#0D4744' : 'red' },
             ]}
             placeholder="Your Name"
+            placeholderTextColor={"gray"}
             value={name}
             onChangeText={setName}
           />
@@ -192,6 +193,7 @@ const ProceedScreen = () => {
               { borderColor: fieldsValid ? '#0D4744' : 'red' },
             ]}
             placeholder="Your Age"
+            placeholderTextColor={"gray"}
             value={age}
             onChangeText={setAge}
           />
@@ -201,6 +203,7 @@ const ProceedScreen = () => {
               { borderColor: fieldsValid ? '#0D4744' : 'red' },
             ]}
             placeholder="Your Gender"
+            placeholderTextColor={"gray"}
             value={gender}
             onChangeText={setGender}
           />
@@ -210,6 +213,7 @@ const ProceedScreen = () => {
               { borderColor: fieldsValid ? '#0D4744' : 'red' },
             ]}
             placeholder="Your Symptom"
+            placeholderTextColor={"gray"}
             value={symptom}
             onChangeText={setSymptom}
           />
@@ -219,6 +223,7 @@ const ProceedScreen = () => {
               { borderColor: fieldsValid ? '#0D4744' : 'red' },
             ]}
             placeholder="Your Complication"
+            placeholderTextColor={"gray"}
             value={complications}
             onChangeText={setComplications}
           />
@@ -228,6 +233,7 @@ const ProceedScreen = () => {
               { borderColor: fieldsValid ? '#0D4744' : 'red' },
             ]}
             placeholder="Account Holder Number"
+            placeholderTextColor={"gray"}
             value={phone}
             onChangeText={setPhone}
             keyboardType='numeric'
@@ -242,6 +248,7 @@ const ProceedScreen = () => {
               { borderColor: fieldsValid ? '#0D4744' : 'red' },
             ]}
             placeholder="Patient's Name"
+            placeholderTextColor={"gray"}
             value={patientname}
             onChangeText={setPatientName}
           />
@@ -251,6 +258,7 @@ const ProceedScreen = () => {
               { borderColor: fieldsValid ? '#0D4744' : 'red' },
             ]}
             placeholder="Patient's Age"
+            placeholderTextColor={"gray"}
             value={patientage}
             onChangeText={setPatientage}
           />
@@ -260,6 +268,7 @@ const ProceedScreen = () => {
               { borderColor: fieldsValid ? '#0D4744' : 'red' },
             ]}
             placeholder="Patient's Gender"
+            placeholderTextColor={"gray"}
             value={patientgender}
             onChangeText={setPatientgender}
           />
@@ -269,6 +278,7 @@ const ProceedScreen = () => {
               { borderColor: fieldsValid ? '#0D4744' : 'red' },
             ]}
             placeholder="Patient's Symptom"
+            placeholderTextColor={"gray"}
             value={patientsymptom}
             onChangeText={setPatientsymptom}
           />
@@ -278,6 +288,7 @@ const ProceedScreen = () => {
               { borderColor: fieldsValid ? '#0D4744' : 'red' },
             ]}
             placeholder="Patient's Complication"
+            placeholderTextColor={"gray"}
             value={patientcomplications}
             onChangeText={setPatientcomplications}
           />
@@ -287,6 +298,7 @@ const ProceedScreen = () => {
               { borderColor: fieldsValid ? '#0D4744' : 'red' },
             ]}
             placeholder="Account Holder Number"
+            placeholderTextColor={"gray"}
             value={phone}
             onChangeText={setPhone}
             keyboardType='numeric'
@@ -328,6 +340,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderRadius: 5,
+    color:'gray'
   },
   button: {
     marginTop: 20,

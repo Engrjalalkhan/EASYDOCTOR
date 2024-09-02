@@ -5,6 +5,7 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 
@@ -30,7 +31,7 @@ const MyAppointmentsScreen = ({ route, navigation }) => {
 
           if (doctorDoc.exists) {
             const doctorData = doctorDoc.data();
-            bookingsData.push({ bookingId: bookingDoc.id, doctorData });
+            bookingsData.push({ bookingId: bookingDoc.id, bookingData, doctorData });
           } else {
             console.log(`Doctor with ID ${doctorId} does not exist.`);
           }
@@ -49,17 +50,79 @@ const MyAppointmentsScreen = ({ route, navigation }) => {
     navigation.navigate('FeedbackScreen', { doctorId });
   };
 
-  const handleBookAppointment = () => {
-    navigation.navigate('Book');
+  const handleCancelAppointment = async (bookingId) => {
+    try {
+      // Fetch the specific booking document
+      const bookingDoc = await firestore().collection('Bookings').doc(bookingId).get();
+
+      if (bookingDoc.exists) {
+        const bookingData = bookingDoc.data();
+        
+        if (bookingData.paymentStatus === 'unpaid') {
+          // Show an alert to confirm cancellation
+          Alert.alert(
+            'Cancel Appointment',
+            'Are you sure you want to cancel the appointment?',
+            [
+              {
+                text: 'No',
+                style: 'cancel',
+              },
+              {
+                text: 'Yes',
+                onPress: async () => {
+                  try {
+                    // Delete the booking
+                    await firestore().collection('Bookings').doc(bookingId).delete();
+                    // Remove the booking from the local state
+                    setBookings(prevBookings =>
+                      prevBookings.filter(booking => booking.bookingId !== bookingId)
+                    );
+                    console.log('Booking cancelled successfully');
+                  } catch (error) {
+                    console.error('Error cancelling booking:', error);
+                  }
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else {
+          Alert.alert('Cannot cancel', 'This appointment cannot be canceled because it is already paid.');
+        }
+      } else {
+        Alert.alert('Error', 'Booking not found.');
+      }
+    } catch (error) {
+      console.error('Error checking booking status:', error);
+    }
   };
 
-  const handleCallDoctor = () => {
-    // Implement calling functionality here
+  const handleRescheduleAppointment = async (bookingId) => {
+    try {
+      const bookingDoc = await firestore().collection('Bookings').doc(bookingId).get();
+      
+      if (bookingDoc.exists) {
+        const bookingData = bookingDoc.data();
+        
+        if (bookingData.paymentStatus === 'paid') {
+          navigation.navigate('UpdateBook', { bookingId, isRescheduling: true });
+        } else {
+          Alert.alert('Error', 'This appointment cannot be rescheduled.');
+        }
+      } else {
+        Alert.alert('Error', 'Booking not found.');
+      }
+    } catch (error) {
+      console.error('Error fetching booking details:', error);
+      Alert.alert('Error', 'Failed to fetch booking details.');
+    }
   };
+  
 
   return (
     <View style={styles.container}>
-      {bookings.map(({ bookingId, doctorData }) => (
+      {bookings.map(({ bookingId, bookingData, doctorData }) => (
         <View key={bookingId} style={styles.card}>
           {doctorData && doctorData.imageUrl && (
             <View style={styles.profileContainer1}>
@@ -73,27 +136,27 @@ const MyAppointmentsScreen = ({ route, navigation }) => {
             </View>
           )}
           <View style={styles.doctorDetails}>
-            <Text style={styles.doctorName}>{doctorData?.name}</Text>
-            <Text style={styles.specialty}>{doctorData?.specialty}</Text>
-            <Text style={styles.experience}>
+            <Text style={{color:"gray"}}>{doctorData?.name}</Text>
+            <Text style={{color:"gray"}}>{doctorData?.specialty}</Text>
+            <Text style={{color:"gray"}}>
               Experience: {doctorData?.experience} year
             </Text>
-            <Text style={styles.experience}>
+            <Text style={{color:"gray"}}>
               Location: {doctorData?.clinicAddress}
             </Text>
-            <Text style={styles.experience}>Rasst: {doctorData?.rasst}</Text>
+            <Text style={{color:"gray"}}>Rasst: {doctorData?.rasst}</Text>
             {/* Add more doctor details here */}
           </View>
           <View style={styles.buttonContainer}>
             <TouchableOpacity
-              onPress={handleBookAppointment}
-              style={styles.actionButton}>
-              <Text style={styles.actionButtonText}>Book</Text>
+              onPress={() => handleCancelAppointment(bookingId)}
+              style={[styles.actionButton, styles.cancelButton]}>
+              <Text style={styles.actionButtonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={handleCallDoctor}
-              style={styles.actionButton}>
-              <Text style={styles.actionButtonText}>Call</Text>
+              onPress={() => handleRescheduleAppointment(bookingId, bookingData.paymentStatus)}
+              style={[styles.actionButton, styles.rescheduleButton]}>
+              <Text style={styles.actionButtonText}>Reschedule</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -137,14 +200,20 @@ const styles = StyleSheet.create({
   buttonContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+    width:'35%'
   },
   actionButton: {
-    backgroundColor: '#0D4744',
     paddingHorizontal: 20,
     paddingVertical: 5,
     borderRadius: 5,
     marginTop: 5,
     width: '100%',
+  },
+  cancelButton: {
+    backgroundColor: 'red',
+  },
+  rescheduleButton: {
+    backgroundColor: 'gold',
   },
   actionButtonText: {
     color: 'white',

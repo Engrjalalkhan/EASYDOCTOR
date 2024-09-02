@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
   feedbackText: {
     fontSize: 16,
     marginBottom: 5,
+    color:"gray"
   },
   emptyListText: {
     textAlign: 'center',

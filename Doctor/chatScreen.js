@@ -182,6 +182,7 @@ const SenderChatScreen = ({ route, navigation }) => {
             value={message}
             onChangeText={setMessage}
             placeholder="Type a message"
+            placeholderTextColor={"gray"}
             multiline
           />
           <TouchableOpacity onPress={selectAttachment} style={styles.attachmentButton}>
@@ -267,6 +268,7 @@ const styles = StyleSheet.create({
     flex: 1,
     maxHeight: 100,
     paddingRight: 10,
+    color:"gray"
   },
   sendButton: {
     padding: 10,
@@ -285,6 +287,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginHorizontal:7,
     maxWidth: '80%',
+    tintColor:'gray'
   },
   receiverMessage: {
     backgroundColor: '#d0f0c0',
@@ -294,6 +297,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     marginHorizontal:7,
     maxWidth: '80%',
+    tintColor:"gray"
   },
   selectedMessage: {
     borderColor: '#007BFF',
@@ -321,7 +325,8 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 10
+    marginBottom: 10,
+    color:"black"
   },
   modalButton: {
     padding: 10,

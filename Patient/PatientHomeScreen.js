@@ -51,7 +51,7 @@ const PatientHome = ({route, navigation}) => {
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: '#fff',
-            paddingHorizontal: 40,
+            paddingHorizontal: 50,
             borderTopRightRadius: 25,
             borderTopLeftRadius: 25,
           }}>

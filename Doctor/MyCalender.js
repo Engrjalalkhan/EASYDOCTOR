@@ -45,35 +45,53 @@ const MyCalendarScreen = () => {
 
   const handleSave = async () => {
     try {
+      // Replace with logic to get the current doctor's ID from your app's context, navigation, or state
+      const doctorQuerySnapshot = await firestore().collection('Doctor').limit(1).get();
+  
+      if (doctorQuerySnapshot.empty) {
+        throw new Error('No doctor found');
+      }
+  
+      // Assuming you only have one doctor document or you want to use the first one
+      const doctorDoc = doctorQuerySnapshot.docs[0];
+      const doctorId = doctorDoc.id;
+      const doctorData = doctorDoc.data();
+  
+      console.log('Doctor ID:', doctorId);
+      console.log('Doctor Data:', doctorData);
+  
+      // Calculate slots for morning and evening
       const saveMorningSlots = await saveSlots(
         morningEnabled,
         morningFromTime,
         morningToTime,
         morningSlots
       );
+  
       const saveEveningSlots = await saveSlots(
         eveningEnabled,
         eveningFromTime,
         eveningToTime,
         eveningSlots
       );
-
+  
       console.log('Morning slots:', saveMorningSlots);
       console.log('Evening slots:', saveEveningSlots);
-
-      // Save data to Firestore
-      await firestore().collection('Schedules').doc('doctorSchedule').set({
+  
+      // Save schedule data to Firestore in the Schedules collection with doctorId as document ID
+      await firestore().collection('Schedules').doc(doctorId).set({
         morning: saveMorningSlots,
         evening: saveEveningSlots,
         allDays: allEnabled,
       });
-
+  
       console.log('Schedule saved successfully!');
       navigation.goBack();
     } catch (error) {
       console.error('Error saving schedule: ', error);
     }
   };
+  
 
   // Function to calculate and save time slots
   const saveSlots = async (enabled, fromTime, toTime, slots) => {
@@ -152,6 +170,7 @@ const MyCalendarScreen = () => {
                 value={morningFromTime}
                 onChangeText={setMorningFromTime}
                 placeholder="08:00 PM"
+                placeholderTextColor={"gray"}
                 
               />
             </View>
@@ -162,6 +181,7 @@ const MyCalendarScreen = () => {
                 value={morningToTime}
                 onChangeText={setMorningToTime}
                 placeholder="9:00 PM"
+                placeholderTextColor={"gray"}
                 
               />
             </View>
@@ -172,6 +192,7 @@ const MyCalendarScreen = () => {
                 value={morningSlots}
                 onChangeText={setMorningSlots}
                 placeholder="4"
+                placeholderTextColor={"gray"}
                 
               />
             </View>
@@ -197,6 +218,7 @@ const MyCalendarScreen = () => {
                 value={eveningFromTime}
                 onChangeText={setEveningFromTime}
                 placeholder="05:00 AM"
+                placeholderTextColor={"gray"}
                 
               />
             </View>
@@ -207,6 +229,7 @@ const MyCalendarScreen = () => {
                 value={eveningToTime}
                 onChangeText={setEveningToTime}
                 placeholder="09:00 AM"
+                placeholderTextColor={"gray"}
               />
             </View>
             <View>
@@ -216,6 +239,7 @@ const MyCalendarScreen = () => {
                 value={eveningSlots}
                 onChangeText={setEveningSlots}
                 placeholder="4"
+                placeholderTextColor={"gray"}
               />
             </View>
           </View>
@@ -281,6 +305,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     fontWeight: 'bold',
+    color:'gray',
+    textAlign:'center'
   },
   morningToggle: {
     flexDirection: 'row',
@@ -301,6 +327,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     paddingRight: 30,
+    color:'gray'
   },
   input: {
     borderWidth: 1,
@@ -310,6 +337,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     width: 100,
     height: 35,
+    color:'gray'
   },
   timeInputRow: {
     flexDirection: 'row',

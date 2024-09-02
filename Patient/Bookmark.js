@@ -50,9 +50,9 @@ const BookmarkScreen = () => {
         <TouchableOpacity onPress={handleBookAppointment} style={styles.actionButton}>
           <Text style={styles.actionButtonText}>Book</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleCallDoctor} style={styles.actionButton}>
+        {/* <TouchableOpacity onPress={handleCallDoctor} style={styles.actionButton}>
           <Text style={styles.actionButtonText}>Call</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );
@@ -102,14 +102,17 @@ const styles = StyleSheet.create({
   doctorName: {
     fontSize: 18,
     fontWeight: 'bold',
+    color:"gray"
   },
   specialty: {
     fontSize: 16,
     fontStyle: 'italic',
+    color:"gray"
   },
   experience: {
     fontSize: 14,
     marginTop: 5,
+    color:"gray"
   },
   viewProfileButton: {
     color: '#0D4744',
@@ -118,8 +121,10 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   buttonContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    // paddingTop:5
+    marginBottom:60
   },
   actionButton: {
     backgroundColor: '#0D4744',

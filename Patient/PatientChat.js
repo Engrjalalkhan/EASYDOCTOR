@@ -119,7 +119,7 @@ const MyAppointmentsScreen = ({ route, navigation }) => {
             <TouchableOpacity
               onPress={() => handleChat(doctorId)}
               style={styles.actionButton}>
-              <Icon name="comment" size={30} color="white" style={styles.logo} />
+              <Icon name="comment" size={25} color="#dc3d3d" style={styles.logo} />
             </TouchableOpacity>
           </View>
         </View>
@@ -179,6 +179,8 @@ const styles = StyleSheet.create({
   buttonContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom:5,
+    padding:5
   },
   actionButton: {
     backgroundColor: 'transparent',
