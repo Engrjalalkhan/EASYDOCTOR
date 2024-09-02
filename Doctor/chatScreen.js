@@ -133,7 +133,7 @@ const SenderChatScreen = ({ route, navigation }) => {
           <Text>🚫 Message deleted</Text>
         ) : (
           <>
-            {item.text ? <Text>{item.text}</Text> : null}
+            {item.text ? <Text style={{color:"gray"}}>{item.text}</Text> : null}
             {item.attachment && (
               <TouchableOpacity onPress={() => openImageViewer(item.attachment.path)}>
                 <Image source={{ uri: item.attachment.path }} style={styles.messageImage} />

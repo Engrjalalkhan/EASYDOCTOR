@@ -141,7 +141,7 @@ const ReceiverChatScreen = ({ route, navigation }) => {
           <Text>🚫 Message deleted</Text>
         ) : (
           <>
-            {item.text ? <Text>{item.text}</Text> : null}
+            {item.text ? <Text style={{color:"gray"}}>{item.text}</Text> : null}
             {item.attachment && (
               <TouchableOpacity onPress={() => openImageViewer(item.attachment.path)}>
                 <Image source={{ uri: item.attachment.path }} style={styles.messageImage} />
@@ -188,6 +188,7 @@ const ReceiverChatScreen = ({ route, navigation }) => {
             value={message}
             onChangeText={setMessage}
             placeholder="Type a message"
+            placeholderTextColor={"gray"}
             multiline
           />
           <TouchableOpacity onPress={selectAttachment} style={styles.attachmentButton}>
@@ -274,6 +275,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 5,
     fontSize: 16,
+    color:"gray"
   },
   sendButton: {
     padding: 10,
@@ -293,6 +295,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginHorizontal:7,
     maxWidth: '80%',
+    tintColor:'gray'
   },
   receiverMessage: {
     backgroundColor: '#d0f0c0',
@@ -302,6 +305,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     marginHorizontal:7,
     maxWidth: '80%',
+    tintColor:"black"
   },
   selectedMessage: {
     borderColor: '#007BFF',
@@ -329,7 +333,8 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 10
+    marginBottom: 10,
+    color:"black"
   },
   modalButton: {
     padding: 10,
