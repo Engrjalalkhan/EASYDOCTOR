@@ -88,7 +88,7 @@ const MyAppointmentsScreen = ({ route, navigation }) => {
             { cancelable: false }
           );
         } else {
-          Alert.alert('Cannot cancel', 'This appointment cannot be canceled because it is already paid.');
+          Alert.alert('Alert', 'This appointment cannot be canceled because it is already paid.');
         }
       } else {
         Alert.alert('Error', 'Booking not found.');
@@ -108,7 +108,7 @@ const MyAppointmentsScreen = ({ route, navigation }) => {
         if (bookingData.paymentStatus === 'paid') {
           navigation.navigate('UpdateBook', { bookingId, isRescheduling: true });
         } else {
-          Alert.alert('Error', 'This appointment cannot be rescheduled.');
+          Alert.alert('Alert', 'This appointment cannot be rescheduled because its unpaid.');
         }
       } else {
         Alert.alert('Error', 'Booking not found.');
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     paddingHorizontal: 20,
-    paddingVertical: 5,
+    paddingVertical: 3,
     borderRadius: 5,
     marginTop: 5,
     width: '100%',

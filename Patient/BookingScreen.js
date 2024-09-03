@@ -57,13 +57,13 @@ const BookingScreen = ({ navigation }) => {
   }, []);
 
   const handleProceed = () => {
-    if (selectedDate || (selectedMorningSlot || selectedEveningSlot)) {
+    if (selectedDate && (selectedMorningSlot || selectedEveningSlot)) {
       firestore()
         .collection('Bookings')
         .add({
           date: selectedDate,
-          morningSlot: selectedMorningSlot ? selectedMorningSlot + ' PM' : null,
-          eveningSlot: selectedEveningSlot ? selectedEveningSlot + ' AM' : null,
+          morningSlot: selectedMorningSlot ? selectedMorningSlot + ' AM' : null,
+          eveningSlot: selectedEveningSlot ? selectedEveningSlot + ' PM' : null,
         })
         .then(() => {
           console.log('Booking saved successfully!');
@@ -73,17 +73,19 @@ const BookingScreen = ({ navigation }) => {
           console.error('Error saving booking: ', error);
         });
     } else {
-      Alert.alert('Error', 'Please select a date and at least one time slot.');
+      Alert.alert('Error', 'Please select a date and a time slot.');
     }
   };
 
   const handleSlotClick = (slot, period) => {
     if (period === 'morning') {
       setSelectedMorningSlot(slot.startTime);
+      setSelectedEveningSlot(null);  // Clear evening slot selection
     } else {
       setSelectedEveningSlot(slot.startTime);
+      setSelectedMorningSlot(null);  // Clear morning slot selection
     }
-    console.log(`Slot ${slot.startTime} clicked`);
+    console.log(`Slot ${slot.startTime} clicked in ${period}`);
   };
 
   const renderSlotCard = (slots, period) => {

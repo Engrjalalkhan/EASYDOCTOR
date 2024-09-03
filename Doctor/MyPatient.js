@@ -63,9 +63,10 @@ const PatientScreen = () => {
       console.error('Patient ID is missing');
       return;
     }
-
+  
     try {
-      await firestore().collection('Notifications').add({
+      // Use patientId as the document ID in the Notifications collection
+      await firestore().collection('Notifications').doc(patient.patientId).set({
         name: patient.name,
         age: patient.age,
         gender: patient.gender,
@@ -77,11 +78,12 @@ const PatientScreen = () => {
         patientId: patient.patientId, // Store patientId from Booking collection
         createdAt: firestore.FieldValue.serverTimestamp(),
       });
-      Alert.alert('Ping', `Notification sent to ${patient.phone} for appointment on ${patient.date} at ${patient.morningSlot || patient.eveningSlot}`);
+      Alert.alert('Ping', `Notification sent to ${patient.name} for appointment on ${patient.date} at ${patient.morningSlot || patient.eveningSlot}`);
     } catch (error) {
       console.error('Error sending notification:', error);
     }
   };
+  
 
   const handleDelete = async (patientId) => {
     try {
