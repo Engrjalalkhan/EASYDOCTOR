@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert, Image } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert, RefreshControl } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -9,47 +9,53 @@ const PatientScreen = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [doctorId, setDoctorId] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchDoctorId = async () => {
+    const user = auth().currentUser;
+    if (user) {
+      const doctorSnapshot = await firestore().collection('Doctor').where('email', '==', user.email).get();
+      if (!doctorSnapshot.empty) {
+        setDoctorId(doctorSnapshot.docs[0].id);
+      }
+    }
+  };
+
+  const fetchPatients = async () => {
+    try {
+      const querySnapshot = await firestore().collection('Bookings').where('doctorId', '==', doctorId).get();
+      const patientsData = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,  // Booking document ID
+          patientId: data.patientId, // patientId field from Booking document
+          ...data.patient, // Patient data if present
+          phone: data.phone,
+          date: data.date,
+          morningSlot: data.morningSlot,
+          eveningSlot: data.eveningSlot,
+          paymentStatus: data.paymentStatus,
+        };
+      }).filter(patient => patient.patientId); // Ensure we only include valid patientId
+      setPatients(patientsData);
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchDoctorId = async () => {
-      const user = auth().currentUser;
-      if (user) {
-        const doctorSnapshot = await firestore().collection('Doctor').where('email', '==', user.email).get();
-        if (!doctorSnapshot.empty) {
-          setDoctorId(doctorSnapshot.docs[0].id);
-        }
-      }
-    };
-
     fetchDoctorId();
   }, []);
 
   useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        const querySnapshot = await firestore().collection('Bookings').where('doctorId', '==', doctorId).get();
-        const patientsData = querySnapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,  // Booking document ID
-            patientId: data.patientId, // patientId field from Booking document
-            ...data.patient, // Patient data if present
-            phone: data.phone,
-            date: data.date,
-            morningSlot: data.morningSlot,
-            eveningSlot: data.eveningSlot,
-            paymentStatus: data.paymentStatus
-          };
-        }).filter(patient => patient.patientId); // Ensure we only include valid patientId
-        setPatients(patientsData);
-      } catch (error) {
-        console.error('Error fetching patients:', error);
-      }
-    };
-
     if (doctorId) {
       fetchPatients();
     }
+  }, [doctorId]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchPatients().then(() => setRefreshing(false));
   }, [doctorId]);
 
   const handlePing = async (patient) => {
@@ -88,7 +94,12 @@ const PatientScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View style={styles.cardContainer}>
         {patients.map((patient, index) => (
           <View key={index} style={styles.patientCard}>
@@ -167,7 +178,7 @@ const styles = StyleSheet.create({
   patientDetail: {
     fontSize: 16,
     marginBottom: 5,
-    color:"gray"
+    color: "gray"
   },
   deleteButton: {
     position: 'absolute',
@@ -207,12 +218,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
-    color:"gray"
+    color: "gray"
   },
   modalDetail: {
     fontSize: 16,
     marginBottom: 10,
-    color:"gray"
+    color: "gray"
   },
   buttonContainer: {
     flexDirection: 'row',
