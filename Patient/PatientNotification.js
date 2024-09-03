@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert, RefreshControl } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
 
 const PatientNotificationScreen = () => {
   const [notifications, setNotifications] = useState([]);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [patientId, setPatientId] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const fetchPatientId = async () => {
@@ -25,24 +25,29 @@ const PatientNotificationScreen = () => {
     fetchPatientId();
   }, []);
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        if (patientId) {
-          const querySnapshot = await firestore().collection('Notifications').where('patientId', '==', patientId).get();
-          const notificationsData = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setNotifications(notificationsData);
-        }
-      } catch (error) {
-        console.error('Error fetching notifications:', error);
+  const fetchNotifications = async () => {
+    try {
+      if (patientId) {
+        const querySnapshot = await firestore().collection('Notifications').where('patientId', '==', patientId).get();
+        const notificationsData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setNotifications(notificationsData);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchNotifications();
   }, [patientId]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchNotifications().then(() => setRefreshing(false));
+  };
 
   const handleDeleteNotification = async (notificationId) => {
     try {
@@ -55,12 +60,17 @@ const PatientNotificationScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View style={styles.notificationContainer}>
         {notifications.map((notification, index) => (
           <View key={index} style={styles.notificationCard}>
             <TouchableOpacity onPress={() => { setSelectedNotification(notification); setModalVisible(true); }}>
-            <Text style={styles.notificationDetail}>Name: {notification.name}</Text>
+              <Text style={styles.notificationDetail}>Name: {notification.name}</Text>
               <Text style={styles.notificationDetail}>Date: {notification.date}</Text>
               <Text style={styles.notificationDetail}>Time: {notification.time}</Text>
               <Text style={styles.notificationDetail}>Status: {notification.paymentStatus}</Text>
@@ -128,6 +138,7 @@ const styles = StyleSheet.create({
   notificationDetail: {
     fontSize: 16,
     marginBottom: 5,
+    color:"gray"
   },
   deleteButton: {
     position: 'absolute',
@@ -167,10 +178,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
+    color:'gray'
   },
   modalDetail: {
     fontSize: 16,
     marginBottom: 10,
+    color:'gray'
   },
   buttonContainer: {
     flexDirection: 'row',
