@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Alert, ScrollView } from 'react-native';
 import { RadioButton, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
@@ -34,7 +34,6 @@ const ProceedScreen = () => {
 
     if (selectedOption === 'forMe') {
       if (validateFieldsForMe()) {
-        // Fetch the patientId from the Patients collection based on the phone number
         const patientId = await getPatientIdByPhone(phone);
         if (patientId) {
           bookingData = {
@@ -56,7 +55,6 @@ const ProceedScreen = () => {
       }
     } else if (selectedOption === 'forSomeoneElse') {
       if (validateFieldsForSomeoneElse()) {
-        // Fetch the patientId from the Patients collection based on the phone number
         const patientId = await getPatientIdByPhone(phone);
         if (patientId) {
           bookingData = {
@@ -157,195 +155,245 @@ const ProceedScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={[styles.title, { color: '#0D4744' }]}>Select One Option to Proceed !</Text>
-      <View style={styles.radioGroup}>
-        <RadioButton.Item
-          label="For Me"
-          value="forMe"
-          status={selectedOption === 'forMe' ? 'checked' : 'unchecked'}
-          onPress={() => handleOptionChange('forMe')}
-          color="#0D4744"
-        />
-        <RadioButton.Item
-          label="For Someone Else"
-          value="forSomeoneElse"
-          status={selectedOption === 'forSomeoneElse' ? 'checked' : 'unchecked'}
-          onPress={() => handleOptionChange('forSomeoneElse')}
-          color="#0D4744"
-        />
+    <ScrollView style={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text style={[styles.title, { color: '#0D4744' }]}>Select One Option to Proceed !</Text>
+        <View style={styles.radioGroup}>
+          <RadioButton.Item
+            label="For Me"
+            value="forMe"
+            status={selectedOption === 'forMe' ? 'checked' : 'unchecked'}
+            onPress={() => handleOptionChange('forMe')}
+            color="#0D4744"
+          />
+          <RadioButton.Item
+            label="For Someone Else"
+            value="forSomeoneElse"
+            status={selectedOption === 'forSomeoneElse' ? 'checked' : 'unchecked'}
+            onPress={() => handleOptionChange('forSomeoneElse')}
+            color="#0D4744"
+          />
+        </View>
+
+        {showForMeFields && (
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[
+                styles.input,
+                { borderColor: fieldsValid ? '#0D4744' : 'red' },
+              ]}
+              placeholder="Your Name"
+              placeholderTextColor={"gray"}
+              value={name}
+              onChangeText={setName}
+            />
+            <TextInput
+              style={[
+                styles.input,
+                { borderColor: fieldsValid ? '#0D4744' : 'red' },
+              ]}
+              placeholder="Your Age"
+              placeholderTextColor={"gray"}
+              value={age}
+              onChangeText={setAge}
+            />
+            <Text style={styles.label}>Your Gender</Text>
+            <View style={styles.genderRadioGroup}>
+              <RadioButton
+                value="male"
+                status={gender === 'male' ? 'checked' : 'unchecked'}
+                onPress={() => setGender('male')}
+                color="#0D4744"
+              />
+              <Text style={styles.genderText}>Male</Text>
+              <RadioButton
+                value="female"
+                status={gender === 'female' ? 'checked' : 'unchecked'}
+                onPress={() => setGender('female')}
+                color="#0D4744"
+              />
+              <Text style={styles.genderText}>Female</Text>
+            </View>
+            <TextInput
+              style={[
+                styles.input,
+                { borderColor: fieldsValid ? '#0D4744' : 'red' },
+              ]}
+              placeholder="Your Symptom"
+              placeholderTextColor={"gray"}
+              value={symptom}
+              onChangeText={setSymptom}
+            />
+            <TextInput
+              style={[
+                styles.input,
+                { borderColor: fieldsValid ? '#0D4744' : 'red' },
+              ]}
+              placeholder="Your Complication"
+              placeholderTextColor={"gray"}
+              value={complications}
+              onChangeText={setComplications}
+            />
+            <TextInput
+              style={[
+                styles.input,
+                { borderColor: fieldsValid ? '#0D4744' : 'red' },
+              ]}
+              placeholder="Account Holder Number"
+              placeholderTextColor={"gray"}
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType='numeric'
+            />
+          </View>
+        )}
+
+        {showForSomeoneElseFields && (
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[
+                styles.input,
+                { borderColor: fieldsValid ? '#0D4744' : 'red' },
+              ]}
+              placeholder="Patient's Name"
+              placeholderTextColor={"gray"}
+              value={patientname}
+              onChangeText={setPatientName}
+            />
+            <TextInput
+              style={[
+                styles.input,
+                { borderColor: fieldsValid ? '#0D4744' : 'red' },
+              ]}
+              placeholder="Patient's Age"
+              placeholderTextColor={"gray"}
+              value={patientage}
+              onChangeText={setPatientage}
+            />
+            <Text style={styles.label}>Patient's Gender</Text>
+            <View style={styles.genderRadioGroup}>
+              <RadioButton
+                value="male"
+                status={patientgender === 'male' ? 'checked' : 'unchecked'}
+                onPress={() => setPatientgender('male')}
+                color="#0D4744"
+              />
+              <Text style={styles.genderText}>Male</Text>
+              <RadioButton
+                value="female"
+                status={patientgender === 'female' ? 'checked' : 'unchecked'}
+                onPress={() => setPatientgender('female')}
+                color="#0D4744"
+              />
+              <Text style={styles.genderText}>Female</Text>
+            </View>
+            <TextInput
+              style={[
+                styles.input,
+                { borderColor: fieldsValid ? '#0D4744' : 'red' },
+              ]}
+              placeholder="Patient's Symptom"
+              placeholderTextColor={"gray"}
+              value={patientsymptom}
+              onChangeText={setPatientsymptom}
+            />
+            <TextInput
+              style={[
+                styles.input,
+                { borderColor: fieldsValid ? '#0D4744' : 'red' },
+              ]}
+              placeholder="Patient's Complication"
+              placeholderTextColor={"gray"}
+              value={patientcomplications}
+              onChangeText={setPatientcomplications}
+            />
+            <TextInput
+              style={[
+                styles.input,
+                { borderColor: fieldsValid ? '#0D4744' : 'red' },
+              ]}
+              placeholder="Account Holder Number"
+              placeholderTextColor={"gray"}
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType='numeric'
+            />
+          </View>
+        )}
+
+        <Button
+          mode="contained"
+          onPress={handleProceed}
+          style={styles.proceedButton}
+          labelStyle={styles.buttonLabel}
+          
+        >
+          Proceed
+        </Button>
       </View>
-      {showForMeFields && (
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={[
-              styles.input,
-              { borderColor: fieldsValid ? '#0D4744' : 'red' },
-            ]}
-            placeholder="Your Name"
-            placeholderTextColor={"gray"}
-            value={name}
-            onChangeText={setName}
-          />
-          <TextInput
-            style={[
-              styles.input,
-              { borderColor: fieldsValid ? '#0D4744' : 'red' },
-            ]}
-            placeholder="Your Age"
-            placeholderTextColor={"gray"}
-            value={age}
-            onChangeText={setAge}
-          />
-          <TextInput
-            style={[
-              styles.input,
-              { borderColor: fieldsValid ? '#0D4744' : 'red' },
-            ]}
-            placeholder="Your Gender"
-            placeholderTextColor={"gray"}
-            value={gender}
-            onChangeText={setGender}
-          />
-          <TextInput
-            style={[
-              styles.input,
-              { borderColor: fieldsValid ? '#0D4744' : 'red' },
-            ]}
-            placeholder="Your Symptom"
-            placeholderTextColor={"gray"}
-            value={symptom}
-            onChangeText={setSymptom}
-          />
-          <TextInput
-            style={[
-              styles.input,
-              { borderColor: fieldsValid ? '#0D4744' : 'red' },
-            ]}
-            placeholder="Your Complication"
-            placeholderTextColor={"gray"}
-            value={complications}
-            onChangeText={setComplications}
-          />
-          <TextInput
-            style={[
-              styles.input,
-              { borderColor: fieldsValid ? '#0D4744' : 'red' },
-            ]}
-            placeholder="Account Holder Number"
-            placeholderTextColor={"gray"}
-            value={phone}
-            onChangeText={setPhone}
-            keyboardType='numeric'
-          />
-        </View>
-      )}
-      {showForSomeoneElseFields && (
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={[
-              styles.input,
-              { borderColor: fieldsValid ? '#0D4744' : 'red' },
-            ]}
-            placeholder="Patient's Name"
-            placeholderTextColor={"gray"}
-            value={patientname}
-            onChangeText={setPatientName}
-          />
-          <TextInput
-            style={[
-              styles.input,
-              { borderColor: fieldsValid ? '#0D4744' : 'red' },
-            ]}
-            placeholder="Patient's Age"
-            placeholderTextColor={"gray"}
-            value={patientage}
-            onChangeText={setPatientage}
-          />
-          <TextInput
-            style={[
-              styles.input,
-              { borderColor: fieldsValid ? '#0D4744' : 'red' },
-            ]}
-            placeholder="Patient's Gender"
-            placeholderTextColor={"gray"}
-            value={patientgender}
-            onChangeText={setPatientgender}
-          />
-          <TextInput
-            style={[
-              styles.input,
-              { borderColor: fieldsValid ? '#0D4744' : 'red' },
-            ]}
-            placeholder="Patient's Symptom"
-            placeholderTextColor={"gray"}
-            value={patientsymptom}
-            onChangeText={setPatientsymptom}
-          />
-          <TextInput
-            style={[
-              styles.input,
-              { borderColor: fieldsValid ? '#0D4744' : 'red' },
-            ]}
-            placeholder="Patient's Complication"
-            placeholderTextColor={"gray"}
-            value={patientcomplications}
-            onChangeText={setPatientcomplications}
-          />
-          <TextInput
-            style={[
-              styles.input,
-              { borderColor: fieldsValid ? '#0D4744' : 'red' },
-            ]}
-            placeholder="Account Holder Number"
-            placeholderTextColor={"gray"}
-            value={phone}
-            onChangeText={setPhone}
-            keyboardType='numeric'
-          />
-        </View>
-      )}
-      <Button
-        mode="contained"
-        onPress={handleProceed}
-        disabled={!selectedOption}
-        style={[styles.button, { backgroundColor: '#0D4744' }]}
-      >
-        Proceed
-      </Button>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   container: {
     flex: 1,
-    alignItems: 'center',
+    backgroundColor: '#fff',
     justifyContent: 'center',
+    padding: 20,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
     marginBottom: 20,
   },
   radioGroup: {
-    flexDirection: 'column',
-    alignItems: 'flex-start',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
     marginBottom: 20,
   },
+  genderRadioGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    justifyContent: 'space-evenly',  // Distributes the items evenly
+  },
+  genderText: {
+    marginHorizontal: 10, // Add horizontal space between the RadioButton and text
+    fontSize: 16,
+    color: 'gray',
+  },
+
   inputContainer: {
-    width: '80%',
+    marginBottom: 20,
   },
   input: {
-    marginBottom: 10,
-    padding: 10,
     borderWidth: 1,
+    borderColor: '#0D4744',
     borderRadius: 5,
-    color:'gray'
+    padding: 10,
+    marginBottom: 10,
   },
-  button: {
+  proceedButton: {
     marginTop: 20,
-    width: '80%',
+    paddingVertical: 10,
+    backgroundColor:"#0D4744"
   },
+  buttonLabel: {
+    fontSize: 18,
+    color: '#fff',
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: 'gray',
+  }
 });
 
 export default ProceedScreen;
+ 

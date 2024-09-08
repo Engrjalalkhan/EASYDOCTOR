@@ -5,7 +5,8 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  Alert
+  Alert,
+  ScrollView
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -85,54 +86,58 @@ const MyAppointmentsScreen = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      {bookings.map(({ bookingId, doctorId, doctorData }) => (
-        <View key={bookingId} style={styles.card}>
-          {doctorData && doctorData.imageUrl && (
-            <View style={styles.profileContainer1}>
-              <Image
-                source={{ uri: doctorData.imageUrl }}
-                style={styles.profileImage1}
-              />
-              <TouchableOpacity onPress={() => handleViewProfile(doctorId)}>
-                <Text style={styles.viewProfileButton}>View Feedback</Text>
+    <ScrollView style={styles.scrollContainer}>
+      <View style={styles.container}>
+        {bookings.map(({ bookingId, doctorId, doctorData }) => (
+          <View key={bookingId} style={styles.card}>
+            {doctorData && doctorData.imageUrl && (
+              <View style={styles.profileContainer1}>
+                <Image
+                  source={{ uri: doctorData.imageUrl }}
+                  style={styles.profileImage1}
+                />
+                <TouchableOpacity onPress={() => handleViewProfile(doctorId)}>
+                  <Text style={styles.viewProfileButton}>Feedback</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            <View style={styles.doctorDetails}>
+              <Text style={styles.doctorName}>{doctorData?.name}</Text>
+              <Text style={styles.specialty}>{doctorData?.specialty}</Text>
+              <Text style={styles.experience}>
+                Experience: {doctorData?.experience} year
+              </Text>
+              <Text style={styles.experience}>
+                Location: {doctorData?.clinicAddress}
+              </Text>
+              <Text style={styles.experience}>Rasst: {doctorData?.rasst}</Text>
+            </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                onPress={() => handleDelete(bookingId)}
+                style={styles.actionButton}>
+                <Icon name="delete" size={30} color="#dc3d3d" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleChat(doctorId)}
+                style={styles.actionButton}>
+                <Icon name="comment" size={25} color="#dc3d3d" style={styles.logo} />
               </TouchableOpacity>
             </View>
-          )}
-          <View style={styles.doctorDetails}>
-            <Text style={styles.doctorName}>{doctorData?.name}</Text>
-            <Text style={styles.specialty}>{doctorData?.specialty}</Text>
-            <Text style={styles.experience}>
-              Experience: {doctorData?.experience} year
-            </Text>
-            <Text style={styles.experience}>
-              Location: {doctorData?.clinicAddress}
-            </Text>
-            <Text style={styles.experience}>Rasst: {doctorData?.rasst}</Text>
           </View>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              onPress={() => handleDelete(bookingId)}
-              style={styles.actionButton}>
-              <Icon name="delete" size={30} color="#dc3d3d" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => handleChat(doctorId)}
-              style={styles.actionButton}>
-              <Icon name="comment" size={25} color="#dc3d3d" style={styles.logo} />
-            </TouchableOpacity>
-          </View>
-        </View>
-      ))}
-    </View>
+        ))}
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  scrollContainer: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#fff',
+  },
+  container: {
+    padding: 20,
   },
   card: {
     flexDirection: 'row',
@@ -142,17 +147,20 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 5,
     marginBottom: 50,
-    width: 350,
+    width: 320,
     justifyContent: 'space-between',
+    alignSelf:'center'
   },
   profileContainer1: {
     alignItems: 'center',
+    padding:10
   },
   profileImage1: {
-    width: 80,
-    height: 80,
+    width: 70,
+    height: 70,
     borderRadius: 40,
     marginBottom: 10,
+    
   },
   viewProfileButton: {
     color: '#0D4744',
@@ -179,27 +187,14 @@ const styles = StyleSheet.create({
   buttonContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom:5,
-    padding:5
+    marginBottom: 5,
+    padding: 5,
   },
   actionButton: {
     backgroundColor: 'transparent',
     borderRadius: 5,
     marginTop: 5,
     width: '100%',
-  },
-  deleteIcon: {
-    width: 25,
-    height: 25,
-    borderRadius: 15,
-    marginVertical:5
-  },
-  chatIcon: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    marginTop: 10,
-    borderWidth: 5
   },
 });
 

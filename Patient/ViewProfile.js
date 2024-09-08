@@ -50,14 +50,15 @@ const FeedbackScreen = ({ route }) => {
     }
   
     try {
-      // Add feedback to the 'feedback' collection
-      await firestore().collection('feedback').add({
-        doctorId: selectedDoctor, // Set the doctorId field to selectedDoctor
+      // Add feedback to the 'feedback' collection with doctorId as the document ID
+      const feedbackDocRef = firestore().collection('feedback').doc(selectedDoctor);
+      await feedbackDocRef.set({
+        doctorId: selectedDoctor,
         feedback: feedback,
         rating: rating,
         createdAt: firestore.FieldValue.serverTimestamp(),
       });
-  
+
       // Check if the rating is positive (greater than 3)
       if (rating > 3) {
         // Add the doctor to the 'TopDoctor' collection
@@ -79,8 +80,6 @@ const FeedbackScreen = ({ route }) => {
       Alert.alert('Error', 'Something went wrong. Please try again later.');
     }
   };
-  
-  
 
   if (loading) {
     return (
@@ -93,13 +92,12 @@ const FeedbackScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text
-          style={styles.headerText}>
+        <Text style={styles.headerText}>
           EASY + DOCTOR
         </Text>
         <View style={styles.profileContainer1}>
-        {/* <Text style={styles.userName}>{userName}</Text>
-        <Image source={{ uri: profileImage }} style={styles.profileImage} /> */}
+          {/* <Text style={styles.userName}>{userName}</Text>
+          <Image source={{ uri: profileImage }} style={styles.profileImage} /> */}
         </View>
         <View style={styles.feedbackContainer}>
           <Text style={styles.title}>Submit Feedback</Text>

@@ -189,6 +189,7 @@ const NewAppointment = ({ route, navigation }) => {
               <Text style={styles.specialtyText}>Orthopedic</Text>
             </TouchableOpacity>
           </ScrollView>
+          <ScrollView contentContainerStyle={styles.scrollViewContent}>
           <Text style={styles.topDoctorsTitle}>Top Doctors</Text>
           {filteredDoctors.map(doctor => (
             <View key={doctor.id} style={styles.card}>
@@ -198,7 +199,7 @@ const NewAppointment = ({ route, navigation }) => {
                   style={styles.profileImage1}
                 />
                 <TouchableOpacity onPress={() => handleViewProfile(doctor.id)}>
-                  <Text style={styles.viewProfileButton}>View Feedback</Text>
+                  <Text style={styles.viewProfileButton}>Feedback</Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.doctorDetails}>
@@ -243,6 +244,8 @@ const NewAppointment = ({ route, navigation }) => {
               </View>
             </View>
           ))}
+          </ScrollView>
+          
         </View>
       </View>
     </View>
@@ -255,6 +258,9 @@ const styles = StyleSheet.create({
   container1: {
     flex: 1,
     flexDirection: 'row',
+  },
+  scrollViewContent: {
+    flexDirection:'column'
   },
   content: {
     flex: 1,
@@ -333,6 +339,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 10,
     marginStart: 10,
+    marginBottom:40
   },
   specialtyIcon: {
     width: 60,
@@ -359,15 +366,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 5,
     marginBottom: 50,
-    width:350,
+    width:300,
     justifyContent:'space-between',
   },
   profileContainer1: {
     alignItems: 'center',
+    padding:10
   },
   profileImage1: {
-    width: 80,
-    height: 80,
+    width: 65,
+    height: 65,
     borderRadius: 40,
     marginBottom: 10,
   },

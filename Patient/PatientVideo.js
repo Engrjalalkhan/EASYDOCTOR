@@ -5,7 +5,8 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  Alert
+  Alert,
+  ScrollView
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import Feather from 'react-native-vector-icons/Feather';
@@ -86,52 +87,57 @@ const MyAppointmentsScreen = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      {bookings.map(({ bookingId, doctorId, doctorData }) => (
-        <View key={bookingId} style={styles.card}>
-          {doctorData && doctorData.imageUrl && (
-            <View style={styles.profileContainer1}>
-              <Image
-                source={{ uri: doctorData.imageUrl }}
-                style={styles.profileImage1}
-              />
-              <TouchableOpacity onPress={() => handleViewProfile(doctorId)}>
-                <Text style={styles.viewProfileButton}>View Feedback</Text>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        {bookings.map(({ bookingId, doctorId, doctorData }) => (
+          <View key={bookingId} style={styles.card}>
+            {doctorData && doctorData.imageUrl && (
+              <View style={styles.profileContainer1}>
+                <Image
+                  source={{ uri: doctorData.imageUrl }}
+                  style={styles.profileImage1}
+                />
+                <TouchableOpacity onPress={() => handleViewProfile(doctorId)}>
+                  <Text style={styles.viewProfileButton}>Feedback</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            <View style={styles.doctorDetails}>
+              <Text style={styles.doctorName}>{doctorData?.name}</Text>
+              <Text style={styles.specialty}>{doctorData?.specialty}</Text>
+              <Text style={styles.experience}>
+                Experience: {doctorData?.experience} year
+              </Text>
+              <Text style={styles.experience}>
+                Location: {doctorData?.clinicAddress}
+              </Text>
+              <Text style={styles.experience}>Rasst: {doctorData?.rasst}</Text>
+            </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                onPress={() => handleDelete(bookingId)}
+                style={styles.actionButton}>
+                <Icon name="delete" size={30} color="#dc3d3d" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleChat(doctorId)}
+                style={styles.actionButton}>
+                <Feather name="phone" size={25} color="#dc3d3d" style={{marginHorizontal:7}} />
               </TouchableOpacity>
             </View>
-          )}
-          <View style={styles.doctorDetails}>
-            <Text style={styles.doctorName}>{doctorData?.name}</Text>
-            <Text style={styles.specialty}>{doctorData?.specialty}</Text>
-            <Text style={styles.experience}>
-              Experience: {doctorData?.experience} year
-            </Text>
-            <Text style={styles.experience}>
-              Location: {doctorData?.clinicAddress}
-            </Text>
-            <Text style={styles.experience}>Rasst: {doctorData?.rasst}</Text>
           </View>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              onPress={() => handleDelete(bookingId)}
-              style={styles.actionButton}>
-              <Icon name="delete" size={30} color="#dc3d3d" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => handleChat(doctorId)}
-              style={styles.actionButton}>
-              <Feather name="phone" size={25} color="#dc3d3d" style={{marginHorizontal:7}} />
-            </TouchableOpacity>
-          </View>
-        </View>
-      ))}
-    </View>
+        ))}
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 20,  // Add some padding at the bottom
+  },
   container: {
-    flex: 1,
     padding: 20,
     backgroundColor: '#fff',
   },
@@ -143,15 +149,17 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 5,
     marginBottom: 50,
-    width: 350,
     justifyContent: 'space-between',
+    alignSelf:'center',
+    width:320,
   },
   profileContainer1: {
     alignItems: 'center',
+    padding:10
   },
   profileImage1: {
-    width: 80,
-    height: 80,
+    width: 70,
+    height: 70,
     borderRadius: 40,
     marginBottom: 10,
   },

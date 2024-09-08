@@ -27,6 +27,7 @@ const MyCalendarScreen = () => {
   const [eveningToTime, setEveningToTime] = useState('');
   const [eveningSlots, setEveningSlots] = useState('');
 
+  // Toggle calendar visibility only when specifically requested
   const toggleCalendar = () => {
     setShowCalendar(!showCalendar);
   };
@@ -45,21 +46,16 @@ const MyCalendarScreen = () => {
 
   const handleSave = async () => {
     try {
-      // Replace with logic to get the current doctor's ID from your app's context, navigation, or state
       const doctorQuerySnapshot = await firestore().collection('Doctor').limit(1).get();
-  
+
       if (doctorQuerySnapshot.empty) {
         throw new Error('No doctor found');
       }
-  
-      // Assuming you only have one doctor document or you want to use the first one
+
       const doctorDoc = doctorQuerySnapshot.docs[0];
       const doctorId = doctorDoc.id;
       const doctorData = doctorDoc.data();
-  
-      console.log('Doctor ID:', doctorId);
-      console.log('Doctor Data:', doctorData);
-  
+
       // Calculate slots for morning and evening
       const saveMorningSlots = await saveSlots(
         morningEnabled,
@@ -67,78 +63,63 @@ const MyCalendarScreen = () => {
         morningToTime,
         morningSlots
       );
-  
+
       const saveEveningSlots = await saveSlots(
         eveningEnabled,
         eveningFromTime,
         eveningToTime,
         eveningSlots
       );
-  
-      console.log('Morning slots:', saveMorningSlots);
-      console.log('Evening slots:', saveEveningSlots);
-  
-      // Save schedule data to Firestore in the Schedules collection with doctorId as document ID
+
+      // Save schedule data to Firestore
       await firestore().collection('Schedules').doc(doctorId).set({
         morning: saveMorningSlots,
         evening: saveEveningSlots,
         allDays: allEnabled,
       });
-  
+
       console.log('Schedule saved successfully!');
       navigation.goBack();
     } catch (error) {
       console.error('Error saving schedule: ', error);
     }
   };
-  
 
   // Function to calculate and save time slots
   const saveSlots = async (enabled, fromTime, toTime, slots) => {
     if (!enabled || !fromTime || !toTime || !slots) {
       return [];
     }
-  
-    const slotsCount = parseInt(slots);
+
+    const slotsData = [];
     const fromTimeParts = fromTime.split(':').map(part => parseInt(part));
     const toTimeParts = toTime.split(':').map(part => parseInt(part));
-  
-    const fromHour = fromTimeParts[0];
-    const fromMinute = fromTimeParts[1];
-    const toHour = toTimeParts[0];
-    const toMinute = toTimeParts[1];
-  
-    const fromTimeInMinutes = fromHour * 60 + fromMinute;
-    const toTimeInMinutes = toHour * 60 + toMinute;
-  
-    const slotDuration = 15; // 15-minute slot duration
-  
-    const slotsData = [];
-  
+    const fromTimeInMinutes = fromTimeParts[0] * 60 + fromTimeParts[1];
+    const toTimeInMinutes = toTimeParts[0] * 60 + toTimeParts[1];
+    const slotDuration = 15;
+
     let currentTimeInMinutes = fromTimeInMinutes;
-  
+
     while (currentTimeInMinutes < toTimeInMinutes) {
       const slotStartHour = Math.floor(currentTimeInMinutes / 60);
       const slotStartMinute = currentTimeInMinutes % 60;
-  
+
       const slotStart = `${slotStartHour.toString().padStart(2, '0')}:${slotStartMinute.toString().padStart(2, '0')}`;
-  
       currentTimeInMinutes += slotDuration;
-  
+
       const slotEndHour = Math.floor(currentTimeInMinutes / 60);
       const slotEndMinute = currentTimeInMinutes % 60;
-  
+
       const slotEnd = `${slotEndHour.toString().padStart(2, '0')}:${slotEndMinute.toString().padStart(2, '0')}`;
-  
+
       slotsData.push({
         startTime: slotStart,
         endTime: slotEnd,
       });
     }
-  
+
     return slotsData;
   };
-  
 
   return (
     <ScrollView style={styles.container}>
@@ -149,9 +130,9 @@ const MyCalendarScreen = () => {
           style={{ width: 24, height: 24, justifyContent: 'flex-end' }}
         />
       </TouchableOpacity>
-      
-      <Calendar />
-      
+
+      {showCalendar && <Calendar />}
+
       <View style={styles.morningToggle}>
         <Text style={styles.sectionTitle}>Morning</Text>
         <Switch
@@ -160,44 +141,40 @@ const MyCalendarScreen = () => {
           style={{ paddingStart: 20, marginTop: 10 }}
         />
       </View>
+
       {morningEnabled && (
-        <>
-          <View style={styles.timeInputRow}>
-            <View>
-              <Text style={styles.label}>FROM</Text>
-              <TextInput
-                style={styles.input}
-                value={morningFromTime}
-                onChangeText={setMorningFromTime}
-                placeholder="08:00 PM"
-                placeholderTextColor={"gray"}
-                
-              />
-            </View>
-            <View>
-              <Text style={styles.label}>TO</Text>
-              <TextInput
-                style={styles.input}
-                value={morningToTime}
-                onChangeText={setMorningToTime}
-                placeholder="9:00 PM"
-                placeholderTextColor={"gray"}
-                
-              />
-            </View>
-            <View>
-              <Text style={styles.label}>SLOTS</Text>
-              <TextInput
-                style={styles.input}
-                value={morningSlots}
-                onChangeText={setMorningSlots}
-                placeholder="4"
-                placeholderTextColor={"gray"}
-                
-              />
-            </View>
+        <View style={styles.timeInputRow}>
+          <View>
+            <Text style={styles.label}>FROM</Text>
+            <TextInput
+              style={styles.input}
+              value={morningFromTime}
+              onChangeText={setMorningFromTime}
+              placeholder="08:00 PM"
+              placeholderTextColor="gray"
+            />
           </View>
-        </>
+          <View>
+            <Text style={styles.label}>TO</Text>
+            <TextInput
+              style={styles.input}
+              value={morningToTime}
+              onChangeText={setMorningToTime}
+              placeholder="09:00 PM"
+              placeholderTextColor="gray"
+            />
+          </View>
+          <View>
+            <Text style={styles.label}>SLOTS</Text>
+            <TextInput
+              style={styles.input}
+              value={morningSlots}
+              onChangeText={setMorningSlots}
+              placeholder="4"
+              placeholderTextColor="gray"
+            />
+          </View>
+        </View>
       )}
 
       <View style={styles.eveningToggle}>
@@ -208,42 +185,40 @@ const MyCalendarScreen = () => {
           style={{ paddingStart: 20, marginTop: 10 }}
         />
       </View>
+
       {eveningEnabled && (
-        <>
-          <View style={styles.timeInputRow}>
-            <View>
-              <Text style={styles.label}>FROM</Text>
-              <TextInput
-                style={styles.input}
-                value={eveningFromTime}
-                onChangeText={setEveningFromTime}
-                placeholder="05:00 AM"
-                placeholderTextColor={"gray"}
-                
-              />
-            </View>
-            <View>
-              <Text style={styles.label}>TO</Text>
-              <TextInput
-                style={styles.input}
-                value={eveningToTime}
-                onChangeText={setEveningToTime}
-                placeholder="09:00 AM"
-                placeholderTextColor={"gray"}
-              />
-            </View>
-            <View>
-              <Text style={styles.label}>SLOTS</Text>
-              <TextInput
-                style={styles.input}
-                value={eveningSlots}
-                onChangeText={setEveningSlots}
-                placeholder="4"
-                placeholderTextColor={"gray"}
-              />
-            </View>
+        <View style={styles.timeInputRow}>
+          <View>
+            <Text style={styles.label}>FROM</Text>
+            <TextInput
+              style={styles.input}
+              value={eveningFromTime}
+              onChangeText={setEveningFromTime}
+              placeholder="05:00 PM"
+              placeholderTextColor="gray"
+            />
           </View>
-        </>
+          <View>
+            <Text style={styles.label}>TO</Text>
+            <TextInput
+              style={styles.input}
+              value={eveningToTime}
+              onChangeText={setEveningToTime}
+              placeholder="09:00 PM"
+              placeholderTextColor="gray"
+            />
+          </View>
+          <View>
+            <Text style={styles.label}>SLOTS</Text>
+            <TextInput
+              style={styles.input}
+              value={eveningSlots}
+              onChangeText={setEveningSlots}
+              placeholder="4"
+              placeholderTextColor="gray"
+            />
+          </View>
+        </View>
       )}
 
       <Text style={styles.sectionSubtitle}>RECURRING ON</Text>
@@ -255,6 +230,7 @@ const MyCalendarScreen = () => {
           style={{ paddingStart: 20, marginTop: 10 }}
         />
       </View>
+
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
         <Text style={styles.saveButtonText}>Save</Text>
       </TouchableOpacity>
@@ -282,20 +258,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: 'white',
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    paddingTop: 150,
-  },
-  closeButton: {
-    marginBottom: 210,
-  },
-  closeButtonText: {
-    fontSize: 18,
-    color: '#0D4744',
-  },
   sectionTitle: {
     fontSize: 24,
     color: '#136b66',
@@ -305,13 +267,31 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     fontWeight: 'bold',
-    color:'gray',
-    textAlign:'center'
+    color: 'gray',
+    textAlign: 'center',
   },
   morningToggle: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 20,
+  },
+  timeInputRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    padding: 8,
+    width: 100,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginTop: 5,
+    color: '#136b66',
   },
   eveningToggle: {
     flexDirection: 'row',
@@ -321,37 +301,15 @@ const styles = StyleSheet.create({
   allToggle: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 20,
   },
-  label: {
-    marginTop: 10,
-    fontSize: 16,
-    paddingRight: 30,
-    color:'gray'
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 5,
-    padding: 10,
-    marginTop: 10,
-    width: 100,
-    height: 35,
-    color:'gray'
-  },
-  timeInputRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
   saveButton: {
-    backgroundColor: '#0D4744',
-    width: '60%',
-    height: 40,
+    backgroundColor: '#136b66',
+    borderRadius: 10,
+    paddingVertical: 10,
     alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 25,
-    marginTop: 10,
-    alignSelf: 'center',
+    marginTop: 30,
   },
   saveButtonText: {
     color: 'white',
