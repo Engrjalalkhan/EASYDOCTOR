@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TextInput, TouchableOpacity, Image, StyleSheet, Modal, Alert, Platform } from 'react-native';
+import { View, Text, FlatList, TextInput, TouchableOpacity, Image, StyleSheet, Modal, Alert, Platform, ActionSheetIOS } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import ImagePicker from 'react-native-image-crop-picker';
+import BannerNotification from '../Component/BannerNotification'; // Import the banner notification component
 
 // Import the images for the send, delete, and attachment buttons
-import sendIcon from '../Src/images/send.png'; // Replace with your image path
-import deleteIcon from '../Src/images/delete.png'; // Replace with your image path
-import attachmentIcon from '../Src/images/attachment.png'; // Replace with your image path
+import sendIcon from '../Src/images/send.png';
+import deleteIcon from '../Src/images/delete.png';
+import attachmentIcon from '../Src/images/attachment.png';
 
 const SenderChatScreen = ({ route, navigation }) => {
+  const { doctorId } = route.params;
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
   const [attachment, setAttachment] = useState(null);
@@ -16,13 +18,13 @@ const SenderChatScreen = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [doctorId, setDoctorId] = useState(route.params.doctorId); // Get doctorId from route params
+  const [bannerNotification, setBannerNotification] = useState(null);
 
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('chats')
       .doc(doctorId)
-      .collection('messages') // Assuming messages are stored in sub-collection named 'messages'
+      .collection('messages')
       .orderBy('createdAt', 'desc')
       .onSnapshot(querySnapshot => {
         const messages = querySnapshot.docs.map(doc => ({
@@ -30,6 +32,25 @@ const SenderChatScreen = ({ route, navigation }) => {
           ...doc.data()
         }));
         setMessages(messages);
+
+        // Check for new messages
+        const newMessage = messages.find(msg => msg.user === 'Receiver' && !msg.notified);
+        if (newMessage) {
+          setBannerNotification({
+            title: 'New Message',
+            description: newMessage.text,
+            onClick: () => {
+              setBannerNotification(null); // Hide the banner when clicked
+            }
+          });
+
+          // Update Firestore to mark the message as notified
+          firestore().collection('chats')
+            .doc(doctorId)
+            .collection('messages')
+            .doc(newMessage.id)
+            .update({ notified: true });
+        }
       });
 
     return () => unsubscribe();
@@ -37,14 +58,27 @@ const SenderChatScreen = ({ route, navigation }) => {
 
   const sendMessage = async () => {
     if (message.length > 0 || attachment) {
-      await firestore().collection('chats').doc(doctorId).collection('messages').add({
-        text: message,
-        attachment: attachment,
-        createdAt: firestore.FieldValue.serverTimestamp(),
-        user: 'Sender'
-      });
+      await firestore().collection('chats')
+        .doc(doctorId)
+        .collection('messages')
+        .add({
+          text: message,
+          attachment: attachment,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+          user: 'Sender'
+        });
+
       setMessage('');
       setAttachment(null);
+
+      // Notify the receiver about the new message
+      setBannerNotification({
+        title: 'New Message',
+        description: message,
+        onClick: () => {
+          setBannerNotification(null); // Hide the banner when clicked
+        }
+      });
     }
   };
 
@@ -62,7 +96,11 @@ const SenderChatScreen = ({ route, navigation }) => {
 
     const batch = firestore().batch();
     selectedMessages.forEach(id => {
-      const docRef = firestore().collection('chats').doc(doctorId).collection('messages').doc(id);
+      const docRef = firestore().collection('chats')
+        .doc(doctorId)
+        .collection('messages')
+        .doc(id);
+
       if (option === 'deleteForEveryone') {
         batch.update(docRef, { deletedForEveryone: true, text: '🚫 Message deleted', attachment: null });
       } else if (option === 'deleteForMe') {
@@ -118,14 +156,14 @@ const SenderChatScreen = ({ route, navigation }) => {
 
   const renderItem = ({ item }) => {
     if (item.deletedBy && item.deletedBy.includes('Sender') && item.user === 'Sender') {
-      return null; // Skip rendering if deleted by the current user
+      return null;
     }
 
     return (
       <TouchableOpacity
         onLongPress={() => handleLongPress(item.id)}
         style={[
-          item.user === 'Sender' ? styles.receiverMessage : styles.senderMessage,
+          item.user === 'Sender' ? styles.senderMessage : styles.receiverMessage,
           selectedMessages.includes(item.id) && styles.selectedMessage
         ]}
       >
@@ -149,11 +187,9 @@ const SenderChatScreen = ({ route, navigation }) => {
     navigation.setOptions({
       headerTitle: 'Chat',
       headerRight: () => (
-        <View style={styles.headerRight}>
-          <TouchableOpacity onPress={showDeleteOptions} style={styles.headerRight}>
-            <Image source={deleteIcon} style={styles.deleteIcon} />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={showDeleteOptions} style={styles.headerRight}>
+          <Image source={deleteIcon} style={styles.deleteIcon} />
+        </TouchableOpacity>
       ),
       headerStyle: {
         backgroundColor: '#fff',
@@ -202,7 +238,7 @@ const SenderChatScreen = ({ route, navigation }) => {
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Delete Messages ?</Text>
+              <Text style={styles.modalTitle}>Delete Messages?</Text>
               <TouchableOpacity onPress={() => handleDelete('deleteForEveryone')} style={styles.modalButton}>
                 <Text style={styles.modalButtonText}>Delete for Everyone</Text>
               </TouchableOpacity>
@@ -225,6 +261,13 @@ const SenderChatScreen = ({ route, navigation }) => {
           <Image source={{ uri: selectedImage }} style={styles.fullscreenImage} />
         </TouchableOpacity>
       </Modal>
+      {bannerNotification && (
+        <BannerNotification
+          title={bannerNotification.title}
+          description={bannerNotification.description}
+          onClick={bannerNotification.onClick}
+        />
+      )}
     </View>
   );
 };
@@ -280,21 +323,21 @@ const styles = StyleSheet.create({
     width:50
   },
   senderMessage: {
-    backgroundColor: '#e0e0e0',
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-    alignSelf: 'flex-start',
-    marginHorizontal:7,
-    maxWidth: '80%',
-    tintColor:'gray'
-  },
-  receiverMessage: {
     backgroundColor: '#d0f0c0',
     padding: 10,
     borderRadius: 10,
     marginBottom: 10,
     alignSelf: 'flex-end',
+    marginHorizontal:7,
+    maxWidth: '80%',
+    tintColor:'gray'
+  },
+  receiverMessage: {
+    backgroundColor: '#e0e0e0',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+    alignSelf: 'flex-start',
     marginHorizontal:7,
     maxWidth: '80%',
     tintColor:"gray"
