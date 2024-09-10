@@ -136,10 +136,11 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     paddingBottom: 20,  // Add some padding at the bottom
+    backgroundColor: '#fff',
   },
   container: {
     padding: 20,
-    backgroundColor: '#fff',
+    
   },
   card: {
     flexDirection: 'row',
