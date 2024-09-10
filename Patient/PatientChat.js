@@ -175,6 +175,7 @@ const styles = StyleSheet.create({
   doctorName: {
     fontSize: 16,
     fontWeight: 'bold',
+    color:'gray'
   },
   specialty: {
     fontSize: 14,
