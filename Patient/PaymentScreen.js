@@ -186,6 +186,7 @@ const PaymentScreen = () => {
             <Text style={styles.specialty}>{item.specialty}</Text>
             <Text style={styles.experience}>Experience: {item.experience} years</Text>
             <Text style={styles.experience}>Location: {item.clinicAddress}</Text>
+            <Text style={{color:'black',fontWeight:'bold'}}>Doctor Fee: {item.price}</Text>
             <Text style={styles.experience}>Rasst: {item.rasst}</Text>
           </View>
         </TouchableOpacity>

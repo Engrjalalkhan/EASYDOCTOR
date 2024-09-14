@@ -53,6 +53,7 @@
     "react-native-ui-datepicker": "^2.0.2",
     "react-native-vector-icons": "^10.1.0",
     "react-native-webrtc": "^124.0.3",
+    "react-native-webview": "^13.12.2",
     "tesseract.js": "^5.1.0",
     "twilio": "^5.1.0",
     "zego-express-engine-reactnative": "^3.14.5"

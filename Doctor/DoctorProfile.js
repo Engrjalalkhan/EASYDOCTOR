@@ -55,6 +55,7 @@ const DoctorProfile = () => {
   const [rasst, setRasst] = useState('');
   const [clinicAddress, setClinicAddress] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
+  const [price, setPrice] = useState(''); // New state for price in PKR
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleImagePicker = source => {
@@ -100,12 +101,13 @@ const DoctorProfile = () => {
       !specialty ||
       !experience ||
       !clinicAddress ||
-      !rasst||
-      !selectedImage
+      !rasst ||
+      !selectedImage ||
+      !price // Validate the new price field
     ) {
       Alert.alert(
         'Error',
-        'Please fill out all fields and select a profile image.',
+        'Please fill out all fields, including the price, and select a profile image.',
       );
       return;
     }
@@ -128,6 +130,7 @@ const DoctorProfile = () => {
         clinicAddress,
         rasst,
         imageUrl, // URL of the uploaded profile image
+        price: parseFloat(price), // Save price as a number
       });
 
       // Navigate to Patient Home screen after saving profile
@@ -171,7 +174,7 @@ const DoctorProfile = () => {
             borderTopLeftRadius: 25,
             borderTopRightRadius: 25,
           }}>
-          <Text style={{fontSize: 20, fontWeight: 'bold',color:"gray"}}>
+          <Text style={{fontSize: 20, fontWeight: 'bold', color: 'gray'}}>
             Please Provide Your Details !!
           </Text>
           {/* Profile image placeholder */}
@@ -189,7 +192,6 @@ const DoctorProfile = () => {
                 style={styles.profileImage}
               />
             )}
-            
           </TouchableOpacity>
 
           {/* Modal with options */}
@@ -226,7 +228,7 @@ const DoctorProfile = () => {
               marginBottom: 10,
               paddingHorizontal: 10,
               borderRadius: 10,
-              color:'gray'
+              color: 'gray'
             }}
           />
           <TextInput
@@ -243,7 +245,7 @@ const DoctorProfile = () => {
               marginBottom: 10,
               paddingHorizontal: 10,
               borderRadius: 10,
-              color:'gray'
+              color: 'gray'
             }}
           />
           <View style={styles.passwordContainer}>
@@ -272,7 +274,7 @@ const DoctorProfile = () => {
             <Picker
               selectedValue={specialty}
               onValueChange={itemValue => setSpecialty(itemValue)}
-              style={{height: '8%', width: '100%',color:'gray'}}>
+              style={{height: '8%', width: '100%', color: 'gray'}}>
               <Picker.Item label="Select Specialty" value="" />
               {specialties.map(spec => (
                 <Picker.Item label={spec} value={spec} key={spec} />
@@ -290,7 +292,7 @@ const DoctorProfile = () => {
             <Picker
               selectedValue={clinicAddress}
               onValueChange={itemValue => setClinicAddress(itemValue)}
-              style={{height: '8%', width: '100%',color:'gray'}}>
+              style={{height: '8%', width: '100%', color: 'gray'}}>
               <Picker.Item label="Select Clinic Address" value="" />
               {clinicAddresses.map(address => (
                 <Picker.Item label={address} value={address} key={address} />
@@ -308,27 +310,43 @@ const DoctorProfile = () => {
               height: 40,
               borderColor: 'gray',
               borderWidth: 1,
-              marginBottom: 20,
+              marginBottom: 10,
               paddingHorizontal: 10,
               borderRadius: 10,
-              color:'gray'
+              color: 'gray'
             }}
           />
           <TextInput
-            placeholder="Rasst ID for Payment"
+            placeholder="Fee in PKR"
             placeholderTextColor={"gray"}
-            value={rasst}
-            onChangeText={setRasst}
+            value={price}
+            onChangeText={setPrice}
             keyboardType="numeric"
             style={{
               width: 300,
               height: 40,
               borderColor: 'gray',
               borderWidth: 1,
-              marginBottom: 20,
+              marginBottom: 10,
               paddingHorizontal: 10,
               borderRadius: 10,
-              color:'gray'
+              color: 'gray'
+            }}
+          />
+          <TextInput
+            placeholder="Rasst"
+            placeholderTextColor={"gray"}
+            value={rasst}
+            onChangeText={setRasst}
+            style={{
+              width: 300,
+              height: 40,
+              borderColor: 'gray',
+              borderWidth: 1,
+              marginBottom: 10,
+              paddingHorizontal: 10,
+              borderRadius: 10,
+              color: 'gray'
             }}
           />
           <TouchableOpacity

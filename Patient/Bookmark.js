@@ -45,6 +45,7 @@ const BookmarkScreen = () => {
         <Text style={styles.doctorName}>{item.name}</Text>
         <Text style={styles.specialty}>{item.specialty}</Text>
         <Text style={styles.experience}>Years of Experience: {item.experience}</Text>
+        <Text style={{color:'black', fontWeight:'bold'}}>Doctor Fee: {item.price}</Text>
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={handleBookAppointment} style={styles.actionButton}>

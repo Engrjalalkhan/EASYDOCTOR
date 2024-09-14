@@ -95,7 +95,7 @@ const Home = ({route, navigation}) => {
 
       <View style={[styles.drawer, {marginLeft: isDrawerOpen ? 0 : -300}]}>
         {/* User Profile in Drawer */}
-        <TouchableOpacity>
+        <TouchableOpacity >
           <View style={styles.profileContainer1}>
             <Image source={{uri: profileImage}} style={styles.profileImage} />
             <Text style={styles.userName1}>{userName}</Text>

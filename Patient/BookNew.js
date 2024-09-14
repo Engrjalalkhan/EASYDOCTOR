@@ -211,7 +211,7 @@ const NewAppointment = ({ route, navigation }) => {
                 <Text style={{color:'gray'}}>
                   Location: {doctor.clinicAddress}
                 </Text>
-                <Text style={{color:'gray'}}>Rasst: {doctor.rasst}</Text>
+                <Text style={{color:'black',fontWeight:'bold'}}>Doctor Fee: {doctor.price}</Text>
               </View>
               <View style={styles.buttonContainer}>
                 <View style={styles.bookmarkContainer}>

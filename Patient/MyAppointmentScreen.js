@@ -134,6 +134,7 @@ const MyAppointmentsScreen = ({ route, navigation }) => {
         <Text style={{ color: 'gray' }}>{doctorData?.specialty}</Text>
         <Text style={{ color: 'gray' }}>Experience: {doctorData?.experience} years</Text>
         <Text style={{ color: 'gray' }}>Location: {doctorData?.clinicAddress}</Text>
+        <Text style={{color:'black',fontWeight:'bold'}}>Doctor Fee: {doctorData?.price}</Text>
         <Text style={{ color: 'gray' }}>Rasst: {doctorData?.rasst}</Text>
       </View>
       <View style={styles.buttonContainer}>
